@@ -1,6 +1,47 @@
 {
- "unread": 7,
+ "unread": 10,
  "items": [
+  {
+   "id": "5e1b47b8760a4f558ef81a6fa4c69302",
+   "kind": "milestone_completed",
+   "severity": "success",
+   "title": "Milestone 3: Final validation pass: live integrations, tests and retention drill",
+   "body": "Validated the whole system against the real services: 82 backend tests, 58 live checks, 13 Swift tests on Linux, all iOS sources parsed, the Xcode project structurally validated, and a live retention drill through the systemd unit.",
+   "created_at": 1794028236.0053377,
+   "read_at": null,
+   "payload": {
+    "milestone_id": "4645d5816c214e0b89eaab6704efeaa7",
+    "seq": 3,
+    "phase": "Phase 6"
+   }
+  },
+  {
+   "id": "14c2babc259542aaa516d64f8e530543",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794028201.7092633,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "708ef5b7c67245479cc4d19627b28a48",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "e1155d507089431f9a5ae196bfde5a05",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794028201.6819756,
+   "read_at": null,
+   "payload": {
+    "message_id": "8aff6a25d08d47ef943cd48f843f51cb",
+    "seq": 7
+   }
+  },
   {
    "id": "0a51625181ec49eeacefd64695954078",
    "kind": "milestone_completed",

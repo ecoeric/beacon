@@ -1,5 +1,78 @@
 [
  {
+  "id": "4645d5816c214e0b89eaab6704efeaa7",
+  "seq": 3,
+  "title": "Final validation pass: live integrations, tests and retention drill",
+  "summary": "Validated the whole system against the real services: 82 backend tests, 58 live checks, 13 Swift tests on Linux, all iOS sources parsed, the Xcode project structurally validated, and a live retention drill through the systemd unit.",
+  "changes": [
+   "Pi-hole, Minecraft (NeoForge 21.1.252, 91 mods), Docker and host metrics verified live",
+   "Agent state, queue delivery and cooperative interrupt verified against the running runtime",
+   "Retention drill: aged screenshot deleted by beacon-retention.service, 410 confirmed, history preserved",
+   "iOS: SwiftUI app source complete; models/networking typechecked and tested; project validated"
+  ],
+  "phase": "Phase 6",
+  "created_at": 1794028236.0014548,
+  "screenshots": [
+   {
+    "id": "39dcc7d025fd4ddcad9e718d8edde5b8",
+    "caption": "Agent integration: derived state, runtime pid, queue and evidence",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 58956,
+    "width": 1120,
+    "height": 484,
+    "created_at": 1794028236.0019002,
+    "expires_at": 1794633036.0019002,
+    "url": "/api/v1/screenshots/39dcc7d025fd4ddcad9e718d8edde5b8",
+    "sha256": "0d4e2285dec7828ab62897f7e36a9941eb04634011f049054511f97b769695ee",
+    "expired": false
+   },
+   {
+    "id": "34ce30e4003845e280efb2f9dd3107a6",
+    "caption": "Pi-hole v6 integration: blocking state, query totals, top blocked domains and clients",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 38677,
+    "width": 1120,
+    "height": 526,
+    "created_at": 1794028236.0027778,
+    "expires_at": 1794633036.0027778,
+    "url": "/api/v1/screenshots/34ce30e4003845e280efb2f9dd3107a6",
+    "sha256": "5e07313b4f3e61bbf1939b640bdd0ad52775ab67e70259af5e4e0d0139b88993",
+    "expired": false
+   },
+   {
+    "id": "71a52fcf7bcd4015996e478ddb53789e",
+    "caption": "Minecraft integration: online state via server-list ping, players, process metrics and guarded controls",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 69356,
+    "width": 1120,
+    "height": 547,
+    "created_at": 1794028236.0035396,
+    "expires_at": 1794633036.0035396,
+    "url": "/api/v1/screenshots/71a52fcf7bcd4015996e478ddb53789e",
+    "sha256": "43603e5306613f89b9acb24cde99ccfc5bab0c53676495bc4f370f2b8707189a",
+    "expired": false
+   },
+   {
+    "id": "d5d2b7a34d7a452ba796b67c0cf4a842",
+    "caption": "The running agent and Minecraft console on the server desktop at final validation",
+    "source": "window",
+    "content_type": "image/png",
+    "bytes": 183724,
+    "width": 1366,
+    "height": 768,
+    "created_at": 1794028236.0045254,
+    "expires_at": 1794633036.0045254,
+    "url": "/api/v1/screenshots/d5d2b7a34d7a452ba796b67c0cf4a842",
+    "sha256": "1450c5e8e8cab6e3d04cc79450c3f8822b5aaf8af1094096a58a05d1d6f0cb7b",
+    "expired": false
+   }
+  ],
+  "expired_screenshots": 0
+ },
+ {
   "id": "ca19163a14ca4e428ab4d94284b31199",
   "seq": 2,
   "title": "Retention drill: 7-day cleanup verified",
