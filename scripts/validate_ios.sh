@@ -16,7 +16,7 @@ SWIFT_IMAGE="${SWIFT_IMAGE:-swift:6.0}"
 heading() { printf '\n\033[1m== %s\033[0m\n' "$1"; }
 
 USER_FLAGS=(--user "$(id -u):$(id -g)" -e HOME=/tmp)
-heading "1/3 swiftc -parse (all sources)"
+heading "1/4 swiftc -parse (all sources)"
 sudo docker run --rm "${USER_FLAGS[@]}" -v "$PROJECT/ios:/work" -w /work "$SWIFT_IMAGE" bash -lc '
 set -e
 files=$(find Beacon BeaconTests SharedTests -name "*.swift" | sort)
@@ -27,11 +27,14 @@ done
 echo "all sources parsed"
 '
 
-heading "2/3 Foundation-only compile + tests (SwiftPM)"
+heading "2/4 Foundation-only compile + tests (SwiftPM)"
 sudo docker run --rm "${USER_FLAGS[@]}" -v "$PROJECT/ios:/work" -w /work "$SWIFT_IMAGE" swift test 2>&1 | tail -n 12
 
 heading "3/4 view initialiser call sites"
 cd "$PROJECT"
+python3 scripts/check_view_initialisers.py
+
+heading "4/4 Xcode project structure"
 if command -v uv >/dev/null 2>&1; then
     uv run --with pbxproj python scripts/validate_ios_project.py
 else
