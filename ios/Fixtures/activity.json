@@ -1,6 +1,73 @@
 {
- "unread": 17,
+ "unread": 22,
  "items": [
+  {
+   "id": "dd27e5a9131d4e50aae5d5d2b6659c81",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794084896.4237363,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "119af61a88aa4c899fd66fd1797f0f99",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "39e833aa9ec448269b200e3bc4a396f0",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794084896.3976107,
+   "read_at": null,
+   "payload": {
+    "message_id": "61fcbb5bfe8b42caa818c432ccef7b88",
+    "seq": 17
+   }
+  },
+  {
+   "id": "a80f4e13a5f142c49216990e9b156490",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794084865.1032643,
+   "read_at": null,
+   "payload": {
+    "message_id": "c7b38c844e6b4f3da0e92d5a24503284",
+    "seq": 15
+   }
+  },
+  {
+   "id": "d3633f5ef9e7486ba7d530ff05a7c3dd",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794084850.7417693,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "6e863084a8c0410fa03523025734bf78",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "82e9d121d3c047f6b58cceb3d82cb3d4",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794084850.7136695,
+   "read_at": null,
+   "payload": {
+    "message_id": "1c5d264341d04f07a97e52034a5c7ff0",
+    "seq": 13
+   }
+  },
   {
    "id": "a38152ef1b44463bae85674e3eb569f7",
    "kind": "milestone_completed",

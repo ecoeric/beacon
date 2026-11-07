@@ -42,12 +42,16 @@ covered with offline protocol tests, plus contract, security and backup guardrai
 * The smoke test and Swift fixture test counted sentences by naive dot-splitting, so a status
   mentioning `docs/SETUP.md` was reported as four sentences; both now use a terminator regex
   (and a pytest regression test covers abbreviations), matching the backend's own rule.
+* Operator-deleted screenshots were counted as "expired by retention" in milestone and retention
+  summaries, and reads said "passed its 7-day window" for a manual delete. Both now distinguish
+  the two cases (`{"error":"deleted"}` for manual deletes, retention only counts rows that reached
+  `expires_at`).
 * Screenshot file names lost their context because `Path(name).name` was applied first
   (`GET /api/v1/retention/status` became `status.png`); path separators are now flattened to
   dashes and runs collapsed, verified live (`GET-api-v1-retention-status.png`).
 
 ### Verified
-* 119 pytest tests (three consecutive clean runs), 58 live smoke checks, 13 Swift tests,
+* 121 pytest tests (three consecutive clean runs), 58 live smoke checks, 13 Swift tests,
   22 Swift files parsed, 18 Xcode-project checks, 109 view call sites checked, OpenAPI drift
   check clean.
 

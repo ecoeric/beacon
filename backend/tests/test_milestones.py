@@ -241,3 +241,33 @@ def test_screenshot_name_keeps_context_and_strips_separators():
     assert "/" not in sanitise_name("../../etc/passwd")
     assert sanitise_name("") == "screenshot"
     assert len(sanitise_name("x" * 400)) <= 80
+
+
+def test_manual_delete_is_not_counted_as_retention_expiry(client, auth):
+    milestone = _create_milestone(client, auth)
+    stored = client.post(
+        f"/api/v1/milestones/{milestone['id']}/screenshots",
+        files=[("files", ("x.png", _png(), "image/png"))],
+        headers=auth("admin"),
+    ).json()[0]
+    assert client.delete(f"/api/v1/screenshots/{stored['id']}", headers=auth("admin")).status_code == 200
+    refreshed = client.get(f"/api/v1/milestones/{milestone['id']}", headers=auth()).json()
+    assert refreshed["screenshots"] == []
+    assert refreshed["expired_screenshots"] == 0, "an operator delete is not a retention expiry"
+
+    gone = client.get(stored["url"], headers=auth())
+    assert gone.status_code == 410
+    assert gone.json()["error"] == "deleted"
+
+
+def test_retention_status_does_not_count_manual_deletes(client, auth):
+    milestone = _create_milestone(client, auth)
+    stored = client.post(
+        f"/api/v1/milestones/{milestone['id']}/screenshots",
+        files=[("files", ("y.png", _png(), "image/png"))],
+        headers=auth("admin"),
+    ).json()[0]
+    client.delete(f"/api/v1/screenshots/{stored['id']}", headers=auth("admin"))
+    status = client.get("/api/v1/retention/status", headers=auth()).json()
+    assert status["live"] == 0
+    assert status["expired"] == 0

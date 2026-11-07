@@ -12,7 +12,7 @@
  "awaiting_input": true,
  "progress": null,
  "updated_at": 1794084744.171329,
- "data_age_seconds": 94.30028986930847,
+ "data_age_seconds": 236.78835129737854,
  "is_stale": false,
  "stale_after_seconds": 90,
  "snapshot_source": "agent",
@@ -23,20 +23,20 @@
   "agent_name": "agent",
   "runtime_pid": 496352,
   "runtime_alive": true,
-  "last_activity_at": 1794084836.1930585,
+  "last_activity_at": 1794084978.6205359,
   "last_activity_kind": "Assistant turn running",
   "turn_running": true,
-  "transcript_updated_at": 1794084836.1930585
+  "transcript_updated_at": 1794084978.6205359
  },
  "queue": {
   "pending": 0,
   "delivered": 0,
   "acknowledged": 0,
-  "processed_last_24h": 6
+  "processed_last_24h": 9
  },
  "latest_interrupt": {
-  "id": "59abdfe8e1da4904a3fc2342a6c39e82",
-  "requested_at": 1794032344.3672287,
+  "id": "119af61a88aa4c899fd66fd1797f0f99",
+  "requested_at": 1794084896.4228559,
   "mode": "checkpoint",
   "status": "acknowledged",
   "reason": "smoke test",
@@ -53,12 +53,12 @@
   {
    "source": "agent_snapshot",
    "detail": "Pushed by agent at 1794084744",
-   "age_seconds": 94.30028986930847
+   "age_seconds": 236.78835129737854
   },
   {
    "source": "cherry_session",
    "detail": "agent \u00b7 # Master Implementation Prompt: Native iOS Server",
-   "age_seconds": 2.2785604000091553
+   "age_seconds": 2.339144468307495
   },
   {
    "source": "runtime_process",
@@ -72,8 +72,8 @@
   },
   {
    "source": "interrupt",
-   "detail": "checkpoint interrupt acknowledged at 1794032344",
-   "age_seconds": 52494.10439014435
+   "detail": "checkpoint interrupt acknowledged at 1794084896",
+   "age_seconds": 84.53682446479797
   }
  ],
  "notes": []

@@ -446,7 +446,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 
 | Harness | Command | Last result |
 |---|---|---|
-| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 119 passed |
+| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 121 passed |
 | Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
@@ -471,7 +471,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 * **Files**: `backend/tests/test_contract_and_security.py`,
   `backend/tests/test_integration_edges.py`, `scripts/check_openapi_drift.py`,
   `scripts/check_view_initialisers.py`.
-* **Test**: 119 pytest tests total (119 passing), contract checker exit 0.
+* **Test**: 121 pytest tests total (121 passing), contract checker exit 0.
 * **Limitations**: the secret scan is best-effort (binary files are skipped); static checks are
   guardrails, not a proof of absence.
 

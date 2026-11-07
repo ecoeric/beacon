@@ -155,11 +155,14 @@ def meta_for_milestone(db: Database, milestone_id: str) -> tuple[list[Screenshot
             expired += 1
         else:
             live.append(item)
-    todo = db.scalar(
-        "SELECT COUNT(*) FROM screenshot WHERE milestone_id=? AND deleted_at IS NOT NULL",
-        (milestone_id,),
+    # Only images that actually reached the retention deadline count as "expired"; images an
+    # operator deleted early are gone but are not retention casualties.
+    swept_by_retention = db.scalar(
+        "SELECT COUNT(*) FROM screenshot WHERE milestone_id=? AND deleted_at IS NOT NULL "
+        "AND expires_at <= ?",
+        (milestone_id, now()),
     )
-    return live, expired + int(todo or 0)
+    return live, expired + int(swept_by_retention or 0)
 
 
 def get_row(db: Database, screenshot_id: str):
@@ -181,6 +184,12 @@ def read(settings: Settings, db: Database, screenshot_id: str) -> tuple[Path, st
         raise ScreenshotError("not_found", "screenshot not found", status_code=404)
     item = meta(row)
     if item.expired:
+        if row["deleted_at"] is not None and row["expires_at"] > now():
+            raise ScreenshotError(
+                "deleted",
+                "this screenshot was deleted from the dashboard",
+                status_code=410,
+            )
         raise ScreenshotError(
             "expired",
             "this screenshot has passed its 7-day retention window and was removed",
@@ -261,12 +270,9 @@ def summary_counts(settings: Settings, db: Database) -> dict[str, int]:
         )
         or 0
     )
+    # Retention-expired only: an early operator delete is not a retention casualty.
     expired = int(
-        db.scalar(
-            "SELECT COUNT(*) FROM screenshot WHERE deleted_at IS NOT NULL OR expires_at <= ?",
-            (now(),),
-        )
-        or 0
+        db.scalar("SELECT COUNT(*) FROM screenshot WHERE expires_at <= ?", (now(),)) or 0
     )
     return {"live": live, "expired": expired, "retention_days": settings.screenshot_retention_days}
 

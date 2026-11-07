@@ -1,5 +1,5 @@
 {
- "generated_at": 1794084838.4647157,
+ "generated_at": 1794084980.940991,
  "agent": {
   "state": "working",
   "state_label": "Working",
@@ -14,7 +14,7 @@
   "awaiting_input": true,
   "progress": null,
   "updated_at": 1794084744.171329,
-  "data_age_seconds": 92.07842087745667,
+  "data_age_seconds": 234.5824339389801,
   "is_stale": false,
   "stale_after_seconds": 90,
   "snapshot_source": "agent",
@@ -25,20 +25,20 @@
    "agent_name": "agent",
    "runtime_pid": 496352,
    "runtime_alive": true,
-   "last_activity_at": 1794084836.1930585,
+   "last_activity_at": 1794084978.6205359,
    "last_activity_kind": "Assistant turn running",
    "turn_running": true,
-   "transcript_updated_at": 1794084836.1930585
+   "transcript_updated_at": 1794084978.6205359
   },
   "queue": {
    "pending": 0,
    "delivered": 0,
    "acknowledged": 0,
-   "processed_last_24h": 6
+   "processed_last_24h": 9
   },
   "latest_interrupt": {
-   "id": "59abdfe8e1da4904a3fc2342a6c39e82",
-   "requested_at": 1794032344.3672287,
+   "id": "119af61a88aa4c899fd66fd1797f0f99",
+   "requested_at": 1794084896.4228559,
    "mode": "checkpoint",
    "status": "acknowledged",
    "reason": "smoke test",
@@ -55,12 +55,12 @@
    {
     "source": "agent_snapshot",
     "detail": "Pushed by agent at 1794084744",
-    "age_seconds": 92.07842087745667
+    "age_seconds": 234.5824339389801
    },
    {
     "source": "cherry_session",
     "detail": "agent \u00b7 # Master Implementation Prompt: Native iOS Server",
-    "age_seconds": 0.05669140815734863
+    "age_seconds": 0.13322710990905762
    },
    {
     "source": "runtime_process",
@@ -74,8 +74,8 @@
    },
    {
     "source": "interrupt",
-    "detail": "checkpoint interrupt acknowledged at 1794032344",
-    "age_seconds": 52491.882521152496
+    "detail": "checkpoint interrupt acknowledged at 1794084896",
+    "age_seconds": 82.33090710639954
    }
   ],
   "notes": []
@@ -87,7 +87,7 @@
    "state": "up",
    "summary": "Responding",
    "detail": null,
-   "checked_at": 1794084838.4646525,
+   "checked_at": 1794084980.940768,
    "latency_ms": null
   },
   {
@@ -96,7 +96,7 @@
    "state": "up",
    "summary": "Working",
    "detail": "Beacon \u2014 native iOS server dashboard",
-   "checked_at": 1794084838.464672,
+   "checked_at": 1794084980.940831,
    "latency_ms": null
   },
   {
@@ -105,25 +105,25 @@
    "state": "up",
    "summary": "DNS up \u00b7 blocking",
    "detail": "Up 6 days (healthy)",
-   "checked_at": 1794084837.8561614,
+   "checked_at": 1794084980.3324716,
    "latency_ms": null
   },
   {
    "key": "minecraft",
    "label": "Minecraft",
    "state": "up",
-   "summary": "Online \u00b7 3/20 players",
+   "summary": "Online \u00b7 2/20 players",
    "detail": "1.21.1",
-   "checked_at": 1794084837.8571782,
+   "checked_at": 1794084980.3332243,
    "latency_ms": null
   },
   {
    "key": "server",
    "label": "Host metrics",
    "state": "up",
-   "summary": "CPU 21% \u00b7 RAM 70%",
+   "summary": "CPU 22% \u00b7 RAM 69%",
    "detail": null,
-   "checked_at": 1794084838.1402476,
+   "checked_at": 1794084980.6019552,
    "latency_ms": null
   },
   {
@@ -132,39 +132,39 @@
    "state": "up",
    "summary": "Read-only monitor",
    "detail": null,
-   "checked_at": 1794084837.8245952,
+   "checked_at": 1794084980.3163607,
    "latency_ms": null
   }
  ],
  "server": {
-  "generated_at": 1794084838.1402476,
-  "uptime_seconds": 929881.63,
+  "generated_at": 1794084980.6019552,
+  "uptime_seconds": 930024.09,
   "cpu": {
-   "percent": 20.8,
+   "percent": 22.2,
    "per_core": [
-    24.4,
-    19.0,
-    23.4,
-    30.3,
-    17.7,
-    14.2,
+    21.7,
+    18.0,
+    28.2,
+    28.3,
+    18.5,
+    22.1,
     23.6,
-    14.2
+    16.2
    ],
    "load": [
-    3.12,
-    2.55,
-    1.62
+    3.25,
+    2.65,
+    1.78
    ],
-   "temperature_c": 39.0,
+   "temperature_c": 37.0,
    "model": "Intel(R) Core(TM) i5-9300H CPU @ 2.40GHz",
    "cores": 8
   },
   "memory": {
    "total_bytes": 16620445696,
-   "used_bytes": 11624464384,
-   "available_bytes": 4995981312,
-   "percent": 69.9,
+   "used_bytes": 11409776640,
+   "available_bytes": 5210669056,
+   "percent": 68.6,
    "swap_total_bytes": 12901675008,
    "swap_used_bytes": 929710080,
    "swap_percent": 7.2
@@ -176,7 +176,7 @@
    "temperature_c": 31.0,
    "memory_used_bytes": 6291456,
    "memory_total_bytes": 4294967296,
-   "power_w": 1.01,
+   "power_w": 1.0,
    "error": null
   },
   "disks": [
@@ -184,8 +184,8 @@
     "mount": "/",
     "filesystem": "ext4",
     "total_bytes": 236183568384,
-    "used_bytes": 67889876992,
-    "free_bytes": 156221648896,
+    "used_bytes": 67889889280,
+    "free_bytes": 156221636608,
     "percent": 28.7
    },
    {
@@ -207,10 +207,10 @@
   ],
   "network": {
    "interface": "enp3s0",
-   "rx_bytes_per_second": 68971.5,
-   "tx_bytes_per_second": 88245.9,
-   "rx_bytes_total": 11046656287,
-   "tx_bytes_total": 15543691478
+   "rx_bytes_per_second": 26392.1,
+   "tx_bytes_per_second": 31369.1,
+   "rx_bytes_total": 11051863109,
+   "tx_bytes_total": 15592688128
   },
   "docker": [
    {
@@ -219,8 +219,8 @@
     "state": "running",
     "status": "Up 6 days (healthy)",
     "health": "healthy",
-    "cpu_percent": 0.22,
-    "memory_bytes": 23246929,
+    "cpu_percent": 0.28,
+    "memory_bytes": 23288872,
     "memory_limit_bytes": 16621523435,
     "started_at": null,
     "error": null
@@ -240,22 +240,22 @@
    "state": "running",
    "status": "Up 6 days (healthy)",
    "health": "healthy",
-   "cpu_percent": 0.22,
-   "memory_bytes": 23246929,
+   "cpu_percent": 0.28,
+   "memory_bytes": 23288872,
    "memory_limit_bytes": 16621523435,
    "started_at": null,
    "error": null
   },
-  "queries_total": 28219,
-  "queries_blocked": 4291,
-  "percent_blocked": 15.21,
-  "unique_domains": 5530,
-  "queries_forwarded": 1899,
-  "queries_cached": 21894,
+  "queries_total": 28355,
+  "queries_blocked": 4320,
+  "percent_blocked": 15.24,
+  "unique_domains": 5547,
+  "queries_forwarded": 1910,
+  "queries_cached": 21989,
   "top_blocked_domains": [
    {
     "name": "scribe.logs.roku.com",
-    "count": 3579
+    "count": 3603
    },
    {
     "name": "logs.netflix.com",
@@ -277,19 +277,19 @@
   "top_clients": [
    {
     "name": "192.168.1.83",
-    "count": 13689
+    "count": 13749
    },
    {
     "name": "192.168.1.75",
-    "count": 6077
+    "count": 6129
    },
    {
     "name": "192.168.1.95",
-    "count": 3659
+    "count": 3677
    },
    {
     "name": "192.168.1.41",
-    "count": 3634
+    "count": 3640
    },
    {
     "name": "192.168.1.70",
@@ -300,13 +300,13 @@
    {
     "name": "cache",
     "address": "cache:-1",
-    "count": 21894,
+    "count": 21989,
     "response_avg_ms": null
    },
    {
     "name": "blocklist",
     "address": "blocklist:-1",
-    "count": 4291,
+    "count": 4320,
     "response_avg_ms": null
    },
    {
@@ -318,11 +318,11 @@
    {
     "name": "one.one.one.one",
     "address": "1.0.0.1:53",
-    "count": 812,
+    "count": 823,
     "response_avg_ms": 21.4
    }
   ],
-  "generated_at": 1794084837.8561614,
+  "generated_at": 1794084980.3324716,
   "error": null
  },
  "minecraft": {
@@ -334,29 +334,28 @@
   "mods_count": 91,
   "protocol": 767,
   "motd": "sussy pussy",
-  "players_online": 3,
+  "players_online": 2,
   "players_max": 20,
   "players": [
-   "ecoeric",
-   "_Dizen",
-   "PorscheLegend23"
+   "PorscheLegend23",
+   "ecoeric"
   ],
-  "uptime_seconds": 57123.4,
+  "uptime_seconds": 57265.9,
   "pid": 432706,
   "cpu_percent": null,
-  "memory_bytes": 8568373248,
+  "memory_bytes": 8568709120,
   "tps": null,
   "mspt": null,
   "tick_metrics_note": "Tick metrics unavailable: no spark/TPS provider installed and RCON/query are disabled",
   "recent_errors": [],
   "recent_events": [
-   "[07Nov2026 13:46:41.642] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen left the game",
-   "[07Nov2026 13:46:46.597] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 left the game",
-   "[07Nov2026 13:47:28.419] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ecoeric joined the game",
-   "[07Nov2026 13:47:43.498] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen joined the game",
-   "[07Nov2026 13:49:16.609] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 joined the game"
+   "[07Nov2026 13:54:59.336] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ecoeric left the game",
+   "[07Nov2026 13:55:02.436] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 left the game",
+   "[07Nov2026 13:55:14.386] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen left the game",
+   "[07Nov2026 13:55:46.162] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ecoeric joined the game",
+   "[07Nov2026 13:55:55.973] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 joined the game"
   ],
-  "log_updated_at": 1794084761.6533387,
+  "log_updated_at": 1794084956.1246173,
   "last_backup_at": null,
   "backup_note": "No backup directory found in the server folder \u2014 no existing mechanism detected",
   "controls": {
@@ -369,7 +368,7 @@
    "start_method": null,
    "reason": null
   },
-  "generated_at": 1794084837.8571782,
+  "generated_at": 1794084980.3332243,
   "error": null
  },
  "latest_milestone": {
@@ -444,11 +443,78 @@
     "expired": false
    }
   ],
-  "expired_screenshots": 3
+  "expired_screenshots": 0
  },
  "activity": {
-  "unread": 17,
+  "unread": 22,
   "items": [
+   {
+    "id": "dd27e5a9131d4e50aae5d5d2b6659c81",
+    "kind": "agent_interrupted",
+    "severity": "warning",
+    "title": "Agent interrupted",
+    "body": "smoke test",
+    "created_at": 1794084896.4237363,
+    "read_at": null,
+    "payload": {
+     "interrupt_id": "119af61a88aa4c899fd66fd1797f0f99",
+     "mode": "checkpoint",
+     "pid": null
+    }
+   },
+   {
+    "id": "39e833aa9ec448269b200e3bc4a396f0",
+    "kind": "agent_message_delivered",
+    "severity": "info",
+    "title": "Instruction delivered to the agent",
+    "body": "Beacon smoke test \u2014 no action required.",
+    "created_at": 1794084896.3976107,
+    "read_at": null,
+    "payload": {
+     "message_id": "61fcbb5bfe8b42caa818c432ccef7b88",
+     "seq": 17
+    }
+   },
+   {
+    "id": "a80f4e13a5f142c49216990e9b156490",
+    "kind": "agent_message_delivered",
+    "severity": "info",
+    "title": "Instruction delivered to the agent",
+    "body": "Beacon smoke test \u2014 no action required.",
+    "created_at": 1794084865.1032643,
+    "read_at": null,
+    "payload": {
+     "message_id": "c7b38c844e6b4f3da0e92d5a24503284",
+     "seq": 15
+    }
+   },
+   {
+    "id": "d3633f5ef9e7486ba7d530ff05a7c3dd",
+    "kind": "agent_interrupted",
+    "severity": "warning",
+    "title": "Agent interrupted",
+    "body": "smoke test",
+    "created_at": 1794084850.7417693,
+    "read_at": null,
+    "payload": {
+     "interrupt_id": "6e863084a8c0410fa03523025734bf78",
+     "mode": "checkpoint",
+     "pid": null
+    }
+   },
+   {
+    "id": "82e9d121d3c047f6b58cceb3d82cb3d4",
+    "kind": "agent_message_delivered",
+    "severity": "info",
+    "title": "Instruction delivered to the agent",
+    "body": "Beacon smoke test \u2014 no action required.",
+    "created_at": 1794084850.7136695,
+    "read_at": null,
+    "payload": {
+     "message_id": "1c5d264341d04f07a97e52034a5c7ff0",
+     "seq": 13
+    }
+   },
    {
     "id": "a38152ef1b44463bae85674e3eb569f7",
     "kind": "milestone_completed",
@@ -651,35 +717,8 @@
      "message_id": "9ad353a0f36e46228fdd85dac80e4b99",
      "seq": 3
     }
-   },
-   {
-    "id": "85bc2fc240cc4398b246dbed766647d8",
-    "kind": "agent_interrupted",
-    "severity": "warning",
-    "title": "Agent interrupted",
-    "body": "smoke test",
-    "created_at": 1794027907.3879385,
-    "read_at": null,
-    "payload": {
-     "interrupt_id": "360ddd0282e643adbb8824bdc6ba54f3",
-     "mode": "checkpoint",
-     "pid": null
-    }
-   },
-   {
-    "id": "1eb3856f887e44208e62ddf664b2d99b",
-    "kind": "agent_message_delivered",
-    "severity": "info",
-    "title": "Instruction delivered to the agent",
-    "body": "Beacon smoke test \u2014 no action required.",
-    "created_at": 1794027907.3634484,
-    "read_at": null,
-    "payload": {
-     "message_id": "248b18f602b24994bd0026a4ba03ca7f",
-     "seq": 1
-    }
    }
   ]
  },
- "data_age_seconds": 92.07842087745667
+ "data_age_seconds": 234.5824339389801
 }
