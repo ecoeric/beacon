@@ -1,18 +1,18 @@
 {
- "generated_at": 1794028239.894131,
+ "generated_at": 1794028306.5460865,
  "agent": {
   "state": "working",
   "state_label": "Working",
   "project": "Beacon \u2014 native iOS server dashboard",
-  "stage": "Phase 3-5: agent integration and monitoring complete; native iOS source under validation",
-  "activity": "Handing over: documentation, milestones and verification complete",
+  "stage": "Phase 6: refined and validated \u2014 iOS build pending on macOS",
+  "activity": "Complete: backend, agent integration, milestones, monitoring and documentation",
   "last_milestone": "Milestone #3: final validation pass (all suites green)",
   "next_action": "Build and run the app on macOS, then plan device installation",
   "blockers": [],
   "awaiting_input": false,
   "progress": null,
-  "updated_at": 1794028236.144248,
-  "data_age_seconds": 3.576263904571533,
+  "updated_at": 1794028302.1293507,
+  "data_age_seconds": 4.240321159362793,
   "is_stale": false,
   "stale_after_seconds": 90,
   "snapshot_source": "agent",
@@ -23,20 +23,20 @@
    "agent_name": "agent",
    "runtime_pid": 432130,
    "runtime_alive": true,
-   "last_activity_at": 1794028239.587188,
+   "last_activity_at": 1794028306.2389936,
    "last_activity_kind": "Assistant turn running",
    "turn_running": true,
-   "transcript_updated_at": 1794028239.587188
+   "transcript_updated_at": 1794028306.2389936
   },
   "queue": {
    "pending": 0,
    "delivered": 0,
    "acknowledged": 0,
-   "processed_last_24h": 4
+   "processed_last_24h": 5
   },
   "latest_interrupt": {
-   "id": "708ef5b7c67245479cc4d19627b28a48",
-   "requested_at": 1794028201.708012,
+   "id": "8ff5d939cb8446009953b0f7cfc073bf",
+   "requested_at": 1794028258.7667773,
    "mode": "checkpoint",
    "status": "acknowledged",
    "reason": "smoke test",
@@ -52,13 +52,13 @@
   "evidence": [
    {
     "source": "agent_snapshot",
-    "detail": "Pushed by agent at 1794028236",
-    "age_seconds": 3.576263904571533
+    "detail": "Pushed by agent at 1794028302",
+    "age_seconds": 4.240321159362793
    },
    {
     "source": "cherry_session",
     "detail": "agent \u00b7 # Master Implementation Prompt: Native iOS Server",
-    "age_seconds": 0.13332390785217285
+    "age_seconds": 0.1306781768798828
    },
    {
     "source": "runtime_process",
@@ -72,8 +72,8 @@
    },
    {
     "source": "interrupt",
-    "detail": "checkpoint interrupt acknowledged at 1794028202",
-    "age_seconds": 38.01249980926514
+    "detail": "checkpoint interrupt acknowledged at 1794028259",
+    "age_seconds": 47.60289454460144
    }
   ],
   "notes": []
@@ -85,7 +85,7 @@
    "state": "up",
    "summary": "Responding",
    "detail": null,
-   "checked_at": 1794028239.8940127,
+   "checked_at": 1794028306.545965,
    "latency_ms": null
   },
   {
@@ -94,7 +94,7 @@
    "state": "up",
    "summary": "Working",
    "detail": "Beacon \u2014 native iOS server dashboard",
-   "checked_at": 1794028239.8940544,
+   "checked_at": 1794028306.5460095,
    "latency_ms": null
   },
   {
@@ -103,7 +103,7 @@
    "state": "up",
    "summary": "DNS up \u00b7 blocking",
    "detail": "Up 5 days (healthy)",
-   "checked_at": 1794028239.7301757,
+   "checked_at": 1794028306.3803327,
    "latency_ms": null
   },
   {
@@ -112,16 +112,16 @@
    "state": "up",
    "summary": "Online \u00b7 3/20 players",
    "detail": "1.21.1",
-   "checked_at": 1794028239.7306364,
+   "checked_at": 1794028306.380807,
    "latency_ms": null
   },
   {
    "key": "server",
    "label": "Host metrics",
    "state": "up",
-   "summary": "CPU 21% \u00b7 RAM 42%",
+   "summary": "CPU 17% \u00b7 RAM 41%",
    "detail": null,
-   "checked_at": 1794028239.7711754,
+   "checked_at": 1794028306.4290056,
    "latency_ms": null
   },
   {
@@ -130,48 +130,48 @@
    "state": "up",
    "summary": "Read-only monitor",
    "detail": null,
-   "checked_at": 1794028234.85055,
+   "checked_at": 1794028301.8105526,
    "latency_ms": null
   }
  ],
  "server": {
-  "generated_at": 1794028239.7711754,
-  "uptime_seconds": 873283.26,
+  "generated_at": 1794028306.4290056,
+  "uptime_seconds": 873349.92,
   "cpu": {
-   "percent": 20.6,
+   "percent": 17.4,
    "per_core": [
-    27.6,
-    15.2,
-    15.6,
-    24.5,
-    26.0,
-    17.5,
-    16.1,
-    21.2
+    18.4,
+    13.3,
+    14.8,
+    10.9,
+    24.2,
+    23.1,
+    14.8,
+    19.4
    ],
    "load": [
-    3.65,
-    2.87,
-    1.83
+    2.75,
+    2.73,
+    1.86
    ],
-   "temperature_c": 34.0,
+   "temperature_c": 37.0,
    "model": "Intel(R) Core(TM) i5-9300H CPU @ 2.40GHz",
    "cores": 8
   },
   "memory": {
    "total_bytes": 16620445696,
-   "used_bytes": 6893756416,
-   "available_bytes": 9726689280,
-   "percent": 41.5,
+   "used_bytes": 6844190720,
+   "available_bytes": 9776254976,
+   "percent": 41.2,
    "swap_total_bytes": 12901675008,
-   "swap_used_bytes": 935706624,
+   "swap_used_bytes": 935968768,
    "swap_percent": 7.3
   },
   "gpu": {
    "available": true,
    "name": "NVIDIA GeForce GTX 1650",
    "utilization_percent": 0.0,
-   "temperature_c": 31.0,
+   "temperature_c": 32.0,
    "memory_used_bytes": 6291456,
    "memory_total_bytes": 4294967296,
    "power_w": 1.0,
@@ -182,8 +182,8 @@
     "mount": "/",
     "filesystem": "ext4",
     "total_bytes": 236183568384,
-    "used_bytes": 67670675456,
-    "free_bytes": 156440850432,
+    "used_bytes": 67671326720,
+    "free_bytes": 156440199168,
     "percent": 28.7
    },
    {
@@ -205,10 +205,10 @@
   ],
   "network": {
    "interface": "enp3s0",
-   "rx_bytes_per_second": 55920.8,
-   "tx_bytes_per_second": 145966.7,
-   "rx_bytes_total": 10548191515,
-   "tx_bytes_total": 12149311300
+   "rx_bytes_per_second": 51080.8,
+   "tx_bytes_per_second": 134873.4,
+   "rx_bytes_total": 10552474586,
+   "tx_bytes_total": 12196712120
   },
   "docker": [
    {
@@ -217,7 +217,7 @@
     "state": "running",
     "status": "Up 5 days (healthy)",
     "health": "healthy",
-    "cpu_percent": 0.62,
+    "cpu_percent": 0.34,
     "memory_bytes": 21443379,
     "memory_limit_bytes": 16621523435,
     "started_at": null,
@@ -238,22 +238,22 @@
    "state": "running",
    "status": "Up 5 days (healthy)",
    "health": "healthy",
-   "cpu_percent": 0.62,
+   "cpu_percent": 0.34,
    "memory_bytes": 21443379,
    "memory_limit_bytes": 16621523435,
    "started_at": null,
    "error": null
   },
-  "queries_total": 36168,
-  "queries_blocked": 5610,
+  "queries_total": 36207,
+  "queries_blocked": 5614,
   "percent_blocked": 15.51,
   "unique_domains": 5359,
   "queries_forwarded": 2856,
-  "queries_cached": 27525,
+  "queries_cached": 27560,
   "top_blocked_domains": [
    {
     "name": "scribe.logs.roku.com",
-    "count": 3988
+    "count": 3992
    },
    {
     "name": "logs.netflix.com",
@@ -275,19 +275,19 @@
   "top_clients": [
    {
     "name": "192.168.1.83",
-    "count": 13451
+    "count": 13479
    },
    {
     "name": "192.168.1.75",
-    "count": 7690
+    "count": 7694
    },
    {
     "name": "192.168.1.95",
-    "count": 5599
+    "count": 5603
    },
    {
     "name": "192.168.1.41",
-    "count": 3626
+    "count": 3629
    },
    {
     "name": "192.168.1.78",
@@ -298,13 +298,13 @@
    {
     "name": "cache",
     "address": "cache:-1",
-    "count": 27525,
+    "count": 27560,
     "response_avg_ms": null
    },
    {
     "name": "blocklist",
     "address": "blocklist:-1",
-    "count": 5610,
+    "count": 5614,
     "response_avg_ms": null
    },
    {
@@ -320,7 +320,7 @@
     "response_avg_ms": 14.5
    }
   ],
-  "generated_at": 1794028239.7301757,
+  "generated_at": 1794028306.3803327,
   "error": null
  },
  "minecraft": {
@@ -335,14 +335,14 @@
   "players_online": 3,
   "players_max": 20,
   "players": [
+   "_Dizen",
    "PorscheLegend23",
-   "ecoeric",
-   "_Dizen"
+   "ecoeric"
   ],
-  "uptime_seconds": 525.3,
+  "uptime_seconds": 592.0,
   "pid": 432706,
-  "cpu_percent": 66.7,
-  "memory_bytes": 4054757376,
+  "cpu_percent": 57.9,
+  "memory_bytes": 4059611136,
   "tps": null,
   "mspt": null,
   "tick_metrics_note": "Tick metrics unavailable: no spark/TPS provider installed and RCON/query are disabled",
@@ -360,7 +360,7 @@
    "[06Nov2026 22:08:03.903] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen left the game",
    "[06Nov2026 22:08:08.743] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen joined the game"
   ],
-  "log_updated_at": 1794028219.7472458,
+  "log_updated_at": 1794028298.243017,
   "last_backup_at": null,
   "backup_note": "No backup directory found in the server folder \u2014 no existing mechanism detected",
   "controls": {
@@ -373,7 +373,7 @@
    "start_method": null,
    "reason": null
   },
-  "generated_at": 1794028239.7306364,
+  "generated_at": 1794028306.380807,
   "error": null
  },
  "latest_milestone": {
@@ -450,8 +450,35 @@
   "expired_screenshots": 0
  },
  "activity": {
-  "unread": 10,
+  "unread": 12,
   "items": [
+   {
+    "id": "053dca867a554373b89e3dbbcc1ef5cd",
+    "kind": "agent_interrupted",
+    "severity": "warning",
+    "title": "Agent interrupted",
+    "body": "smoke test",
+    "created_at": 1794028258.767605,
+    "read_at": null,
+    "payload": {
+     "interrupt_id": "8ff5d939cb8446009953b0f7cfc073bf",
+     "mode": "checkpoint",
+     "pid": null
+    }
+   },
+   {
+    "id": "9aeafe7614144aa5b02a0a8e1752137a",
+    "kind": "agent_message_delivered",
+    "severity": "info",
+    "title": "Instruction delivered to the agent",
+    "body": "Beacon smoke test \u2014 no action required.",
+    "created_at": 1794028258.7416487,
+    "read_at": null,
+    "payload": {
+     "message_id": "280f29b0dbb04448a4082cdf865706fc",
+     "seq": 9
+    }
+   },
    {
     "id": "5e1b47b8760a4f558ef81a6fa4c69302",
     "kind": "milestone_completed",
@@ -590,5 +617,5 @@
    }
   ]
  },
- "data_age_seconds": 3.576263904571533
+ "data_age_seconds": 4.240321159362793
 }

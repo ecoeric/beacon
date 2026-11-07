@@ -405,10 +405,15 @@ def cmd_summary(args: argparse.Namespace) -> int:
         print(f"{service['key']:<10} {service['state']:<12} {service['summary'][:80]}")
     server = data["server"]
     if server.get("memory"):
+        gpu = server.get("gpu") or {}
+        gpu_text = (
+            f"{gpu.get('utilization_percent')}% · {gpu.get('temperature_c')}°C"
+            if gpu.get("available")
+            else "unavailable"
+        )
         print(
             f"\nhost       cpu {server['cpu'].get('percent')}% · "
-            f"ram {server['memory']['percent']}% · gpu {server['gpu'].get('utilization_percent')}°C "
-            f"{server['gpu'].get('temperature_c')}"
+            f"ram {server['memory']['percent']}% · gpu {gpu_text}"
         )
     milestone = data.get("latest_milestone")
     if milestone:
