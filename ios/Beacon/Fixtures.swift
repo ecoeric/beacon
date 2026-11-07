@@ -4,7 +4,6 @@
 // Sample data for SwiftUI previews and the layout snapshot test target. Compiled only in
 // DEBUG builds. Values mirror the real API shapes captured in ios/Fixtures/*.json.
 
-#if DEBUG
 import Foundation
 
 enum Fixtures {
@@ -175,6 +174,8 @@ enum Fixtures {
         online: true,
         state: "running",
         version: "1.21.1",
+        loader: "NeoForge 21.1.252",
+        modsCount: 91,
         protocolNumber: 767,
         motd: "sussy pussy",
         playersOnline: 2,
@@ -302,4 +303,3 @@ enum Fixtures {
         )
     )
 }
-#endif

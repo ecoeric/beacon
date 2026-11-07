@@ -30,7 +30,7 @@ echo "all sources parsed"
 heading "2/3 Foundation-only compile + tests (SwiftPM)"
 sudo docker run --rm "${USER_FLAGS[@]}" -v "$PROJECT/ios:/work" -w /work "$SWIFT_IMAGE" swift test 2>&1 | tail -n 12
 
-heading "3/3 Xcode project structure"
+heading "3/4 view initialiser call sites"
 cd "$PROJECT"
 if command -v uv >/dev/null 2>&1; then
     uv run --with pbxproj python scripts/validate_ios_project.py

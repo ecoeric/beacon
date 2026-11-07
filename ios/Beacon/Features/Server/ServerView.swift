@@ -521,7 +521,7 @@ struct ServerView: View {
             }
             Text("Metrics come straight from /proc, sensors, nvidia-smi, the Docker read-only helper, the Pi-hole v6 API and the Minecraft server-list ping.")
                 .font(.beaconTiny)
-                .foregroundStyle(.secondary.opacity(0.85))
+                .foregroundStyle(Color.secondary.opacity(0.85))
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 6)

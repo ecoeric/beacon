@@ -136,7 +136,8 @@ cd ~/beacon/backend && .venv/bin/python -m pytest tests -q
 # 2. live end-to-end checks (real Pi-hole, Minecraft, Docker, agent runtime)
 ~/beacon/backend/.venv/bin/python ~/beacon/scripts/smoke_test.py
 
-# 3. iOS: parse every source, compile+test the Foundation subset, validate the Xcode project
+# 3. iOS: parse every source, compile+test the Foundation subset, check view call sites,
+#    validate the Xcode project
 cd ~/beacon && scripts/validate_ios.sh
 
 # 4. deployment health

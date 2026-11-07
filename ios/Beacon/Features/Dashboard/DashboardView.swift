@@ -393,7 +393,7 @@ struct DashboardView: View {
             }
             Text("\(model.freshnessText) · data ages are shown per card")
                 .font(.beaconTiny)
-                .foregroundStyle(.secondary.opacity(0.8))
+                .foregroundStyle(Color.secondary.opacity(0.8))
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 4)

@@ -350,9 +350,7 @@ final class AppModel: ObservableObject {
     // MARK: - Images
 
     func screenshotData(id: String) async throws -> Data {
-        #if DEBUG
         if let data = previewScreenshots[id] { return data }
-        #endif
         guard let client else { throw BeaconError.notConfigured }
         return try await client.screenshotData(id: id)
     }
@@ -411,7 +409,6 @@ final class AppModel: ObservableObject {
 
     // MARK: - Previews & snapshot tests
 
-    #if DEBUG
     /// Snapshot tests and previews can supply real image bytes for the gallery tiles.
     var previewScreenshots: [String: Data] = [:]
 
@@ -447,5 +444,4 @@ final class AppModel: ObservableObject {
         model.lastUpdated = Date()
         return model
     }
-    #endif
 }

@@ -445,6 +445,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 18 checks passed |
+| SwiftUI memberwise call sites | `python3 scripts/check_view_initialisers.py` (heuristic) | 109 call sites / 11 views, no missing arguments |
 | Deployment health | `beacon doctor` | all checks passed |
 
 ---

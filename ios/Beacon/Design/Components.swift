@@ -12,7 +12,7 @@ import UIKit
 struct StatusPill: View {
     let text: String
     var tone: Tone = .neutral
-    var symbol: String?
+    var symbol: String? = nil
     var compact = false
 
     var body: some View {
@@ -34,7 +34,7 @@ struct StatusPill: View {
 
 struct MetaText: View {
     let text: String
-    var symbol: String?
+    var symbol: String? = nil
 
     var body: some View {
         HStack(spacing: 4) {
@@ -52,9 +52,9 @@ struct MetaText: View {
 
 struct SectionHeader: View {
     let title: String
-    var subtitle: String?
-    var actionTitle: String?
-    var action: (() -> Void)?
+    var subtitle: String? = nil
+    var actionTitle: String? = nil
+    var action: (() -> Void)? = nil
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -83,7 +83,7 @@ struct KeyValueRow: View {
     let label: String
     let value: String
     var mono = false
-    var valueTone: Tone?
+    var valueTone: Tone? = nil
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
@@ -114,8 +114,8 @@ struct DividerLine: View {
 struct MetricTile: View {
     let title: String
     let value: String
-    var detail: String?
-    var fraction: Double?
+    var detail: String? = nil
+    var fraction: Double? = nil
     var tone: Tone = .accent
 
     var body: some View {
@@ -167,7 +167,7 @@ struct ProgressTrack: View {
 
 struct ErrorBanner: View {
     let message: String
-    var retry: (() -> Void)?
+    var retry: (() -> Void)? = nil
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
@@ -196,7 +196,7 @@ struct ErrorBanner: View {
 struct EmptyState: View {
     let symbol: String
     let title: String
-    var message: String?
+    var message: String? = nil
 
     var body: some View {
         VStack(spacing: 8) {
