@@ -3,6 +3,54 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.1] — 2026-11-07
+
+Hardening pass: the control paths that could not be exercised against the live services were
+covered with offline protocol tests, plus contract, security and backup guardrails.
+
+### Added
+* `tests/test_minecraft_protocols.py` (10 tests): server-list ping parsing against a fake server,
+  the RCON client against a fake RCON server (success, rejected password, missing password,
+  command reply), the supervised pty console (start -> `stop` -> exit -> console log), the graceful
+  SIGINT fallback, the refusal when no safe channel exists (the process must keep running) and the
+  player-online `force` gate.
+* `tests/test_pihole_parsing.py` (6 tests): recorded Pi-hole v6 payload shapes through
+  `httpx.MockTransport` — statistics, blocking, top domains/clients, upstream average conversion,
+  one-shot re-authentication after 401, missing password, partial statistics failure, unreachable
+  API.
+* `tests/test_integration_edges.py` (11 tests): Docker `ps`/`stats` parsers and cache, helper
+  failures, agent-runtime edge cases (missing/corrupt Cherry Studio DB, agent-id filtering,
+  transcript mtime, unknown runtime), and a backup **restore drill** that serves the API from the
+  restored database with the restored token and image bytes.
+* `tests/test_contract_and_security.py` (8 tests): OpenAPI snapshot equality, no shell-execution
+  primitives, argument-list subprocess calls, capture allow-list shape, Docker helper read-only
+  checks, non-root systemd units, best-effort committed-secret scan.
+* `scripts/check_openapi_drift.py` (check/`--write`) and `scripts/check_view_initialisers.py`
+  (heuristic SwiftUI memberwise call-site check, wired into `scripts/validate_ios.sh`).
+
+### Changed
+* `PiholeClient` accepts an optional HTTP transport (tests replay recorded payloads; production
+  behaviour unchanged).
+* `minecraft.Supervisor` gained `reset()` for deterministic test teardown.
+
+### Fixed
+* Hardened SwiftUI view memberwise call sites (missing optional defaults for `StatusPill`,
+  `MetaText`, `SectionHeader`, `MetricTile`, `KeyValueRow`, `ErrorBanner`, `EmptyState`) and
+  replaced `.secondary.opacity(...)` with `Color.secondary.opacity(...)`, the only form that
+  type-checks; found by the new heuristic call-site checker and manual review.
+* Fixtures moved out of `#if DEBUG` so `#Preview` blocks cannot break a Release build.
+* The smoke test and Swift fixture test counted sentences by naive dot-splitting, so a status
+  mentioning `docs/SETUP.md` was reported as four sentences; both now use a terminator regex
+  (and a pytest regression test covers abbreviations), matching the backend's own rule.
+* Screenshot file names lost their context because `Path(name).name` was applied first
+  (`GET /api/v1/retention/status` became `status.png`); path separators are now flattened to
+  dashes and runs collapsed, verified live (`GET-api-v1-retention-status.png`).
+
+### Verified
+* 119 pytest tests (three consecutive clean runs), 58 live smoke checks, 13 Swift tests,
+  22 Swift files parsed, 18 Xcode-project checks, 109 view call sites checked, OpenAPI drift
+  check clean.
+
 ## [0.1.0] — 2026-11-07
 
 First complete implementation: backend, agent integration, milestone/screenshot pipeline,

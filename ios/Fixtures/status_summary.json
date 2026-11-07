@@ -1,8 +1,8 @@
 {
- "summary": "The agent is working on Beacon \u2014 native iOS server dashboard (Phase 6: refined and validated \u2014 iOS build pending on macOS) on Complete: backend, agent integration, milestones, monitoring and documentation. Last completed: Milestone #3: final validation pass (all suites green). Next: Build and run the app on macOS, then plan device installation.",
+ "summary": "The agent is working on Beacon \u2014 native iOS server dashboard (Phase 6 complete: hardened, tested and documented \u2014 macOS build remains) on Hardening pass finished: 117 backend tests, protocol coverage and a restore drill. Last completed: Milestone #4: hardening, protocol tests and restore drill. Next: Build and run the app on macOS (docs/SETUP.md \u00a75).",
  "state": "working",
- "generated_at": 1794028306.6159415,
- "data_age_seconds": 4.47472620010376,
+ "generated_at": 1794084838.5118177,
+ "data_age_seconds": 94.3260657787323,
  "is_stale": false,
  "based_on": [
   "agent_snapshot",

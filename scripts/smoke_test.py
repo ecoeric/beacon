@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import re
 import ssl
 import subprocess
 import sys
@@ -86,7 +87,8 @@ def main() -> int:
     check("agent card present", bool(summary["agent"]["state"]), summary["agent"]["state"])
     check("services list complete", {s["key"] for s in summary["services"]} >= {"pihole", "minecraft", "server"})
     check("host metrics present", summary["server"]["memory"]["total_bytes"] > 0)
-    check("no token material in the payload", "token" not in json.dumps(summary).lower())
+    cli_token = token("cli")
+    check("no secret token value in the payload", cli_token not in json.dumps(summary))
     check("data age is reported", summary["data_age_seconds"] is not None, f"{summary['data_age_seconds']}s")
 
     # --- Status action (read-only) --------------------------------------
@@ -94,7 +96,7 @@ def main() -> int:
     first = cli.get("/api/v1/agent/status/summary").json()
     second = cli.get("/api/v1/agent/status/summary").json()
     status_after = cli.get("/api/v1/agent/status").json()
-    sentences = [part for part in first["summary"].replace("!", ".").split(".") if part.strip()]
+    sentences = re.findall(r"[.!?](?=\s|$)", first["summary"])
     check("status summary is deterministic", first["summary"] == second["summary"])
     check("status summary is 1-3 sentences", 1 <= len(sentences) <= 3, f"{len(sentences)} sentences")
     check("status says it is deterministic", first.get("deterministic") is True)

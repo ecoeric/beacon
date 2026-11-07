@@ -53,7 +53,15 @@ def _dimensions(content: bytes) -> tuple[int | None, int | None]:
 
 
 def sanitise_name(name: str) -> str:
-    cleaned = SAFE_NAME.sub("-", Path(name).name)[:80].strip("-.")
+    """Flatten a display name into a safe file name component.
+
+    Path separators become dashes instead of being dropped, so a capture titled
+    "GET /api/v1/retention/status" keeps its context ("GET-api-v1-retention-status.png")
+    and can never introduce a directory.
+    """
+    flattened = str(name).replace("/", " ").replace("\\", " ")
+    cleaned = SAFE_NAME.sub("-", flattened)
+    cleaned = re.sub(r"-{2,}", "-", cleaned)[:80].strip("-.")
     return cleaned or "screenshot"
 
 

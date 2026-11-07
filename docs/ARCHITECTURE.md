@@ -227,11 +227,13 @@ systemd
 
 | Layer | Method | Result (last run) |
 |---|---|---|
-| API/service logic | 82 pytest tests with synthetic Cherry Studio DB and controlled processes | 82 passed |
+| API/service logic | 119 pytest tests with synthetic Cherry Studio DB, fake Minecraft/RCON servers, mocked Pi-hole transport and controlled processes | 119 passed |
 | Transport/auth | real Uvicorn TLS server + generated CA in tests | verified trust and rejection |
 | Live system | `scripts/smoke_test.py` against real Pi-hole/Minecraft/Docker/agent | 57 checks passed |
 | iOS logic | Swift 6 on Linux: compile + 13 decoding/formatting tests against live-captured fixtures | 13 passed |
 | iOS syntax | `swiftc -parse` on all 22 Swift files | parsed |
 | Xcode project | `pbxproj` parser + cross-checks | 18 checks passed |
 | Retention | live drill via the systemd unit (aged screenshot) | deleted, 410 confirmed, history kept |
+| Backup / restore | `beacon backup` then serve the API from the restored data directory | milestone, token and image intact |
+| Contract & security | OpenAPI snapshot equality, static no-shell checks, helper allow-list | clean |
 | Agent messaging | live queue + checkpoint + ack + processed; interrupt signal path against a controlled process | verified |

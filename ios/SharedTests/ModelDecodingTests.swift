@@ -45,7 +45,13 @@ final class ModelDecodingTests: XCTestCase {
         let summary = try fixture("status_summary.json", as: StatusSummaryResponse.self)
         XCTAssertFalse(summary.summary.isEmpty)
         XCTAssertTrue(summary.deterministic)
-        XCTAssertLessThanOrEqual(summary.summary.split(separator: ".").count, 3)
+        // Count real sentence terminators (followed by whitespace or end of text) so
+        // abbreviations such as "docs/SETUP.md" are not mistaken for sentence breaks.
+        let pattern = try NSRegularExpression(pattern: "[.!?](?=\\s|$)")
+        let range = NSRange(summary.summary.startIndex..., in: summary.summary)
+        let sentences = pattern.numberOfMatches(in: summary.summary, range: range)
+        XCTAssertGreaterThanOrEqual(sentences, 1)
+        XCTAssertLessThanOrEqual(sentences, 3, summary.summary)
     }
 
     func testDashboardSummaryDecodesEverything() throws {

@@ -104,16 +104,15 @@ Confirmation headers: `agent-interrupt`, `pihole-blocking`, `minecraft-start`,
 | GET | `/minecraft/logs` | read | `?lines=10..300` |
 | POST | `/minecraft/control` | admin | `{action:"start"|"stop"|"restart", force}` + confirm |
 
-## Regenerating the contract snapshot
+## Regenerating or checking the contract snapshot
 
 ```bash
-cd ~/beacon/backend
-BEACON_DATA_DIR=/tmp/beacon-docs .venv/bin/python - <<'PY'
-import json
-from beacon.main import create_app
-open("../docs/openapi.json", "w").write(json.dumps(create_app().openapi(), indent=2) + "\n")
-PY
+# check (exit 1 on drift) — also enforced by pytest
+backend/.venv/bin/python scripts/check_openapi_drift.py
+
+# regenerate after an intentional API change
+backend/.venv/bin/python scripts/check_openapi_drift.py --write
 ```
 
-`ios/Fixtures/*.json` are captured the same way from the live service and are decoded by the Swift
-tests, so contract drift fails the build.
+`ios/Fixtures/*.json` are captured from the live service and decoded by the Swift tests, so
+contract drift fails the iOS validation too.

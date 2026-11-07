@@ -40,6 +40,7 @@ CAPTURE_COMMANDS: dict[str, list[str]] = {
     "summary": ["summary"],
     "agent-status": ["agent", "status"],
     "agent-queue": ["queue", "list"],
+    "queue-stats": ["queue", "stats"],
     "agent-interrupts": ["agent", "interrupts"],
     "milestones": ["milestones", "list"],
     "system": ["system", "show"],
@@ -59,6 +60,8 @@ API_PATHS = {
     "/api/v1/minecraft/status",
     "/api/v1/activity",
     "/api/v1/health",
+    "/api/v1/retention/status",
+    "/api/v1/audit",
 }
 
 FONT_REGULAR = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"

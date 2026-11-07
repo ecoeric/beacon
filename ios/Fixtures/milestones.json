@@ -1,5 +1,79 @@
 [
  {
+  "id": "df7d98c6a03e4687a774d67479db86a7",
+  "seq": 4,
+  "title": "Hardening: protocol tests, restore drill and contract guardrails",
+  "summary": "Closed the verification gaps left by live-only checks: every Minecraft control channel and the RCON/ping protocols are tested offline, Pi-hole payload parsing is replayed from recorded shapes, Docker and agent-runtime edge cases are covered, and a backup is restored into a fresh data directory and served by the API. Contract drift and static security checks are enforced by the test suite.",
+  "changes": [
+   "117 pytest tests (was 82): +10 Minecraft protocol/control, +6 Pi-hole parsing, +11 integration edges, +8 contract/security",
+   "Supervised pty stop, SIGINT fallback and the no-safe-channel refusal are asserted without touching the live server",
+   "Backup restore drill serves the restored milestone, token and screenshot bytes",
+   "OpenAPI snapshot equality, no-shell-execution checks and Docker helper allow-list tests added",
+   "SwiftUI call-site checker wired into the iOS validation script; optional-default compile hazards fixed"
+  ],
+  "phase": "Phase 6",
+  "created_at": 1794084759.3489914,
+  "screenshots": [
+   {
+    "id": "34f34505ed5941b695da42883ef4326d",
+    "caption": "Interrupt history: signal and checkpoint attempts with their evidence",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 22989,
+    "width": 1120,
+    "height": 253,
+    "created_at": 1794084759.3493257,
+    "expires_at": 1794689559.3493257,
+    "url": "/api/v1/screenshots/34f34505ed5941b695da42883ef4326d",
+    "sha256": "23ca144f32af4dd3257793e59c5b1a1de88ca8f1090e2a01b81d9ceb00902248",
+    "expired": false
+   },
+   {
+    "id": "11b131bf47c141839ba314c35d9c6c56",
+    "caption": "Audit trail: every privileged action is recorded with actor, target and IP",
+    "source": "api",
+    "content_type": "image/png",
+    "bytes": 150327,
+    "width": 1120,
+    "height": 2017,
+    "created_at": 1794084759.3510163,
+    "expires_at": 1794689559.3510163,
+    "url": "/api/v1/screenshots/11b131bf47c141839ba314c35d9c6c56",
+    "sha256": "4b31a6ee5f570412efd41d1b7d8dbef153ea5031b2cd7864be052ecc4a3b9c0e",
+    "expired": false
+   },
+   {
+    "id": "8e506cd405194a30974c6d3be22bca5c",
+    "caption": "Message queue counters and last agent checkpoint age",
+    "source": "upload",
+    "content_type": "image/png",
+    "bytes": 22223,
+    "width": 1120,
+    "height": 358,
+    "created_at": 1794084808.918945,
+    "expires_at": 1794689608.918945,
+    "url": "/api/v1/screenshots/8e506cd405194a30974c6d3be22bca5c",
+    "sha256": "a83e4b7b8209827e6bc5b5e77ce04a5102c80c2c370ca7cb163b6dfd5ac29b88",
+    "expired": false
+   },
+   {
+    "id": "12a3d7a46d684ef89be6fa3adda2e47c",
+    "caption": "Screenshot retention state: seven-day window, storage usage and next expiry",
+    "source": "upload",
+    "content_type": "image/png",
+    "bytes": 26217,
+    "width": 1120,
+    "height": 358,
+    "created_at": 1794084824.8992627,
+    "expires_at": 1794689624.8992627,
+    "url": "/api/v1/screenshots/12a3d7a46d684ef89be6fa3adda2e47c",
+    "sha256": "8435685ad76fa299b0342ccefcc770e9cb01eedbb2f1e0ad9647dfce10988fbd",
+    "expired": false
+   }
+  ],
+  "expired_screenshots": 3
+ },
+ {
   "id": "4645d5816c214e0b89eaab6704efeaa7",
   "seq": 3,
   "title": "Final validation pass: live integrations, tests and retention drill",
@@ -86,80 +160,5 @@
   "created_at": 1794028091.3096402,
   "screenshots": [],
   "expired_screenshots": 1
- },
- {
-  "id": "6fd3e34cfa2742bbbb87d3a924b978d8",
-  "seq": 1,
-  "title": "Audited backend, live integrations and native iOS foundation",
-  "summary": "Verified the host and the agent runtime, then shipped the Beacon backend over pinned HTTPS with the agent status, queue and interrupt paths, real Pi-hole and Minecraft monitoring, screenshot retention, and the complete native SwiftUI app source with decoding tests.",
-  "changes": [
-   "Phase 1 audit of host, Cherry Studio runtime, Pi-hole v6 API, Minecraft ping contract and the missing iOS toolchain",
-   "FastAPI + SQLite service on 192.168.1.83:8091 under systemd, ECDSA private CA, scoped bearer tokens",
-   "Read-only agent status (snapshot + Cherry Studio SQLite + /proc) and a deterministic Status action",
-   "Durable message queue with checkpoint delivery, Continue, and a direct SIGINT interrupt path",
-   "Pi-hole v6 integration including blocking control; Minecraft ping/log/process monitoring with guarded controls",
-   "Native SwiftUI app, pinned-TLS client, Keychain storage, four screens; 13 Swift decoding tests green on Linux"
-  ],
-  "phase": "Phase 1-2",
-  "created_at": 1794027976.5942533,
-  "screenshots": [
-   {
-    "id": "ef9113040106408481a9d4188b39b21e",
-    "caption": "Deployment verification: beacon doctor passes every check on the live server",
-    "source": "text",
-    "content_type": "image/png",
-    "bytes": 67621,
-    "width": 1120,
-    "height": 631,
-    "created_at": 1794027976.5949216,
-    "expires_at": 1794632776.5949216,
-    "url": "/api/v1/screenshots/ef9113040106408481a9d4188b39b21e",
-    "sha256": "b5da404e9fa2469eaaa0c6a082d171f68dcab4817243c16e50c01fb76ceca681",
-    "expired": false
-   },
-   {
-    "id": "21060c6a10c94f1ba5e8fbff6c5c5d05",
-    "caption": "Live dashboard payload assembled from the real agent, Pi-hole, Minecraft and host metrics",
-    "source": "text",
-    "content_type": "image/png",
-    "bytes": 49607,
-    "width": 1120,
-    "height": 547,
-    "created_at": 1794027976.595914,
-    "expires_at": 1794632776.595914,
-    "url": "/api/v1/screenshots/21060c6a10c94f1ba5e8fbff6c5c5d05",
-    "sha256": "7f2860928436ada9639c0c629b39de48759ca678e20e3add76e019d9155a65a0",
-    "expired": false
-   },
-   {
-    "id": "495e0c3a151049e087c31ab16138bde5",
-    "caption": "Agent integration detail: state, runtime pid, queue counts and the evidence used to derive them",
-    "source": "api",
-    "content_type": "image/png",
-    "bytes": 150719,
-    "width": 1120,
-    "height": 1786,
-    "created_at": 1794027976.5968916,
-    "expires_at": 1794632776.5968916,
-    "url": "/api/v1/screenshots/495e0c3a151049e087c31ab16138bde5",
-    "sha256": "b50b43bb667c77283879fa5996af4625cfbe08a955370d8bd9f6683814de4f4e",
-    "expired": false
-   },
-   {
-    "id": "91ed2ddbbffc4300b1e53d76233a9946",
-    "caption": "The running AI agent (Cherry Studio + DSH runtime) driving this project",
-    "source": "window",
-    "content_type": "image/png",
-    "bytes": 176384,
-    "width": 1366,
-    "height": 768,
-    "created_at": 1794027976.5980031,
-    "expires_at": 1794632776.5980031,
-    "url": "/api/v1/screenshots/91ed2ddbbffc4300b1e53d76233a9946",
-    "sha256": "c445477e923e9aa64403f742d6c54eb03961a55a39e3849906dff2eeab049f90",
-    "expired": false
-   }
-  ],
-  "expired_screenshots": 0
  }
 ]

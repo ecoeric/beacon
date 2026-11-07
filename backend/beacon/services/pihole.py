@@ -32,7 +32,7 @@ class PiholeError(RuntimeError):
 
 
 class PiholeClient:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Settings, transport: httpx.AsyncBaseTransport | None = None) -> None:
         self.settings = settings
         self._sid: str | None = None
         self._sid_at: float = 0.0
@@ -40,6 +40,7 @@ class PiholeClient:
             base_url=settings.pihole_url.rstrip("/"),
             timeout=settings.pihole_timeout_seconds,
             verify=True,
+            transport=transport,
         )
 
     async def close(self) -> None:

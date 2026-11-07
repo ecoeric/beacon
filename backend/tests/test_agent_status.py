@@ -165,3 +165,25 @@ def test_status_summary_is_one_to_three_sentences_for_every_state(state):
     assert summary
     sentences = [part for part in summary.replace("!", ".").split(".") if part.strip()]
     assert 1 <= len(sentences) <= 3, summary
+
+
+def test_status_summary_handles_abbreviations_and_filenames():
+    """Filenames and versions contain dots but must not create extra sentences."""
+    import re
+
+    from beacon.schemas import AgentSessionInfo, AgentStatusResponse
+
+    status_value = AgentStatusResponse(
+        state="working",
+        state_label="Working",
+        project="Beacon",
+        stage="Phase 6",
+        activity="see docs/SETUP.md section 5",
+        last_milestone="v0.1.0 released",
+        next_action="read docs/API.md",
+        data_age_seconds=10,
+        session=AgentSessionInfo(lastActivityKind="Assistant replied"),
+    )
+    summary, _ = status_summary.render_status_summary(status_value)
+    terminators = re.findall(r"[.!?](?=\s|$)", summary)
+    assert 1 <= len(terminators) <= 3, summary

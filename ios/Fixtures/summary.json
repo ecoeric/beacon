@@ -1,18 +1,20 @@
 {
- "generated_at": 1794028306.5460865,
+ "generated_at": 1794084838.4647157,
  "agent": {
   "state": "working",
   "state_label": "Working",
   "project": "Beacon \u2014 native iOS server dashboard",
-  "stage": "Phase 6: refined and validated \u2014 iOS build pending on macOS",
-  "activity": "Complete: backend, agent integration, milestones, monitoring and documentation",
-  "last_milestone": "Milestone #3: final validation pass (all suites green)",
-  "next_action": "Build and run the app on macOS, then plan device installation",
-  "blockers": [],
-  "awaiting_input": false,
+  "stage": "Phase 6 complete: hardened, tested and documented \u2014 macOS build remains",
+  "activity": "Hardening pass finished: 117 backend tests, protocol coverage and a restore drill",
+  "last_milestone": "Milestone #4: hardening, protocol tests and restore drill",
+  "next_action": "Build and run the app on macOS (docs/SETUP.md \u00a75)",
+  "blockers": [
+   "iOS compilation and device deployment need a macOS machine with Xcode"
+  ],
+  "awaiting_input": true,
   "progress": null,
-  "updated_at": 1794028302.1293507,
-  "data_age_seconds": 4.240321159362793,
+  "updated_at": 1794084744.171329,
+  "data_age_seconds": 92.07842087745667,
   "is_stale": false,
   "stale_after_seconds": 90,
   "snapshot_source": "agent",
@@ -21,22 +23,22 @@
    "name": "# Master Implementation Prompt: Native iOS Server",
    "agent_id": "cc33efa9-6b9f-41f0-bf75-86dbc6e27096",
    "agent_name": "agent",
-   "runtime_pid": 432130,
+   "runtime_pid": 496352,
    "runtime_alive": true,
-   "last_activity_at": 1794028306.2389936,
+   "last_activity_at": 1794084836.1930585,
    "last_activity_kind": "Assistant turn running",
    "turn_running": true,
-   "transcript_updated_at": 1794028306.2389936
+   "transcript_updated_at": 1794084836.1930585
   },
   "queue": {
    "pending": 0,
    "delivered": 0,
    "acknowledged": 0,
-   "processed_last_24h": 5
+   "processed_last_24h": 6
   },
   "latest_interrupt": {
-   "id": "8ff5d939cb8446009953b0f7cfc073bf",
-   "requested_at": 1794028258.7667773,
+   "id": "59abdfe8e1da4904a3fc2342a6c39e82",
+   "requested_at": 1794032344.3672287,
    "mode": "checkpoint",
    "status": "acknowledged",
    "reason": "smoke test",
@@ -52,17 +54,17 @@
   "evidence": [
    {
     "source": "agent_snapshot",
-    "detail": "Pushed by agent at 1794028302",
-    "age_seconds": 4.240321159362793
+    "detail": "Pushed by agent at 1794084744",
+    "age_seconds": 92.07842087745667
    },
    {
     "source": "cherry_session",
     "detail": "agent \u00b7 # Master Implementation Prompt: Native iOS Server",
-    "age_seconds": 0.1306781768798828
+    "age_seconds": 0.05669140815734863
    },
    {
     "source": "runtime_process",
-    "detail": "pid 432130 serving this session",
+    "detail": "pid 496352 serving this session",
     "age_seconds": null
    },
    {
@@ -72,8 +74,8 @@
    },
    {
     "source": "interrupt",
-    "detail": "checkpoint interrupt acknowledged at 1794028259",
-    "age_seconds": 47.60289454460144
+    "detail": "checkpoint interrupt acknowledged at 1794032344",
+    "age_seconds": 52491.882521152496
    }
   ],
   "notes": []
@@ -85,7 +87,7 @@
    "state": "up",
    "summary": "Responding",
    "detail": null,
-   "checked_at": 1794028306.545965,
+   "checked_at": 1794084838.4646525,
    "latency_ms": null
   },
   {
@@ -94,7 +96,7 @@
    "state": "up",
    "summary": "Working",
    "detail": "Beacon \u2014 native iOS server dashboard",
-   "checked_at": 1794028306.5460095,
+   "checked_at": 1794084838.464672,
    "latency_ms": null
   },
   {
@@ -102,8 +104,8 @@
    "label": "Pi-hole",
    "state": "up",
    "summary": "DNS up \u00b7 blocking",
-   "detail": "Up 5 days (healthy)",
-   "checked_at": 1794028306.3803327,
+   "detail": "Up 6 days (healthy)",
+   "checked_at": 1794084837.8561614,
    "latency_ms": null
   },
   {
@@ -112,16 +114,16 @@
    "state": "up",
    "summary": "Online \u00b7 3/20 players",
    "detail": "1.21.1",
-   "checked_at": 1794028306.380807,
+   "checked_at": 1794084837.8571782,
    "latency_ms": null
   },
   {
    "key": "server",
    "label": "Host metrics",
    "state": "up",
-   "summary": "CPU 17% \u00b7 RAM 41%",
+   "summary": "CPU 21% \u00b7 RAM 70%",
    "detail": null,
-   "checked_at": 1794028306.4290056,
+   "checked_at": 1794084838.1402476,
    "latency_ms": null
   },
   {
@@ -130,51 +132,51 @@
    "state": "up",
    "summary": "Read-only monitor",
    "detail": null,
-   "checked_at": 1794028301.8105526,
+   "checked_at": 1794084837.8245952,
    "latency_ms": null
   }
  ],
  "server": {
-  "generated_at": 1794028306.4290056,
-  "uptime_seconds": 873349.92,
+  "generated_at": 1794084838.1402476,
+  "uptime_seconds": 929881.63,
   "cpu": {
-   "percent": 17.4,
+   "percent": 20.8,
    "per_core": [
-    18.4,
-    13.3,
-    14.8,
-    10.9,
-    24.2,
-    23.1,
-    14.8,
-    19.4
+    24.4,
+    19.0,
+    23.4,
+    30.3,
+    17.7,
+    14.2,
+    23.6,
+    14.2
    ],
    "load": [
-    2.75,
-    2.73,
-    1.86
+    3.12,
+    2.55,
+    1.62
    ],
-   "temperature_c": 37.0,
+   "temperature_c": 39.0,
    "model": "Intel(R) Core(TM) i5-9300H CPU @ 2.40GHz",
    "cores": 8
   },
   "memory": {
    "total_bytes": 16620445696,
-   "used_bytes": 6844190720,
-   "available_bytes": 9776254976,
-   "percent": 41.2,
+   "used_bytes": 11624464384,
+   "available_bytes": 4995981312,
+   "percent": 69.9,
    "swap_total_bytes": 12901675008,
-   "swap_used_bytes": 935968768,
-   "swap_percent": 7.3
+   "swap_used_bytes": 929710080,
+   "swap_percent": 7.2
   },
   "gpu": {
    "available": true,
    "name": "NVIDIA GeForce GTX 1650",
    "utilization_percent": 0.0,
-   "temperature_c": 32.0,
+   "temperature_c": 31.0,
    "memory_used_bytes": 6291456,
    "memory_total_bytes": 4294967296,
-   "power_w": 1.0,
+   "power_w": 1.01,
    "error": null
   },
   "disks": [
@@ -182,8 +184,8 @@
     "mount": "/",
     "filesystem": "ext4",
     "total_bytes": 236183568384,
-    "used_bytes": 67671326720,
-    "free_bytes": 156440199168,
+    "used_bytes": 67889876992,
+    "free_bytes": 156221648896,
     "percent": 28.7
    },
    {
@@ -205,20 +207,20 @@
   ],
   "network": {
    "interface": "enp3s0",
-   "rx_bytes_per_second": 51080.8,
-   "tx_bytes_per_second": 134873.4,
-   "rx_bytes_total": 10552474586,
-   "tx_bytes_total": 12196712120
+   "rx_bytes_per_second": 68971.5,
+   "tx_bytes_per_second": 88245.9,
+   "rx_bytes_total": 11046656287,
+   "tx_bytes_total": 15543691478
   },
   "docker": [
    {
     "name": "pihole",
     "image": "pihole/pihole:2026.10.1",
     "state": "running",
-    "status": "Up 5 days (healthy)",
+    "status": "Up 6 days (healthy)",
     "health": "healthy",
-    "cpu_percent": 0.34,
-    "memory_bytes": 21443379,
+    "cpu_percent": 0.22,
+    "memory_bytes": 23246929,
     "memory_limit_bytes": 16621523435,
     "started_at": null,
     "error": null
@@ -236,91 +238,91 @@
    "name": "pihole",
    "image": "pihole/pihole:2026.10.1",
    "state": "running",
-   "status": "Up 5 days (healthy)",
+   "status": "Up 6 days (healthy)",
    "health": "healthy",
-   "cpu_percent": 0.34,
-   "memory_bytes": 21443379,
+   "cpu_percent": 0.22,
+   "memory_bytes": 23246929,
    "memory_limit_bytes": 16621523435,
    "started_at": null,
    "error": null
   },
-  "queries_total": 36207,
-  "queries_blocked": 5614,
-  "percent_blocked": 15.51,
-  "unique_domains": 5359,
-  "queries_forwarded": 2856,
-  "queries_cached": 27560,
+  "queries_total": 28219,
+  "queries_blocked": 4291,
+  "percent_blocked": 15.21,
+  "unique_domains": 5530,
+  "queries_forwarded": 1899,
+  "queries_cached": 21894,
   "top_blocked_domains": [
    {
     "name": "scribe.logs.roku.com",
-    "count": 3992
+    "count": 3579
    },
    {
     "name": "logs.netflix.com",
-    "count": 546
+    "count": 256
+   },
+   {
+    "name": "display.ravm.tv",
+    "count": 59
    },
    {
     "name": "global.telemetry.insights.video.a2z.com",
-    "count": 136
+    "count": 56
    },
    {
-    "name": "incoming.telemetry.mozilla.org",
-    "count": 76
-   },
-   {
-    "name": "srtb.msn.com",
-    "count": 66
+    "name": "metrics.roblox.com",
+    "count": 28
    }
   ],
   "top_clients": [
    {
     "name": "192.168.1.83",
-    "count": 13479
+    "count": 13689
    },
    {
     "name": "192.168.1.75",
-    "count": 7694
+    "count": 6077
    },
    {
     "name": "192.168.1.95",
-    "count": 5603
+    "count": 3659
    },
    {
     "name": "192.168.1.41",
-    "count": 3629
+    "count": 3634
    },
    {
-    "name": "192.168.1.78",
-    "count": 2450
+    "name": "192.168.1.70",
+    "count": 700
    }
   ],
   "upstreams": [
    {
     "name": "cache",
     "address": "cache:-1",
-    "count": 27560,
+    "count": 21894,
     "response_avg_ms": null
    },
    {
     "name": "blocklist",
     "address": "blocklist:-1",
-    "count": 5614,
+    "count": 4291,
     "response_avg_ms": null
    },
    {
     "name": "one.one.one.one",
-    "address": "1.0.0.1:53",
-    "count": 1715,
-    "response_avg_ms": 21.9
+    "address": "1.1.1.1:53",
+    "count": 1087,
+    "response_avg_ms": 14.3
    },
    {
     "name": "one.one.one.one",
-    "address": "1.1.1.1:53",
-    "count": 1141,
-    "response_avg_ms": 14.5
+    "address": "1.0.0.1:53",
+    "count": 812,
+    "response_avg_ms": 21.4
    }
   ],
-  "generated_at": 1794028306.3803327,
+  "generated_at": 1794084837.8561614,
   "error": null
  },
  "minecraft": {
@@ -335,32 +337,26 @@
   "players_online": 3,
   "players_max": 20,
   "players": [
+   "ecoeric",
    "_Dizen",
-   "PorscheLegend23",
-   "ecoeric"
+   "PorscheLegend23"
   ],
-  "uptime_seconds": 592.0,
+  "uptime_seconds": 57123.4,
   "pid": 432706,
-  "cpu_percent": 57.9,
-  "memory_bytes": 4059611136,
+  "cpu_percent": null,
+  "memory_bytes": 8568373248,
   "tps": null,
   "mspt": null,
   "tick_metrics_note": "Tick metrics unavailable: no spark/TPS provider installed and RCON/query are disabled",
-  "recent_errors": [
-   "Caused by: java.lang.RuntimeException: Failed decoding custom payload sable_player_ragdoll:mob_ragdoll_spawn: net.minecraft.nbt.ReportedNbtException: Loading NBT data",
-   "Caused by: net.minecraft.nbt.ReportedNbtException: Loading NBT data",
-   "Caused by: java.io.IOException: Invalid tag id: 69",
-   "at TRANSFORMER/minecraft@1.21.1/net.minecraft.nbt.TagType$1.createException(TagType.java:58) ~[server-1.21.1-20240808.144430-srg.jar%23209!/:?]",
-   "[06Nov2026 22:08:03.903] [Server thread/INFO] [net.minecraft.server.network.ServerGamePacketListenerImpl/]: _Dizen lost connection: Internal Exception: io.netty.handler.codec.DecoderException: Failed to decode packet 'serverbound/minecraft:custom_payload'"
-  ],
+  "recent_errors": [],
   "recent_events": [
-   "[06Nov2026 22:06:16.235] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 joined the game",
-   "[06Nov2026 22:06:44.745] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen left the game",
-   "[06Nov2026 22:06:52.470] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen joined the game",
-   "[06Nov2026 22:08:03.903] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen left the game",
-   "[06Nov2026 22:08:08.743] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen joined the game"
+   "[07Nov2026 13:46:41.642] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen left the game",
+   "[07Nov2026 13:46:46.597] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 left the game",
+   "[07Nov2026 13:47:28.419] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ecoeric joined the game",
+   "[07Nov2026 13:47:43.498] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen joined the game",
+   "[07Nov2026 13:49:16.609] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 joined the game"
   ],
-  "log_updated_at": 1794028298.243017,
+  "log_updated_at": 1794084761.6533387,
   "last_backup_at": null,
   "backup_note": "No backup directory found in the server folder \u2014 no existing mechanism detected",
   "controls": {
@@ -373,85 +369,153 @@
    "start_method": null,
    "reason": null
   },
-  "generated_at": 1794028306.380807,
+  "generated_at": 1794084837.8571782,
   "error": null
  },
  "latest_milestone": {
-  "id": "4645d5816c214e0b89eaab6704efeaa7",
-  "seq": 3,
-  "title": "Final validation pass: live integrations, tests and retention drill",
-  "summary": "Validated the whole system against the real services: 82 backend tests, 58 live checks, 13 Swift tests on Linux, all iOS sources parsed, the Xcode project structurally validated, and a live retention drill through the systemd unit.",
+  "id": "df7d98c6a03e4687a774d67479db86a7",
+  "seq": 4,
+  "title": "Hardening: protocol tests, restore drill and contract guardrails",
+  "summary": "Closed the verification gaps left by live-only checks: every Minecraft control channel and the RCON/ping protocols are tested offline, Pi-hole payload parsing is replayed from recorded shapes, Docker and agent-runtime edge cases are covered, and a backup is restored into a fresh data directory and served by the API. Contract drift and static security checks are enforced by the test suite.",
   "changes": [
-   "Pi-hole, Minecraft (NeoForge 21.1.252, 91 mods), Docker and host metrics verified live",
-   "Agent state, queue delivery and cooperative interrupt verified against the running runtime",
-   "Retention drill: aged screenshot deleted by beacon-retention.service, 410 confirmed, history preserved",
-   "iOS: SwiftUI app source complete; models/networking typechecked and tested; project validated"
+   "117 pytest tests (was 82): +10 Minecraft protocol/control, +6 Pi-hole parsing, +11 integration edges, +8 contract/security",
+   "Supervised pty stop, SIGINT fallback and the no-safe-channel refusal are asserted without touching the live server",
+   "Backup restore drill serves the restored milestone, token and screenshot bytes",
+   "OpenAPI snapshot equality, no-shell-execution checks and Docker helper allow-list tests added",
+   "SwiftUI call-site checker wired into the iOS validation script; optional-default compile hazards fixed"
   ],
   "phase": "Phase 6",
-  "created_at": 1794028236.0014548,
+  "created_at": 1794084759.3489914,
   "screenshots": [
    {
-    "id": "39dcc7d025fd4ddcad9e718d8edde5b8",
-    "caption": "Agent integration: derived state, runtime pid, queue and evidence",
+    "id": "34f34505ed5941b695da42883ef4326d",
+    "caption": "Interrupt history: signal and checkpoint attempts with their evidence",
     "source": "text",
     "content_type": "image/png",
-    "bytes": 58956,
+    "bytes": 22989,
     "width": 1120,
-    "height": 484,
-    "created_at": 1794028236.0019002,
-    "expires_at": 1794633036.0019002,
-    "url": "/api/v1/screenshots/39dcc7d025fd4ddcad9e718d8edde5b8",
-    "sha256": "0d4e2285dec7828ab62897f7e36a9941eb04634011f049054511f97b769695ee",
+    "height": 253,
+    "created_at": 1794084759.3493257,
+    "expires_at": 1794689559.3493257,
+    "url": "/api/v1/screenshots/34f34505ed5941b695da42883ef4326d",
+    "sha256": "23ca144f32af4dd3257793e59c5b1a1de88ca8f1090e2a01b81d9ceb00902248",
     "expired": false
    },
    {
-    "id": "34ce30e4003845e280efb2f9dd3107a6",
-    "caption": "Pi-hole v6 integration: blocking state, query totals, top blocked domains and clients",
-    "source": "text",
+    "id": "11b131bf47c141839ba314c35d9c6c56",
+    "caption": "Audit trail: every privileged action is recorded with actor, target and IP",
+    "source": "api",
     "content_type": "image/png",
-    "bytes": 38677,
+    "bytes": 150327,
     "width": 1120,
-    "height": 526,
-    "created_at": 1794028236.0027778,
-    "expires_at": 1794633036.0027778,
-    "url": "/api/v1/screenshots/34ce30e4003845e280efb2f9dd3107a6",
-    "sha256": "5e07313b4f3e61bbf1939b640bdd0ad52775ab67e70259af5e4e0d0139b88993",
+    "height": 2017,
+    "created_at": 1794084759.3510163,
+    "expires_at": 1794689559.3510163,
+    "url": "/api/v1/screenshots/11b131bf47c141839ba314c35d9c6c56",
+    "sha256": "4b31a6ee5f570412efd41d1b7d8dbef153ea5031b2cd7864be052ecc4a3b9c0e",
     "expired": false
    },
    {
-    "id": "71a52fcf7bcd4015996e478ddb53789e",
-    "caption": "Minecraft integration: online state via server-list ping, players, process metrics and guarded controls",
-    "source": "text",
+    "id": "8e506cd405194a30974c6d3be22bca5c",
+    "caption": "Message queue counters and last agent checkpoint age",
+    "source": "upload",
     "content_type": "image/png",
-    "bytes": 69356,
+    "bytes": 22223,
     "width": 1120,
-    "height": 547,
-    "created_at": 1794028236.0035396,
-    "expires_at": 1794633036.0035396,
-    "url": "/api/v1/screenshots/71a52fcf7bcd4015996e478ddb53789e",
-    "sha256": "43603e5306613f89b9acb24cde99ccfc5bab0c53676495bc4f370f2b8707189a",
+    "height": 358,
+    "created_at": 1794084808.918945,
+    "expires_at": 1794689608.918945,
+    "url": "/api/v1/screenshots/8e506cd405194a30974c6d3be22bca5c",
+    "sha256": "a83e4b7b8209827e6bc5b5e77ce04a5102c80c2c370ca7cb163b6dfd5ac29b88",
     "expired": false
    },
    {
-    "id": "d5d2b7a34d7a452ba796b67c0cf4a842",
-    "caption": "The running agent and Minecraft console on the server desktop at final validation",
-    "source": "window",
+    "id": "12a3d7a46d684ef89be6fa3adda2e47c",
+    "caption": "Screenshot retention state: seven-day window, storage usage and next expiry",
+    "source": "upload",
     "content_type": "image/png",
-    "bytes": 183724,
-    "width": 1366,
-    "height": 768,
-    "created_at": 1794028236.0045254,
-    "expires_at": 1794633036.0045254,
-    "url": "/api/v1/screenshots/d5d2b7a34d7a452ba796b67c0cf4a842",
-    "sha256": "1450c5e8e8cab6e3d04cc79450c3f8822b5aaf8af1094096a58a05d1d6f0cb7b",
+    "bytes": 26217,
+    "width": 1120,
+    "height": 358,
+    "created_at": 1794084824.8992627,
+    "expires_at": 1794689624.8992627,
+    "url": "/api/v1/screenshots/12a3d7a46d684ef89be6fa3adda2e47c",
+    "sha256": "8435685ad76fa299b0342ccefcc770e9cb01eedbb2f1e0ad9647dfce10988fbd",
     "expired": false
    }
   ],
-  "expired_screenshots": 0
+  "expired_screenshots": 3
  },
  "activity": {
-  "unread": 12,
+  "unread": 17,
   "items": [
+   {
+    "id": "a38152ef1b44463bae85674e3eb569f7",
+    "kind": "milestone_completed",
+    "severity": "success",
+    "title": "Milestone 4: Hardening: protocol tests, restore drill and contract guardrails",
+    "body": "Closed the verification gaps left by live-only checks: every Minecraft control channel and the RCON/ping protocols are tested offline, Pi-hole payload parsing is replayed from recorded shapes, Docker and agent-runtime edge cases are covered, and a backup is restored into a fresh data directory and s",
+    "created_at": 1794084759.3534732,
+    "read_at": null,
+    "payload": {
+     "milestone_id": "df7d98c6a03e4687a774d67479db86a7",
+     "seq": 4,
+     "phase": "Phase 6"
+    }
+   },
+   {
+    "id": "f025134d4ae24e5cbc2b67184ae56e3d",
+    "kind": "agent_waiting_for_input",
+    "severity": "warning",
+    "title": "Agent is waiting for your input",
+    "body": "Hardening pass finished: 117 backend tests, protocol coverage and a restore drill",
+    "created_at": 1794084744.172093,
+    "read_at": null,
+    "payload": {
+     "project": "Beacon \u2014 native iOS server dashboard",
+     "stage": "Phase 6 complete: hardened, tested and documented \u2014 macOS build remains"
+    }
+   },
+   {
+    "id": "f265b4d0445a46dcabc45f1be182e808",
+    "kind": "agent_waiting_for_input",
+    "severity": "warning",
+    "title": "Agent is waiting for your input",
+    "body": "Finished: 82 backend tests, 58 live checks, 13 Swift tests, project validation, retention drill, documentation",
+    "created_at": 1794032387.4468887,
+    "read_at": null,
+    "payload": {
+     "project": "Beacon \u2014 native iOS server dashboard",
+     "stage": "Handover ready \u2014 backend live, iOS source validated, macOS build pending"
+    }
+   },
+   {
+    "id": "e28dd13e628340b38a0a894034fa2861",
+    "kind": "agent_interrupted",
+    "severity": "warning",
+    "title": "Agent interrupted",
+    "body": "smoke test",
+    "created_at": 1794032344.3687644,
+    "read_at": null,
+    "payload": {
+     "interrupt_id": "59abdfe8e1da4904a3fc2342a6c39e82",
+     "mode": "checkpoint",
+     "pid": null
+    }
+   },
+   {
+    "id": "2c37cdead7fc4a349bb4c21bd5ae24f0",
+    "kind": "agent_message_delivered",
+    "severity": "info",
+    "title": "Instruction delivered to the agent",
+    "body": "Beacon smoke test \u2014 no action required.",
+    "created_at": 1794032344.3447654,
+    "read_at": null,
+    "payload": {
+     "message_id": "6c2827cf858d405683321648fd39d631",
+     "seq": 11
+    }
+   },
    {
     "id": "053dca867a554373b89e3dbbcc1ef5cd",
     "kind": "agent_interrupted",
@@ -617,5 +681,5 @@
    }
   ]
  },
- "data_age_seconds": 4.240321159362793
+ "data_age_seconds": 92.07842087745667
 }

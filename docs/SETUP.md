@@ -130,8 +130,11 @@ beacon retention run --local     # same command the timer runs
 ## 4. Testing
 
 ```bash
-# 1. backend unit + integration tests (no live services needed)
+# 1. backend unit + integration tests (119; no live services needed)
 cd ~/beacon/backend && .venv/bin/python -m pytest tests -q
+
+# 1b. OpenAPI snapshot must match the code
+cd ~/beacon && backend/.venv/bin/python scripts/check_openapi_drift.py
 
 # 2. live end-to-end checks (real Pi-hole, Minecraft, Docker, agent runtime)
 ~/beacon/backend/.venv/bin/python ~/beacon/scripts/smoke_test.py

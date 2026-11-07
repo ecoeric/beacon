@@ -231,3 +231,13 @@ def test_screenshot_path_cannot_escape_data_dir(env, client, auth):
     response = client.get(stored["url"], headers=auth())
     assert response.status_code == 500
     assert response.json()["error"] == "invalid_path"
+
+
+def test_screenshot_name_keeps_context_and_strips_separators():
+    from beacon.services.screenshots import sanitise_name
+
+    assert sanitise_name("GET /api/v1/retention/status.png") == "GET-api-v1-retention-status.png"
+    assert sanitise_name("home.png") == "home.png"
+    assert "/" not in sanitise_name("../../etc/passwd")
+    assert sanitise_name("") == "screenshot"
+    assert len(sanitise_name("x" * 400)) <= 80

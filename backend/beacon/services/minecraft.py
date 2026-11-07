@@ -499,6 +499,16 @@ class Supervisor:
             except subprocess.TimeoutExpired:
                 proc.kill()
 
+    def reset(self) -> None:
+        """Stop any supervised process and clear state (used by tests and teardown)."""
+        self.shutdown()
+        with self._lock:
+            self._proc = None
+            self._master = None
+            self._started_at = None
+            self._log_file = None
+            self._reader = None
+
 
 supervisor = Supervisor()
 

@@ -63,7 +63,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | 2.17 | Read-only Docker monitoring | Implemented |
 | 2.18 | Pi-hole monitoring and blocking control | Implemented |
 | 2.19 | Minecraft monitoring | Implemented (TPS/MSPT unavailable, stated) |
-| 2.20 | Minecraft controls with safeguards | Partial — verified against a controlled instance; the live manually-started instance is intentionally not restarted |
+| 2.20 | Minecraft controls with safeguards | Implemented (all channels tested against controlled instances; the live manually-started instance is intentionally not restarted) |
 | 2.21 | Activity feed / in-app notifications | Implemented (push: Planned) |
 | 2.22 | Audit trail | Implemented |
 | 2.23 | iOS design system | Implemented |
@@ -71,6 +71,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | 2.25 | iOS screens (Home, Agent, Progress, Server, Settings, Setup) | Implemented (source complete; compiled by Xcode on macOS) |
 | 2.26 | iOS snapshot screenshot test | Implemented (requires macOS/Xcode to run) |
 | 2.27 | Validation harnesses | Implemented |
+| 2.28 | Contract, security and backup guardrails | Implemented |
 
 ---
 
@@ -356,12 +357,17 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 * **Files**: `backend/beacon/services/minecraft.py` (`Supervisor`, `start`, `stop`, `restart`,
   `rcon_command`), `backend/beacon/routers/monitoring.py`.
 * **Test**: `tests/test_monitoring.py` (confirmation required, structured `no_launch_script`
-  error, `not_running` on stop), graceful-hook detection verified live against the installed jars.
+  error, `not_running` on stop), `tests/test_minecraft_protocols.py` covers every channel offline:
+  the pty console path (start -> type `stop` -> process exits -> console log captured), the SIGINT
+  fallback against a process whose cwd/argv match a server, the refusal when no safe channel
+  exists (the process must survive), the player-online `force` gate, and the RCON client against a
+  fake RCON server (auth success, auth rejection, missing password, command reply). Graceful-hook
+  detection was verified live against the installed jars.
 * **Limitations / honesty**:
   * The **live instance** was started manually in a terminal and has players; it was intentionally
-    **not** stopped or restarted during development. Stop/restart against it were therefore not
-    executed end-to-end; the code path is covered by unit tests and the hook detection was
-    verified on the actual jars.
+    **not** stopped or restarted during development. Every control channel is now covered by
+    automated tests against controlled processes, and hook detection was verified on the actual
+    jars, but a live stop has not been performed.
   * `start` refuses if any Minecraft process already runs for this folder; it also refuses to run
     a second instance if a previous stop did not complete.
   * Full console control requires the instance to be started by Beacon (pty) or RCON to be enabled
@@ -440,13 +446,34 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 
 | Harness | Command | Last result |
 |---|---|---|
-| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 82 passed |
+| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 119 passed |
 | Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 18 checks passed |
 | SwiftUI memberwise call sites | `python3 scripts/check_view_initialisers.py` (heuristic) | 109 call sites / 11 views, no missing arguments |
+| OpenAPI contract drift | `backend/.venv/bin/python scripts/check_openapi_drift.py` | up to date (36 paths) |
+| Security guardrails | `tests/test_contract_and_security.py` | no shell execution, helper allow-list, units not root |
+| Backup restore drill | `test_backup_can_be_restored_and_served` | restored DB + token + image served |
 | Deployment health | `beacon doctor` | all checks passed |
+
+---
+
+## 2.28 Contract, security and backup guardrails
+
+* **Behaviour**: the committed OpenAPI snapshot is compared with the app on every test run;
+  static tests forbid shell execution (`shell=True`, `os.system`, `eval/exec`), require
+  subprocess calls to pass argument lists, pin the capture allow-lists to simple tokens, assert the
+  Docker wrapper only exposes `ps`/`stats`, assert both systemd units run as `eric`, and scan the
+  repository for accidentally committed secret values. `beacon backup` is tested end-to-end by
+  restoring the archive into a fresh data directory and serving the API from it (milestone and
+  screenshot bytes included).
+* **Files**: `backend/tests/test_contract_and_security.py`,
+  `backend/tests/test_integration_edges.py`, `scripts/check_openapi_drift.py`,
+  `scripts/check_view_initialisers.py`.
+* **Test**: 119 pytest tests total (119 passing), contract checker exit 0.
+* **Limitations**: the secret scan is best-effort (binary files are skipped); static checks are
+  guardrails, not a proof of absence.
 
 ---
 
