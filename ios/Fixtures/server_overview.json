@@ -1,0 +1,94 @@
+{
+ "generated_at": 1794017527.9013429,
+ "uptime_seconds": 862571.39,
+ "cpu": {
+  "percent": 24.4,
+  "per_core": [
+   20.9,
+   21.4,
+   29.3,
+   21.6,
+   28.2,
+   26.0,
+   21.7,
+   24.5
+  ],
+  "load": [
+   2.73,
+   2.68,
+   2.19
+  ],
+  "temperature_c": 38.0,
+  "model": "Intel(R) Core(TM) i5-9300H CPU @ 2.40GHz",
+  "cores": 8
+ },
+ "memory": {
+  "total_bytes": 16620445696,
+  "used_bytes": 7969304576,
+  "available_bytes": 8651141120,
+  "percent": 47.9,
+  "swap_total_bytes": 12901675008,
+  "swap_used_bytes": 1156980736,
+  "swap_percent": 9.0
+ },
+ "gpu": {
+  "available": true,
+  "name": "NVIDIA GeForce GTX 1650",
+  "utilization_percent": 0.0,
+  "temperature_c": 31.0,
+  "memory_used_bytes": 6291456,
+  "memory_total_bytes": 4294967296,
+  "power_w": 1.0,
+  "error": null
+ },
+ "disks": [
+  {
+   "mount": "/",
+   "filesystem": "ext4",
+   "total_bytes": 236183568384,
+   "used_bytes": 64213069824,
+   "free_bytes": 159898456064,
+   "percent": 27.2
+  },
+  {
+   "mount": "/boot",
+   "filesystem": "ext4",
+   "total_bytes": 989052928,
+   "used_bytes": 260116480,
+   "free_bytes": 660938752,
+   "percent": 26.3
+  },
+  {
+   "mount": "/mnt/storage_hdd",
+   "filesystem": "ext4",
+   "total_bytes": 983349346304,
+   "used_bytes": 265678848,
+   "free_bytes": 973064859648,
+   "percent": 0.0
+  }
+ ],
+ "network": {
+  "interface": "enp3s0",
+  "rx_bytes_per_second": 37089.8,
+  "tx_bytes_per_second": 121314.2,
+  "rx_bytes_total": 9271906296,
+  "tx_bytes_total": 10868359925
+ },
+ "docker": [
+  {
+   "name": "pihole",
+   "image": "pihole/pihole:2026.10.1",
+   "state": "running",
+   "status": "Up 5 days (healthy)",
+   "health": "healthy",
+   "cpu_percent": 0.17,
+   "memory_bytes": 19828572,
+   "memory_limit_bytes": 16621523435,
+   "started_at": null,
+   "error": null
+  }
+ ],
+ "docker_available": true,
+ "docker_error": null,
+ "unavailable": []
+}

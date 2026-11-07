@@ -1,0 +1,11 @@
+#!/bin/sh
+# Beacon CLI wrapper: loads the deployment environment, then runs the Python CLI.
+# Same entry point the AI agent uses at its checkpoints (`beacon agent checkpoint`).
+set -eu
+set -a
+if [ -f /home/eric/beacon/deploy/beacon.env ]; then
+    . /home/eric/beacon/deploy/beacon.env
+fi
+set +a
+cd /home/eric/beacon/backend
+exec /home/eric/beacon/backend/.venv/bin/python -m beacon.cli "$@"

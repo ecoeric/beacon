@@ -1,0 +1,27 @@
+#!/bin/sh
+# Read-only Docker visibility for the Beacon API.
+# Installed root-owned at /usr/local/lib/beacon/docker-read and allow-listed in
+# /etc/sudoers.d/beacon-docker-read. It never accepts mutation subcommands and ignores
+# extra arguments, so it cannot be used to run arbitrary docker commands.
+set -eu
+
+DOCKER=/usr/bin/docker
+
+usage() {
+    echo "usage: docker-read ps | docker-read stats" >&2
+    exit 64
+}
+
+[ "$#" -eq 1 ] || usage
+
+case "$1" in
+    ps)
+        exec "$DOCKER" ps -a --no-trunc --format '{{json .}}'
+        ;;
+    stats)
+        exec "$DOCKER" stats --no-stream --format '{{json .}}'
+        ;;
+    *)
+        usage
+        ;;
+esac

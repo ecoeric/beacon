@@ -1,0 +1,17 @@
+{
+  "": {
+    "swift-dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.build/master.swiftdeps"
+  },
+  "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.derived/BeaconValidationTests.swift": {
+    "dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.build/BeaconValidationTests.d",
+    "object": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.build/BeaconValidationTests.swift.o",
+    "swiftmodule": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.build/BeaconValidationTests~partial.swiftmodule",
+    "swift-dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.build/BeaconValidationTests.swiftdeps"
+  },
+  "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.derived/all-discovered-tests.swift": {
+    "dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.build/all-discovered-tests.d",
+    "object": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.build/all-discovered-tests.swift.o",
+    "swiftmodule": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.build/all-discovered-tests~partial.swiftmodule",
+    "swift-dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageDiscoveredTests.build/all-discovered-tests.swiftdeps"
+  }
+}

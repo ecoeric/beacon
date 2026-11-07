@@ -1,0 +1,29 @@
+[Unit]
+Description=Beacon screenshot retention sweep (7-day window)
+Documentation=file:///home/eric/beacon/docs/ARCHITECTURE.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=eric
+Group=eric
+WorkingDirectory=/home/eric/beacon/backend
+EnvironmentFile=/home/eric/beacon/deploy/beacon.env
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/home/eric
+ExecStart=/home/eric/beacon/backend/.venv/bin/python -m beacon.cli retention run --local
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/eric/beacon/data
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+LockPersonality=yes
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

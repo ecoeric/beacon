@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationTests.build/master.swiftdeps"
+  },
+  "/work/SharedTests/ModelDecodingTests.swift": {
+    "dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationTests.build/ModelDecodingTests.d",
+    "object": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationTests.build/ModelDecodingTests.swift.o",
+    "swiftmodule": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationTests.build/ModelDecodingTests~partial.swiftmodule",
+    "swift-dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationTests.build/ModelDecodingTests.swiftdeps"
+  }
+}

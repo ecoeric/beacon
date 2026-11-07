@@ -1,0 +1,86 @@
+{
+ "unread": 6,
+ "items": [
+  {
+   "id": "6724e5cc72834676824b54d2aad833d0",
+   "kind": "milestone_completed",
+   "severity": "success",
+   "title": "Milestone 1: Audited backend, live integrations and native iOS foundation",
+   "body": "Verified the host and the agent runtime, then shipped the Beacon backend over pinned HTTPS with the agent status, queue and interrupt paths, real Pi-hole and Minecraft monitoring, screenshot retention, and the complete native SwiftUI app source with decoding tests.",
+   "created_at": 1794027976.598905,
+   "read_at": null,
+   "payload": {
+    "milestone_id": "6fd3e34cfa2742bbbb87d3a924b978d8",
+    "seq": 1,
+    "phase": "Phase 1-2"
+   }
+  },
+  {
+   "id": "1fc8c4a38c79412b99dc2a59c18c6ebf",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794027934.2791848,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "6d9aaaa4d304455aa79773467d851ce4",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "a898011ce1d049f19843718ea1d34c09",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794027934.257814,
+   "read_at": null,
+   "payload": {
+    "message_id": "7512a28dc9914365917a0e05ab15b318",
+    "seq": 5
+   }
+  },
+  {
+   "id": "14337cbb4f4e42c18d10ce288ebd2cf7",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794027912.071095,
+   "read_at": null,
+   "payload": {
+    "message_id": "9ad353a0f36e46228fdd85dac80e4b99",
+    "seq": 3
+   }
+  },
+  {
+   "id": "85bc2fc240cc4398b246dbed766647d8",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794027907.3879385,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "360ddd0282e643adbb8824bdc6ba54f3",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "1eb3856f887e44208e62ddf664b2d99b",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794027907.3634484,
+   "read_at": null,
+   "payload": {
+    "message_id": "248b18f602b24994bd0026a4ba03ca7f",
+    "seq": 1
+   }
+  }
+ ]
+}

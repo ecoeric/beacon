@@ -1,0 +1,6 @@
+data/
+backend/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+ios/build/

@@ -1,0 +1,77 @@
+[
+ {
+  "id": "6fd3e34cfa2742bbbb87d3a924b978d8",
+  "seq": 1,
+  "title": "Audited backend, live integrations and native iOS foundation",
+  "summary": "Verified the host and the agent runtime, then shipped the Beacon backend over pinned HTTPS with the agent status, queue and interrupt paths, real Pi-hole and Minecraft monitoring, screenshot retention, and the complete native SwiftUI app source with decoding tests.",
+  "changes": [
+   "Phase 1 audit of host, Cherry Studio runtime, Pi-hole v6 API, Minecraft ping contract and the missing iOS toolchain",
+   "FastAPI + SQLite service on 192.168.1.83:8091 under systemd, ECDSA private CA, scoped bearer tokens",
+   "Read-only agent status (snapshot + Cherry Studio SQLite + /proc) and a deterministic Status action",
+   "Durable message queue with checkpoint delivery, Continue, and a direct SIGINT interrupt path",
+   "Pi-hole v6 integration including blocking control; Minecraft ping/log/process monitoring with guarded controls",
+   "Native SwiftUI app, pinned-TLS client, Keychain storage, four screens; 13 Swift decoding tests green on Linux"
+  ],
+  "phase": "Phase 1-2",
+  "created_at": 1794027976.5942533,
+  "screenshots": [
+   {
+    "id": "ef9113040106408481a9d4188b39b21e",
+    "caption": "Deployment verification: beacon doctor passes every check on the live server",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 67621,
+    "width": 1120,
+    "height": 631,
+    "created_at": 1794027976.5949216,
+    "expires_at": 1794632776.5949216,
+    "url": "/api/v1/screenshots/ef9113040106408481a9d4188b39b21e",
+    "sha256": "b5da404e9fa2469eaaa0c6a082d171f68dcab4817243c16e50c01fb76ceca681",
+    "expired": false
+   },
+   {
+    "id": "21060c6a10c94f1ba5e8fbff6c5c5d05",
+    "caption": "Live dashboard payload assembled from the real agent, Pi-hole, Minecraft and host metrics",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 49607,
+    "width": 1120,
+    "height": 547,
+    "created_at": 1794027976.595914,
+    "expires_at": 1794632776.595914,
+    "url": "/api/v1/screenshots/21060c6a10c94f1ba5e8fbff6c5c5d05",
+    "sha256": "7f2860928436ada9639c0c629b39de48759ca678e20e3add76e019d9155a65a0",
+    "expired": false
+   },
+   {
+    "id": "495e0c3a151049e087c31ab16138bde5",
+    "caption": "Agent integration detail: state, runtime pid, queue counts and the evidence used to derive them",
+    "source": "api",
+    "content_type": "image/png",
+    "bytes": 150719,
+    "width": 1120,
+    "height": 1786,
+    "created_at": 1794027976.5968916,
+    "expires_at": 1794632776.5968916,
+    "url": "/api/v1/screenshots/495e0c3a151049e087c31ab16138bde5",
+    "sha256": "b50b43bb667c77283879fa5996af4625cfbe08a955370d8bd9f6683814de4f4e",
+    "expired": false
+   },
+   {
+    "id": "91ed2ddbbffc4300b1e53d76233a9946",
+    "caption": "The running AI agent (Cherry Studio + DSH runtime) driving this project",
+    "source": "window",
+    "content_type": "image/png",
+    "bytes": 176384,
+    "width": 1366,
+    "height": 768,
+    "created_at": 1794027976.5980031,
+    "expires_at": 1794632776.5980031,
+    "url": "/api/v1/screenshots/91ed2ddbbffc4300b1e53d76233a9946",
+    "sha256": "c445477e923e9aa64403f742d6c54eb03961a55a39e3849906dff2eeab049f90",
+    "expired": false
+   }
+  ],
+  "expired_screenshots": 0
+ }
+]

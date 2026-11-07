@@ -1,0 +1,539 @@
+{
+ "generated_at": 1794027991.8135543,
+ "agent": {
+  "state": "working",
+  "state_label": "Working",
+  "project": "Beacon \u2014 native iOS server dashboard",
+  "stage": "Phase 3-5: agent integration and monitoring complete; native iOS source under validation",
+  "activity": "Verifying the iOS source with the Swift toolchain and writing implementation documentation",
+  "last_milestone": "Milestone #1 recorded: audited backend, live integrations, iOS foundation",
+  "next_action": "Run the final validation pass and hand over build instructions",
+  "blockers": [],
+  "awaiting_input": false,
+  "progress": null,
+  "updated_at": 1794027989.8753572,
+  "data_age_seconds": 0.19866180419921875,
+  "is_stale": false,
+  "stale_after_seconds": 90,
+  "snapshot_source": "agent",
+  "session": {
+   "id": "229a4178-607d-4c20-831c-0c8f4e50468f",
+   "name": "# Master Implementation Prompt: Native iOS Server",
+   "agent_id": "cc33efa9-6b9f-41f0-bf75-86dbc6e27096",
+   "agent_name": "agent",
+   "runtime_pid": 432130,
+   "runtime_alive": true,
+   "last_activity_at": 1794027989.7079136,
+   "last_activity_kind": "Assistant turn running",
+   "turn_running": true,
+   "transcript_updated_at": 1794027989.7079136
+  },
+  "queue": {
+   "pending": 0,
+   "delivered": 0,
+   "acknowledged": 0,
+   "processed_last_24h": 3
+  },
+  "latest_interrupt": {
+   "id": "6d9aaaa4d304455aa79773467d851ce4",
+   "requested_at": 1794027934.2783237,
+   "mode": "checkpoint",
+   "status": "acknowledged",
+   "reason": "smoke test",
+   "pid": null,
+   "signal": null,
+   "resolved_by": null,
+   "exit_observed_at": null,
+   "error": null,
+   "evidence": [
+    "agent note: smoke test"
+   ]
+  },
+  "evidence": [
+   {
+    "source": "agent_snapshot",
+    "detail": "Pushed by agent at 1794027990",
+    "age_seconds": 0.19866180419921875
+   },
+   {
+    "source": "cherry_session",
+    "detail": "agent \u00b7 # Master Implementation Prompt: Native iOS Server",
+    "age_seconds": 0.366105318069458
+   },
+   {
+    "source": "runtime_process",
+    "detail": "pid 432130 serving this session",
+    "age_seconds": null
+   },
+   {
+    "source": "message_queue",
+    "detail": "0 pending \u00b7 0 delivered \u00b7 0 acknowledged",
+    "age_seconds": null
+   },
+   {
+    "source": "interrupt",
+    "detail": "checkpoint interrupt acknowledged at 1794027934",
+    "age_seconds": 55.795695304870605
+   }
+  ],
+  "notes": []
+ },
+ "services": [
+  {
+   "key": "api",
+   "label": "Dashboard API",
+   "state": "up",
+   "summary": "Responding",
+   "detail": null,
+   "checked_at": 1794027991.8133924,
+   "latency_ms": null
+  },
+  {
+   "key": "agent",
+   "label": "AI agent",
+   "state": "up",
+   "summary": "Working",
+   "detail": "Beacon \u2014 native iOS server dashboard",
+   "checked_at": 1794027991.8134685,
+   "latency_ms": null
+  },
+  {
+   "key": "pihole",
+   "label": "Pi-hole",
+   "state": "up",
+   "summary": "DNS up \u00b7 blocking",
+   "detail": "Up 5 days (healthy)",
+   "checked_at": 1794027991.6353405,
+   "latency_ms": null
+  },
+  {
+   "key": "minecraft",
+   "label": "Minecraft",
+   "state": "up",
+   "summary": "Online \u00b7 3/20 players",
+   "detail": "1.21.1",
+   "checked_at": 1794027991.63702,
+   "latency_ms": null
+  },
+  {
+   "key": "server",
+   "label": "Host metrics",
+   "state": "up",
+   "summary": "CPU 21% \u00b7 RAM 36%",
+   "detail": null,
+   "checked_at": 1794027991.6998787,
+   "latency_ms": null
+  },
+  {
+   "key": "docker",
+   "label": "Docker",
+   "state": "up",
+   "summary": "Read-only monitor",
+   "detail": null,
+   "checked_at": 1794027991.6349874,
+   "latency_ms": null
+  }
+ ],
+ "server": {
+  "generated_at": 1794027991.6998787,
+  "uptime_seconds": 873035.19,
+  "cpu": {
+   "percent": 21.0,
+   "per_core": [
+    24.6,
+    15.6,
+    16.4,
+    20.0,
+    35.9,
+    15.2,
+    17.6,
+    24.4
+   ],
+   "load": [
+    2.91,
+    2.41,
+    1.42
+   ],
+   "temperature_c": 34.0,
+   "model": "Intel(R) Core(TM) i5-9300H CPU @ 2.40GHz",
+   "cores": 8
+  },
+  "memory": {
+   "total_bytes": 16620445696,
+   "used_bytes": 5978685440,
+   "available_bytes": 10641760256,
+   "percent": 36.0,
+   "swap_total_bytes": 12901675008,
+   "swap_used_bytes": 935968768,
+   "swap_percent": 7.3
+  },
+  "gpu": {
+   "available": true,
+   "name": "NVIDIA GeForce GTX 1650",
+   "utilization_percent": 0.0,
+   "temperature_c": 31.0,
+   "memory_used_bytes": 6291456,
+   "memory_total_bytes": 4294967296,
+   "power_w": 1.0,
+   "error": null
+  },
+  "disks": [
+   {
+    "mount": "/",
+    "filesystem": "ext4",
+    "total_bytes": 236183568384,
+    "used_bytes": 67649077248,
+    "free_bytes": 156462448640,
+    "percent": 28.6
+   },
+   {
+    "mount": "/boot",
+    "filesystem": "ext4",
+    "total_bytes": 989052928,
+    "used_bytes": 260116480,
+    "free_bytes": 660938752,
+    "percent": 26.3
+   },
+   {
+    "mount": "/mnt/storage_hdd",
+    "filesystem": "ext4",
+    "total_bytes": 983349346304,
+    "used_bytes": 265678848,
+    "free_bytes": 973064859648,
+    "percent": 0.0
+   }
+  ],
+  "network": {
+   "interface": "enp3s0",
+   "rx_bytes_per_second": 68810.8,
+   "tx_bytes_per_second": 51190.2,
+   "rx_bytes_total": 10530689502,
+   "tx_bytes_total": 12025070314
+  },
+  "docker": [
+   {
+    "name": "pihole",
+    "image": "pihole/pihole:2026.10.1",
+    "state": "running",
+    "status": "Up 5 days (healthy)",
+    "health": "healthy",
+    "cpu_percent": 0.38,
+    "memory_bytes": 21453864,
+    "memory_limit_bytes": 16621523435,
+    "started_at": null,
+    "error": null
+   }
+  ],
+  "docker_available": true,
+  "docker_error": null,
+  "unavailable": []
+ },
+ "pihole": {
+  "available": true,
+  "online": true,
+  "blocking": "enabled",
+  "container": {
+   "name": "pihole",
+   "image": "pihole/pihole:2026.10.1",
+   "state": "running",
+   "status": "Up 5 days (healthy)",
+   "health": "healthy",
+   "cpu_percent": 0.38,
+   "memory_bytes": 21453864,
+   "memory_limit_bytes": 16621523435,
+   "started_at": null,
+   "error": null
+  },
+  "queries_total": 36226,
+  "queries_blocked": 5616,
+  "percent_blocked": 15.5,
+  "unique_domains": 5359,
+  "queries_forwarded": 2856,
+  "queries_cached": 27577,
+  "top_blocked_domains": [
+   {
+    "name": "scribe.logs.roku.com",
+    "count": 3992
+   },
+   {
+    "name": "logs.netflix.com",
+    "count": 550
+   },
+   {
+    "name": "global.telemetry.insights.video.a2z.com",
+    "count": 136
+   },
+   {
+    "name": "incoming.telemetry.mozilla.org",
+    "count": 76
+   },
+   {
+    "name": "srtb.msn.com",
+    "count": 66
+   }
+  ],
+  "top_clients": [
+   {
+    "name": "192.168.1.83",
+    "count": 13445
+   },
+   {
+    "name": "192.168.1.75",
+    "count": 7700
+   },
+   {
+    "name": "192.168.1.95",
+    "count": 5587
+   },
+   {
+    "name": "192.168.1.41",
+    "count": 3641
+   },
+   {
+    "name": "192.168.1.78",
+    "count": 2492
+   }
+  ],
+  "upstreams": [
+   {
+    "name": "cache",
+    "address": "cache:-1",
+    "count": 27577,
+    "response_avg_ms": null
+   },
+   {
+    "name": "blocklist",
+    "address": "blocklist:-1",
+    "count": 5616,
+    "response_avg_ms": null
+   },
+   {
+    "name": "one.one.one.one",
+    "address": "1.0.0.1:53",
+    "count": 1715,
+    "response_avg_ms": 21.9
+   },
+   {
+    "name": "one.one.one.one",
+    "address": "1.1.1.1:53",
+    "count": 1141,
+    "response_avg_ms": 14.5
+   }
+  ],
+  "generated_at": 1794027991.6353405,
+  "error": null
+ },
+ "minecraft": {
+  "available": true,
+  "online": true,
+  "state": "running",
+  "version": "1.21.1",
+  "protocol": 767,
+  "motd": "sussy pussy",
+  "players_online": 3,
+  "players_max": 20,
+  "players": [
+   "PorscheLegend23",
+   "ecoeric",
+   "_Dizen"
+  ],
+  "uptime_seconds": 277.2,
+  "pid": 432706,
+  "cpu_percent": 70.5,
+  "memory_bytes": 3111673856,
+  "tps": null,
+  "mspt": null,
+  "tick_metrics_note": "Tick metrics unavailable: no spark/TPS provider installed and RCON/query are disabled",
+  "recent_errors": [
+   "[06Nov2026 22:02:04.223] [main/WARN] [mixin/]: Error loading class: com/li64/tide/registries/entities/misc/fishing/TideFishingHook (java.lang.ClassNotFoundException: com.li64.tide.registries.entities.misc.fishing.TideFishingHook)",
+   "[06Nov2026 22:02:04.371] [main/WARN] [mixin/]: Error loading class: xfacthd/framedblocks/common/blockentity/doubled/slab/FramedAdjustableDoubleBlockEntity (java.lang.ClassNotFoundException: xfacthd.framedblocks.common.blockentity.doubled.slab.FramedAdjustableDoubleBlockEntity)",
+   "[06Nov2026 22:02:04.396] [main/WARN] [mixin/]: Error loading class: me/jellysquid/mods/lithium/common/ai/pathing/PathNodeDefaults (java.lang.ClassNotFoundException: me.jellysquid.mods.lithium.common.ai.pathing.PathNodeDefaults)",
+   "[06Nov2026 22:02:05.494] [main/WARN] [mixin/]: Error loading class: org/jetbrains/annotations/ApiStatus$ScheduledForRemoval (java.lang.ClassNotFoundException: org.jetbrains.annotations.ApiStatus$ScheduledForRemoval)",
+   "[06Nov2026 22:02:29.532] [main/ERROR] [net.minecraft.world.item.crafting.RecipeManager/]: Parsing error loading recipe createdeco:placard: com.google.gson.JsonParseException: Failed to parse either. First: Not a json array: {\"id\":\"minecraft:white_dye\"}; Second: No key tag in MapLike[{\"id\":\"minecraft"
+  ],
+  "recent_events": [
+   "[06Nov2026 22:02:30.922] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Preparing level \"world\"",
+   "[06Nov2026 22:02:33.723] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Done (2.944s)! For help, type \"help\"",
+   "[06Nov2026 22:02:39.245] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ecoeric joined the game",
+   "[06Nov2026 22:05:18.901] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen joined the game",
+   "[06Nov2026 22:06:16.235] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 joined the game"
+  ],
+  "log_updated_at": 1794027976.3599522,
+  "last_backup_at": null,
+  "backup_note": "No backup directory found in the server folder \u2014 no existing mechanism detected",
+  "controls": {
+   "available": true,
+   "actions": [
+    "stop",
+    "restart"
+   ],
+   "stop_method": "sigint",
+   "start_method": null,
+   "reason": null
+  },
+  "generated_at": 1794027991.63702,
+  "error": null
+ },
+ "latest_milestone": {
+  "id": "6fd3e34cfa2742bbbb87d3a924b978d8",
+  "seq": 1,
+  "title": "Audited backend, live integrations and native iOS foundation",
+  "summary": "Verified the host and the agent runtime, then shipped the Beacon backend over pinned HTTPS with the agent status, queue and interrupt paths, real Pi-hole and Minecraft monitoring, screenshot retention, and the complete native SwiftUI app source with decoding tests.",
+  "changes": [
+   "Phase 1 audit of host, Cherry Studio runtime, Pi-hole v6 API, Minecraft ping contract and the missing iOS toolchain",
+   "FastAPI + SQLite service on 192.168.1.83:8091 under systemd, ECDSA private CA, scoped bearer tokens",
+   "Read-only agent status (snapshot + Cherry Studio SQLite + /proc) and a deterministic Status action",
+   "Durable message queue with checkpoint delivery, Continue, and a direct SIGINT interrupt path",
+   "Pi-hole v6 integration including blocking control; Minecraft ping/log/process monitoring with guarded controls",
+   "Native SwiftUI app, pinned-TLS client, Keychain storage, four screens; 13 Swift decoding tests green on Linux"
+  ],
+  "phase": "Phase 1-2",
+  "created_at": 1794027976.5942533,
+  "screenshots": [
+   {
+    "id": "ef9113040106408481a9d4188b39b21e",
+    "caption": "Deployment verification: beacon doctor passes every check on the live server",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 67621,
+    "width": 1120,
+    "height": 631,
+    "created_at": 1794027976.5949216,
+    "expires_at": 1794632776.5949216,
+    "url": "/api/v1/screenshots/ef9113040106408481a9d4188b39b21e",
+    "sha256": "b5da404e9fa2469eaaa0c6a082d171f68dcab4817243c16e50c01fb76ceca681",
+    "expired": false
+   },
+   {
+    "id": "21060c6a10c94f1ba5e8fbff6c5c5d05",
+    "caption": "Live dashboard payload assembled from the real agent, Pi-hole, Minecraft and host metrics",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 49607,
+    "width": 1120,
+    "height": 547,
+    "created_at": 1794027976.595914,
+    "expires_at": 1794632776.595914,
+    "url": "/api/v1/screenshots/21060c6a10c94f1ba5e8fbff6c5c5d05",
+    "sha256": "7f2860928436ada9639c0c629b39de48759ca678e20e3add76e019d9155a65a0",
+    "expired": false
+   },
+   {
+    "id": "495e0c3a151049e087c31ab16138bde5",
+    "caption": "Agent integration detail: state, runtime pid, queue counts and the evidence used to derive them",
+    "source": "api",
+    "content_type": "image/png",
+    "bytes": 150719,
+    "width": 1120,
+    "height": 1786,
+    "created_at": 1794027976.5968916,
+    "expires_at": 1794632776.5968916,
+    "url": "/api/v1/screenshots/495e0c3a151049e087c31ab16138bde5",
+    "sha256": "b50b43bb667c77283879fa5996af4625cfbe08a955370d8bd9f6683814de4f4e",
+    "expired": false
+   },
+   {
+    "id": "91ed2ddbbffc4300b1e53d76233a9946",
+    "caption": "The running AI agent (Cherry Studio + DSH runtime) driving this project",
+    "source": "window",
+    "content_type": "image/png",
+    "bytes": 176384,
+    "width": 1366,
+    "height": 768,
+    "created_at": 1794027976.5980031,
+    "expires_at": 1794632776.5980031,
+    "url": "/api/v1/screenshots/91ed2ddbbffc4300b1e53d76233a9946",
+    "sha256": "c445477e923e9aa64403f742d6c54eb03961a55a39e3849906dff2eeab049f90",
+    "expired": false
+   }
+  ],
+  "expired_screenshots": 0
+ },
+ "activity": {
+  "unread": 6,
+  "items": [
+   {
+    "id": "6724e5cc72834676824b54d2aad833d0",
+    "kind": "milestone_completed",
+    "severity": "success",
+    "title": "Milestone 1: Audited backend, live integrations and native iOS foundation",
+    "body": "Verified the host and the agent runtime, then shipped the Beacon backend over pinned HTTPS with the agent status, queue and interrupt paths, real Pi-hole and Minecraft monitoring, screenshot retention, and the complete native SwiftUI app source with decoding tests.",
+    "created_at": 1794027976.598905,
+    "read_at": null,
+    "payload": {
+     "milestone_id": "6fd3e34cfa2742bbbb87d3a924b978d8",
+     "seq": 1,
+     "phase": "Phase 1-2"
+    }
+   },
+   {
+    "id": "1fc8c4a38c79412b99dc2a59c18c6ebf",
+    "kind": "agent_interrupted",
+    "severity": "warning",
+    "title": "Agent interrupted",
+    "body": "smoke test",
+    "created_at": 1794027934.2791848,
+    "read_at": null,
+    "payload": {
+     "interrupt_id": "6d9aaaa4d304455aa79773467d851ce4",
+     "mode": "checkpoint",
+     "pid": null
+    }
+   },
+   {
+    "id": "a898011ce1d049f19843718ea1d34c09",
+    "kind": "agent_message_delivered",
+    "severity": "info",
+    "title": "Instruction delivered to the agent",
+    "body": "Beacon smoke test \u2014 no action required.",
+    "created_at": 1794027934.257814,
+    "read_at": null,
+    "payload": {
+     "message_id": "7512a28dc9914365917a0e05ab15b318",
+     "seq": 5
+    }
+   },
+   {
+    "id": "14337cbb4f4e42c18d10ce288ebd2cf7",
+    "kind": "agent_message_delivered",
+    "severity": "info",
+    "title": "Instruction delivered to the agent",
+    "body": "Beacon smoke test \u2014 no action required.",
+    "created_at": 1794027912.071095,
+    "read_at": null,
+    "payload": {
+     "message_id": "9ad353a0f36e46228fdd85dac80e4b99",
+     "seq": 3
+    }
+   },
+   {
+    "id": "85bc2fc240cc4398b246dbed766647d8",
+    "kind": "agent_interrupted",
+    "severity": "warning",
+    "title": "Agent interrupted",
+    "body": "smoke test",
+    "created_at": 1794027907.3879385,
+    "read_at": null,
+    "payload": {
+     "interrupt_id": "360ddd0282e643adbb8824bdc6ba54f3",
+     "mode": "checkpoint",
+     "pid": null
+    }
+   },
+   {
+    "id": "1eb3856f887e44208e62ddf664b2d99b",
+    "kind": "agent_message_delivered",
+    "severity": "info",
+    "title": "Instruction delivered to the agent",
+    "body": "Beacon smoke test \u2014 no action required.",
+    "created_at": 1794027907.3634484,
+    "read_at": null,
+    "payload": {
+     "message_id": "248b18f602b24994bd0026a4ba03ca7f",
+     "seq": 1
+    }
+   }
+  ]
+ },
+ "data_age_seconds": 0.19866180419921875
+}

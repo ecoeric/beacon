@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Beacon screenshot retention sweep
+
+[Timer]
+OnCalendar=*-*-* 03:41:00
+Persistent=true
+AccuracySec=1min
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target

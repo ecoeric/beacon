@@ -1,0 +1,78 @@
+{
+ "state": "working",
+ "state_label": "Working",
+ "project": "Beacon \u2014 native iOS server dashboard",
+ "stage": "Phase 3-5: agent integration and monitoring complete; native iOS source under validation",
+ "activity": "Verifying the iOS source with the Swift toolchain and writing implementation documentation",
+ "last_milestone": "Milestone #1 recorded: audited backend, live integrations, iOS foundation",
+ "next_action": "Run the final validation pass and hand over build instructions",
+ "blockers": [],
+ "awaiting_input": false,
+ "progress": null,
+ "updated_at": 1794027989.8753572,
+ "data_age_seconds": 1.9526829719543457,
+ "is_stale": false,
+ "stale_after_seconds": 90,
+ "snapshot_source": "agent",
+ "session": {
+  "id": "229a4178-607d-4c20-831c-0c8f4e50468f",
+  "name": "# Master Implementation Prompt: Native iOS Server",
+  "agent_id": "cc33efa9-6b9f-41f0-bf75-86dbc6e27096",
+  "agent_name": "agent",
+  "runtime_pid": 432130,
+  "runtime_alive": true,
+  "last_activity_at": 1794027989.7079136,
+  "last_activity_kind": "Assistant turn running",
+  "turn_running": true,
+  "transcript_updated_at": 1794027989.7079136
+ },
+ "queue": {
+  "pending": 0,
+  "delivered": 0,
+  "acknowledged": 0,
+  "processed_last_24h": 3
+ },
+ "latest_interrupt": {
+  "id": "6d9aaaa4d304455aa79773467d851ce4",
+  "requested_at": 1794027934.2783237,
+  "mode": "checkpoint",
+  "status": "acknowledged",
+  "reason": "smoke test",
+  "pid": null,
+  "signal": null,
+  "resolved_by": null,
+  "exit_observed_at": null,
+  "error": null,
+  "evidence": [
+   "agent note: smoke test"
+  ]
+ },
+ "evidence": [
+  {
+   "source": "agent_snapshot",
+   "detail": "Pushed by agent at 1794027990",
+   "age_seconds": 1.9526829719543457
+  },
+  {
+   "source": "cherry_session",
+   "detail": "agent \u00b7 # Master Implementation Prompt: Native iOS Server",
+   "age_seconds": 2.120126485824585
+  },
+  {
+   "source": "runtime_process",
+   "detail": "pid 432130 serving this session",
+   "age_seconds": null
+  },
+  {
+   "source": "message_queue",
+   "detail": "0 pending \u00b7 0 delivered \u00b7 0 acknowledged",
+   "age_seconds": null
+  },
+  {
+   "source": "interrupt",
+   "detail": "checkpoint interrupt acknowledged at 1794027934",
+   "age_seconds": 57.54971647262573
+  }
+ ],
+ "notes": []
+}

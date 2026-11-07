@@ -1,0 +1,46 @@
+[Unit]
+Description=Beacon dashboard API (FastAPI + SQLite) for the native iOS app
+Documentation=file:///home/eric/beacon/docs/ARCHITECTURE.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=eric
+Group=eric
+WorkingDirectory=/home/eric/beacon/backend
+EnvironmentFile=/home/eric/beacon/deploy/beacon.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=HOME=/home/eric
+ExecStart=/home/eric/beacon/backend/.venv/bin/uvicorn beacon.asgi:app \
+    --host ${BEACON_BIND} --port ${BEACON_PORT} \
+    --ssl-certfile ${BEACON_TLS_CERT} --ssl-keyfile ${BEACON_TLS_KEY} \
+    --no-server-header --timeout-keep-alive 75
+Restart=always
+RestartSec=3
+TimeoutStopSec=20
+KillSignal=SIGINT
+
+# Hardening notes:
+#  * NoNewPrivileges is deliberately OFF: the service calls the sudo-allow-listed, read-only
+#    `docker-read` wrapper. That wrapper only accepts `ps` and `stats` (see /usr/local/lib/beacon).
+#  * PrivateTmp is OFF so `ffmpeg -f x11grab` can reach /tmp/.X11-unix for real window captures.
+#  * PrivateDevices is OFF because nvidia-smi needs /dev/nvidia*.
+# Everything else is locked down; the process writes only to the data directory and the
+# Minecraft server folder (needed to start the server).
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/eric/beacon/data /home/eric/Desktop/NeoForgeServer
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryMax=1G
+TasksMax=128
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

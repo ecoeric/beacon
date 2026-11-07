@@ -1,0 +1,47 @@
+{
+ "agent": {
+  "binding_mode": "cherry-studio dsh runtime",
+  "configured_agent_id": "cc33efa9-6b9f-41f0-bf75-86dbc6e27096",
+  "runtime_resolvable": true,
+  "status_source": "agent snapshot + Cherry Studio SQLite (read-only) + /proc"
+ },
+ "message_delivery": {
+  "mode": "checkpoint",
+  "max_message_chars": 4000
+ },
+ "interrupt": {
+  "modes": [
+   "signal",
+   "checkpoint"
+  ],
+  "signal": "SIGINT"
+ },
+ "screenshots": {
+  "retention_days": 7,
+  "sources": [
+   "text",
+   "api",
+   "window",
+   "file"
+  ],
+  "max_per_milestone": 4
+ },
+ "monitoring": {
+  "docker": true,
+  "docker_error": null,
+  "gpu": true,
+  "gpu_error": null,
+  "cpu_temperature": true,
+  "minecraft_tick_metrics": false,
+  "minecraft_control_actions": [
+   "stop",
+   "restart"
+  ],
+  "pihole": true
+ },
+ "notifications": {
+  "in_app": true,
+  "push": false,
+  "push_note": "APNs is an extension point, not implemented"
+ }
+}

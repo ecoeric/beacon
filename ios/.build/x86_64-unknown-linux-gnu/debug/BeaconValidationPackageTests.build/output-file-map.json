@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageTests.build/master.swiftdeps"
+  },
+  "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageTests.derived/runner.swift": {
+    "dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageTests.build/runner.d",
+    "object": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageTests.build/runner.swift.o",
+    "swiftmodule": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/work/.build/x86_64-unknown-linux-gnu/debug/BeaconValidationPackageTests.build/runner.swiftdeps"
+  }
+}

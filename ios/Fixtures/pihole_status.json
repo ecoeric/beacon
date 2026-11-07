@@ -1,0 +1,95 @@
+{
+ "available": true,
+ "online": true,
+ "blocking": "enabled",
+ "container": {
+  "name": "pihole",
+  "image": "pihole/pihole:2026.10.1",
+  "state": "running",
+  "status": "Up 5 days (healthy)",
+  "health": "healthy",
+  "cpu_percent": 0.17,
+  "memory_bytes": 19828572,
+  "memory_limit_bytes": 16621523435,
+  "started_at": null,
+  "error": null
+ },
+ "queries_total": 35426,
+ "queries_blocked": 5190,
+ "percent_blocked": 14.65,
+ "unique_domains": 5240,
+ "queries_forwarded": 2517,
+ "queries_cached": 27620,
+ "top_blocked_domains": [
+  {
+   "name": "scribe.logs.roku.com",
+   "count": 3606
+  },
+  {
+   "name": "logs.netflix.com",
+   "count": 601
+  },
+  {
+   "name": "global.telemetry.insights.video.a2z.com",
+   "count": 136
+  },
+  {
+   "name": "incoming.telemetry.mozilla.org",
+   "count": 112
+  },
+  {
+   "name": "end.scorecardresearch.com",
+   "count": 74
+  }
+ ],
+ "top_clients": [
+  {
+   "name": "192.168.1.83",
+   "count": 12280
+  },
+  {
+   "name": "192.168.1.75",
+   "count": 7243
+  },
+  {
+   "name": "192.168.1.95",
+   "count": 4933
+  },
+  {
+   "name": "192.168.1.41",
+   "count": 3630
+  },
+  {
+   "name": "192.168.1.78",
+   "count": 3414
+  }
+ ],
+ "upstreams": [
+  {
+   "name": "cache",
+   "address": "cache:-1",
+   "count": 27620,
+   "response_avg_ms": null
+  },
+  {
+   "name": "blocklist",
+   "address": "blocklist:-1",
+   "count": 5190,
+   "response_avg_ms": null
+  },
+  {
+   "name": "one.one.one.one",
+   "address": "1.0.0.1:53",
+   "count": 1669,
+   "response_avg_ms": 22.1
+  },
+  {
+   "name": "one.one.one.one",
+   "address": "1.1.1.1:53",
+   "count": 848,
+   "response_avg_ms": 14.5
+  }
+ ],
+ "generated_at": 1794017527.7051525,
+ "error": null
+}
