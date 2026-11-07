@@ -348,6 +348,8 @@ class MinecraftStatus(BaseModel):
     online: bool
     state: Literal["running", "stopped", "unreachable", "unknown"]
     version: str | None = None
+    loader: str | None = None
+    mods_count: int | None = None
     protocol: int | None = None
     motd: str | None = None
     players_online: int | None = None

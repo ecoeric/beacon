@@ -15,8 +15,9 @@ SWIFT_IMAGE="${SWIFT_IMAGE:-swift:6.0}"
 
 heading() { printf '\n\033[1m== %s\033[0m\n' "$1"; }
 
+USER_FLAGS=(--user "$(id -u):$(id -g)" -e HOME=/tmp)
 heading "1/3 swiftc -parse (all sources)"
-docker run --rm -v "$PROJECT/ios:/work" -w /work "$SWIFT_IMAGE" bash -lc '
+sudo docker run --rm "${USER_FLAGS[@]}" -v "$PROJECT/ios:/work" -w /work "$SWIFT_IMAGE" bash -lc '
 set -e
 files=$(find Beacon BeaconTests SharedTests -name "*.swift" | sort)
 echo "parsing $(echo "$files" | wc -l) files"
@@ -27,7 +28,7 @@ echo "all sources parsed"
 '
 
 heading "2/3 Foundation-only compile + tests (SwiftPM)"
-docker run --rm -v "$PROJECT/ios:/work" -w /work "$SWIFT_IMAGE" swift test 2>&1 | tail -n 12
+sudo docker run --rm "${USER_FLAGS[@]}" -v "$PROJECT/ios:/work" -w /work "$SWIFT_IMAGE" swift test 2>&1 | tail -n 12
 
 heading "3/3 Xcode project structure"
 cd "$PROJECT"

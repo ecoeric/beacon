@@ -521,6 +521,7 @@ def cmd_minecraft(args: argparse.Namespace) -> int:
     heading("Minecraft")
     print(f"state      {data.get('state')}  online={data.get('online')}")
     print(f"version    {data.get('version')} (protocol {data.get('protocol')})")
+    print(f"loader     {data.get('loader') or 'unknown'} · {data.get('mods_count')} mods")
     print(f"players    {data.get('players_online')}/{data.get('players_max')} {', '.join(data.get('players') or [])}")
     if data.get("uptime_seconds"):
         print(f"uptime     {data['uptime_seconds'] / 3600:.1f} h · pid {data.get('pid')}")

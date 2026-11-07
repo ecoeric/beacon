@@ -3,6 +3,8 @@
  "online": true,
  "state": "running",
  "version": "1.21.1",
+ "loader": "NeoForge 21.1.252",
+ "mods_count": 91,
  "protocol": 767,
  "motd": "sussy pussy",
  "players_online": 3,
@@ -12,28 +14,28 @@
   "ecoeric",
   "PorscheLegend23"
  ],
- "uptime_seconds": 562.7,
- "pid": 418280,
- "cpu_percent": 59.8,
- "memory_bytes": 4206809088,
+ "uptime_seconds": 456.6,
+ "pid": 432706,
+ "cpu_percent": 41.6,
+ "memory_bytes": 3460747264,
  "tps": null,
  "mspt": null,
  "tick_metrics_note": "Tick metrics unavailable: no spark/TPS provider installed and RCON/query are disabled",
  "recent_errors": [
-  "[06Nov2026 19:02:53.663] [main/WARN] [mixin/]: Error loading class: xfacthd/framedblocks/common/blockentity/doubled/slab/FramedAdjustableDoubleBlockEntity (java.lang.ClassNotFoundException: xfacthd.framedblocks.common.blockentity.doubled.slab.FramedAdjustableDoubleBlockEntity)",
-  "[06Nov2026 19:02:53.686] [main/WARN] [mixin/]: Error loading class: me/jellysquid/mods/lithium/common/ai/pathing/PathNodeDefaults (java.lang.ClassNotFoundException: me.jellysquid.mods.lithium.common.ai.pathing.PathNodeDefaults)",
-  "[06Nov2026 19:02:54.669] [main/WARN] [mixin/]: Error loading class: org/jetbrains/annotations/ApiStatus$ScheduledForRemoval (java.lang.ClassNotFoundException: org.jetbrains.annotations.ApiStatus$ScheduledForRemoval)",
-  "[06Nov2026 19:03:15.658] [main/ERROR] [net.minecraft.world.item.crafting.RecipeManager/]: Parsing error loading recipe createdeco:placard: com.google.gson.JsonParseException: Failed to parse either. First: Not a json array: {\"id\":\"minecraft:white_dye\"}; Second: No key tag in MapLike[{\"id\":\"minecraft",
-  "java.lang.NullPointerException: Cannot invoke \"net.minecraft.world.level.Level.northstar$dimension()\" because \"this.level\" is null"
+  "Caused by: java.lang.RuntimeException: Failed decoding custom payload sable_player_ragdoll:mob_ragdoll_spawn: net.minecraft.nbt.ReportedNbtException: Loading NBT data",
+  "Caused by: net.minecraft.nbt.ReportedNbtException: Loading NBT data",
+  "Caused by: java.io.IOException: Invalid tag id: 69",
+  "at TRANSFORMER/minecraft@1.21.1/net.minecraft.nbt.TagType$1.createException(TagType.java:58) ~[server-1.21.1-20240808.144430-srg.jar%23209!/:?]",
+  "[06Nov2026 22:08:03.903] [Server thread/INFO] [net.minecraft.server.network.ServerGamePacketListenerImpl/]: _Dizen lost connection: Internal Exception: io.netty.handler.codec.DecoderException: Failed to decode packet 'serverbound/minecraft:custom_payload'"
  ],
  "recent_events": [
-  "[06Nov2026 19:03:16.914] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Preparing level \"world\"",
-  "[06Nov2026 19:03:19.494] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Done (2.702s)! For help, type \"help\"",
-  "[06Nov2026 19:03:24.464] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ecoeric joined the game",
-  "[06Nov2026 19:03:30.373] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen joined the game",
-  "[06Nov2026 19:06:20.924] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 joined the game"
+  "[06Nov2026 22:06:16.235] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: PorscheLegend23 joined the game",
+  "[06Nov2026 22:06:44.745] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen left the game",
+  "[06Nov2026 22:06:52.470] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen joined the game",
+  "[06Nov2026 22:08:03.903] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen left the game",
+  "[06Nov2026 22:08:08.743] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: _Dizen joined the game"
  ],
- "log_updated_at": 1794017475.7130778,
+ "log_updated_at": 1794028164.2194076,
  "last_backup_at": null,
  "backup_note": "No backup directory found in the server folder \u2014 no existing mechanism detected",
  "controls": {
@@ -46,6 +48,6 @@
   "start_method": null,
   "reason": null
  },
- "generated_at": 1794017527.5198374,
+ "generated_at": 1794028171.011475,
  "error": null
 }

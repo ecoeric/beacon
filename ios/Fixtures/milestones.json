@@ -1,5 +1,20 @@
 [
  {
+  "id": "ca19163a14ca4e428ab4d94284b31199",
+  "seq": 2,
+  "title": "Retention drill: 7-day cleanup verified",
+  "summary": "Self-test of the automatic screenshot retention: one screenshot is aged past its window, the systemd retention unit is run, and the file must disappear while the milestone text survives.",
+  "changes": [
+   "Screenshot captured and attached through the API",
+   "expires_at moved into the past to simulate day 8",
+   "beacon-retention.service triggered manually (same command the daily timer runs)"
+  ],
+  "phase": "Phase 4",
+  "created_at": 1794028091.3096402,
+  "screenshots": [],
+  "expired_screenshots": 1
+ },
+ {
   "id": "6fd3e34cfa2742bbbb87d3a924b978d8",
   "seq": 1,
   "title": "Audited backend, live integrations and native iOS foundation",

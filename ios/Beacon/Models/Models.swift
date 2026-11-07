@@ -501,6 +501,8 @@ struct MinecraftStatus: Codable, Equatable {
     let online: Bool
     let state: String
     let version: String?
+    let loader: String?
+    let modsCount: Int?
     let protocolNumber: Int?
     let motd: String?
     let playersOnline: Int?
@@ -525,7 +527,7 @@ struct MinecraftStatus: Codable, Equatable {
     var isRunning: Bool { state == "running" }
 
     enum CodingKeys: String, CodingKey {
-        case available, online, state, version, motd, players, uptimeSeconds, pid
+        case available, online, state, version, loader, modsCount, motd, players, uptimeSeconds, pid
         case protocolNumber = "protocol"
         case cpuPercent, memoryBytes, tps, mspt, tickMetricsNote
         case playersOnline, playersMax, recentErrors, recentEvents, logUpdatedAt

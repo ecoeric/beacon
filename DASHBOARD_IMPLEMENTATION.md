@@ -273,7 +273,11 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
   `backend/beacon/cli.py` (`beacon retention run --local`), `backend/beacon/main.py`.
 * **Test**: `tests/test_milestones.py` — expiry sweep deletes file but keeps milestone text;
   unrelated files untouched; generated orphans removed; dry run; project-escape protection.
-  Live: `beacon retention run --dry-run` + `/retention/status`.
+  **Live drill** (milestone #2, kept as a record): a real screenshot's `expires_at` was moved into
+  the past, `sudo systemctl start beacon-retention.service` ran the shipped unit, the file was
+  deleted, the API answered `410 expired`, the milestone summary stayed readable with
+  `expired_screenshots: 1`, and the sweep wrote its audit row
+  (`{"deleted_screenshots":1,"deleted_files":1,"kept":4}`).
 * **Limitations**: retention is age-based only (no manual pinning); screenshots are not backed up
   beyond the regular `beacon backup`.
 * **Debug**: `beacon retention status`, `systemctl list-timers beacon-retention.timer`,
@@ -329,13 +333,16 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 
 ## 2.19 Minecraft monitoring
 
-* **Behaviour**: server-list ping (version, protocol, MOTD, players + sample), process metrics
-  (`/proc` pid, CPU %, RSS, uptime), recent log errors/events/tick warnings, backup detection.
-  TPS/MSPT are reported as `null` with an explicit reason (no spark, RCON/query disabled).
+* **Behaviour**: server-list ping (version, protocol, MOTD, players + sample), mod loader/version
+  and installed mod count detected from `libraries/net/neoforged/*` and `mods/*.jar`, process
+  metrics (`/proc` pid, CPU %, RSS, uptime), recent log errors/events/tick warnings, backup
+  detection. TPS/MSPT are reported as `null` with an explicit reason (no spark, RCON/query
+  disabled).
 * **Files**: `backend/beacon/services/minecraft.py`,
   `backend/beacon/routers/monitoring.py`, `ios/Beacon/Features/Server/ServerView.swift`.
 * **Test**: `tests/test_monitoring.py` (stopped server path, control confirmation), live smoke
-  test against the running NeoForge server (1.21.1, players, pid, RSS, logs).
+  test against the running NeoForge server (1.21.1, players, pid, RSS, logs). Live detection
+  reported `NeoForge 21.1.252 · 91 mods`.
 * **Limitations**: tick metrics unavailable; player list is the ping sample plus log join/leave
   reconstruction; no RCON/query enabled.
 
@@ -434,7 +441,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Harness | Command | Last result |
 |---|---|---|
 | Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 82 passed |
-| Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 57 checks passed |
+| Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 18 checks passed |

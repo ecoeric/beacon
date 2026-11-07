@@ -1,6 +1,20 @@
 {
- "unread": 6,
+ "unread": 7,
  "items": [
+  {
+   "id": "0a51625181ec49eeacefd64695954078",
+   "kind": "milestone_completed",
+   "severity": "success",
+   "title": "Milestone 2: Retention drill: 7-day cleanup verified",
+   "body": "Self-test of the automatic screenshot retention: one screenshot is aged past its window, the systemd retention unit is run, and the file must disappear while the milestone text survives.",
+   "created_at": 1794028091.310693,
+   "read_at": null,
+   "payload": {
+    "milestone_id": "ca19163a14ca4e428ab4d94284b31199",
+    "seq": 2,
+    "phase": "Phase 4"
+   }
+  },
   {
    "id": "6724e5cc72834676824b54d2aad833d0",
    "kind": "milestone_completed",

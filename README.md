@@ -49,3 +49,24 @@ repository installs, signs, or distributes the app — deployment to a device is
 
 Implemented / Partial / Planned / Unavailable are used consistently in the docs; every claim
 in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were run.
+
+## Verified state
+
+| Check | Result |
+|---|---|
+| `pytest backend/tests` | 82 passed |
+| `scripts/smoke_test.py` (live Pi-hole / Minecraft / Docker / agent) | 58 checks passed |
+| `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
+| `swiftc -parse` on iOS sources | 22 files parsed |
+| `scripts/validate_ios_project.py` | 18 checks passed |
+| `beacon doctor` | all checks passed |
+| Retention drill through `beacon-retention.service` | aged screenshot deleted, 410 confirmed, milestone text kept |
+
+Milestone records with four real screenshots each are stored on the server and shown in the app;
+screenshots expire automatically after seven days while milestone summaries remain.
+
+## Status of the iPhone build
+
+The native project (Xcode project, SwiftUI app, pinned-TLS client, tests) is complete and
+version-controlled here. Building it requires Xcode on macOS; see `docs/SETUP.md` §5. No
+installation, signing or distribution to a phone was performed — that is a separate project.

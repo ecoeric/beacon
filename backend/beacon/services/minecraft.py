@@ -298,6 +298,28 @@ def backup_info(settings: Settings) -> tuple[float | None, str | None]:
     return newest, None
 
 
+def loader_info(settings: Settings) -> tuple[str | None, int | None]:
+    """Detect the mod loader/version from installed libraries and count installed mods."""
+    loader: str | None = None
+    for family, label in (("neoforge", "NeoForge"), ("forge", "Forge")):
+        base = settings.minecraft_dir / "libraries" / "net" / "neoforged" / family
+        try:
+            versions = sorted(entry.name for entry in base.iterdir() if entry.is_dir())
+        except OSError:
+            continue
+        if versions:
+            loader = f"{label} {versions[-1]}"
+            break
+    mods_count: int | None = None
+    mods_dir = settings.minecraft_dir / "mods"
+    if mods_dir.is_dir():
+        try:
+            mods_count = sum(1 for entry in mods_dir.iterdir() if entry.suffix.lower() == ".jar")
+        except OSError:
+            mods_count = None
+    return loader, mods_count
+
+
 def _spark_installed(settings: Settings) -> bool:
     mods = settings.minecraft_dir / "mods"
     if not mods.is_dir():
@@ -552,6 +574,7 @@ async def status(settings: Settings) -> MinecraftStatus:
     version = None
     protocol = None
     motd = None
+    loader, mods_count = loader_info(settings)
     players_online = None
     players_max = None
     players: list[str] = []
@@ -597,6 +620,8 @@ async def status(settings: Settings) -> MinecraftStatus:
         online=ping_result is not None,
         state=state,  # type: ignore[arg-type]
         version=version,
+        loader=loader,
+        mods_count=mods_count,
         protocol=protocol,
         motd=motd,
         players_online=players_online,

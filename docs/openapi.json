@@ -3711,6 +3711,28 @@
             ],
             "title": "Version"
           },
+          "loader": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loader"
+          },
+          "mods_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mods Count"
+          },
           "protocol": {
             "anyOf": [
               {

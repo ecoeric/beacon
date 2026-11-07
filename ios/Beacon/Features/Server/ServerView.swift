@@ -403,7 +403,7 @@ struct ServerView: View {
     private func minecraftCard(_ minecraft: MinecraftStatus) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                SectionHeader(title: "Minecraft", subtitle: minecraft.version.map { "NeoForge · \($0)" })
+                SectionHeader(title: "Minecraft", subtitle: minecraftDetailLine(minecraft))
                 Spacer()
                 StatusPill(
                     text: minecraft.state,
@@ -498,6 +498,14 @@ struct ServerView: View {
             }
         }
         .beaconCard()
+    }
+
+    private func minecraftDetailLine(_ minecraft: MinecraftStatus) -> String? {
+        var parts: [String] = []
+        if let loader = minecraft.loader { parts.append(loader) }
+        if let version = minecraft.version { parts.append(version) }
+        if let mods = minecraft.modsCount { parts.append("\(mods) mods") }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
     private var advancedFooter: some View {
