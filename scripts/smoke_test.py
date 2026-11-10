@@ -209,10 +209,22 @@ def main() -> int:
     minecraft = cli.get("/api/v1/minecraft/status").json()
     check("Minecraft status available", minecraft["available"])
     check("Minecraft online state detected", minecraft["state"] in {"running", "stopped", "unreachable"}, minecraft["state"])
-    if minecraft["state"] == "running":
-        check("Minecraft version via server-list ping", bool(minecraft["version"]), minecraft["version"])
-        check("Minecraft player count reported", minecraft["players_online"] is not None, f"{minecraft['players_online']} online")
-        check("Minecraft process metrics reported", minecraft["pid"] is not None and minecraft["memory_bytes"] is not None)
+    running = minecraft["state"] == "running"
+    check(
+        "Minecraft version via server-list ping",
+        (not running) or bool(minecraft["version"]),
+        minecraft["version"] or "server stopped",
+    )
+    check(
+        "Minecraft player count reported",
+        (not running) or minecraft["players_online"] is not None,
+        f"{minecraft['players_online']} online" if running else "server stopped",
+    )
+    check(
+        "Minecraft process metrics reported",
+        (not running) or (minecraft["pid"] is not None and minecraft["memory_bytes"] is not None),
+        f"pid {minecraft['pid']}" if running else "server stopped",
+    )
     check("tick metrics are not fabricated", minecraft["tps"] is None and bool(minecraft["tick_metrics_note"]), minecraft["tick_metrics_note"][:60])
     logs = cli.get("/api/v1/minecraft/logs", params={"lines": 20})
     check("Minecraft logs are readable", logs.status_code == 200 and len(logs.json()["lines"]) == 20)
