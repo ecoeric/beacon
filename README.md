@@ -38,7 +38,7 @@ systemctl status beacon-api
 beacon doctor
 ```
 
-Documentation: `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `DASHBOARD_IMPLEMENTATION.md`.
+Documentation: `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/OPERATIONS.md`, `DASHBOARD_IMPLEMENTATION.md`.
 
 ## Building the iPhone app
 
@@ -61,6 +61,7 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `scripts/validate_ios_project.py` | 18 checks passed |
 | `scripts/check_openapi_drift.py` | contract up to date |
 | backup restore drill | restored DB, token and image served by the API |
+| crash recovery (`SIGKILL`) | systemd restart, API back in 3.8 s, data intact |
 | `beacon doctor` | all checks passed |
 | Retention drill through `beacon-retention.service` | aged screenshot deleted, 410 confirmed, milestone text kept |
 

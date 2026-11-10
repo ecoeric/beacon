@@ -38,6 +38,12 @@ ProtectControlGroups=yes
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 RestrictNamespaces=yes
 LockPersonality=yes
+# NOTE: an IPAddressDeny/Allow egress allow-list was trialled and reverted: with it in place the
+# service could not reach Pi-hole on the same host, so it is not a safe control for this
+# deployment. Network exposure is instead limited by binding to the LAN address only.
+# Only native syscalls, and hide processes of other users from /proc (we only read our own).
+SystemCallArchitectures=native
+ProtectProc=invisible
 MemoryMax=1G
 TasksMax=128
 UMask=0077

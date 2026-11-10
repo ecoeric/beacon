@@ -201,6 +201,8 @@ Documentation endpoints are disabled in production (`BEACON_ENABLE_DOCS=0`).
 
 ### 8.5 Deployment topology (actual)
 
+Operational procedures: `docs/OPERATIONS.md`.
+
 ```
 systemd
 ├── beacon-api.service      eric, 192.168.1.83:8091 TLS, ProtectSystem=strict

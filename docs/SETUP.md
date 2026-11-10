@@ -220,6 +220,9 @@ Restore: stop the service, replace `data/beacon.sqlite` and the `secrets/`, `tls
 
 ## 7. Troubleshooting
 
+For day-to-day procedures (backup/restore, token and TLS rotation, incidents, hardening posture)
+see **`docs/OPERATIONS.md`**.
+
 | Symptom | Fix |
 |---|---|
 | `beacon doctor` reports "API reachable" failed | `systemctl status beacon-api`; check port 8091 (`ss -tlnp`); certificate/key permissions (`data/tls` 0700, keys 0600) |

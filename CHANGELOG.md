@@ -3,6 +3,38 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.2] — 2026-11-10
+
+Operational validation on the live deployment plus a small hardening increment.
+
+### Added
+* `docs/OPERATIONS.md`: runbook for service lifecycle, health checks, backup/restore, token and TLS
+  rotation, retention, agent operations, Minecraft/Pi-hole procedures, incident checklist,
+  hardening posture and upgrades.
+
+### Verified on the live host
+* **Production backup**: `VACUUM INTO` copy with `PRAGMA integrity_check = ok`; 4 milestones,
+  16 screenshot rows, 12 live image files, 3 tokens, TLS material and secrets included (1.3 MB).
+* **Restore drill**: the archive was restored into a temporary data directory and served by a
+  second TLS instance on `127.0.0.1:8093` using the restored CA and token — health `ok`, the same
+  four milestones, and a screenshot served byte-for-byte (22 989 bytes). The temporary instance
+  was then stopped; the live service was untouched.
+* **Crash recovery**: `SIGKILL` of the main process → systemd restarted it and the API answered in
+  **3.8 s** with all data intact.
+* **Hardening score**: `systemd-analyze security` improved from 6.9 to **6.5 MEDIUM** by adding
+  `SystemCallArchitectures=native` and `ProtectProc=invisible`.
+
+### Tried and reverted
+* `IPAddressDeny=any` + `IPAddressAllow=127.0.0.0/8 192.168.1.0/24` on the service: with the BPF
+  egress allow-list active the service could no longer reach Pi-hole on the same host, so the
+  control was removed. The unit file and the runbook record why; exposure remains limited by
+  binding to the LAN address only.
+
+### Operational note
+* The Minecraft server was stopped externally around 2026-11-10 13:29 (clean world save in
+  `latest.log`); Beacon's audit log contains no Minecraft control actions. The dashboard correctly
+  reports it as stopped.
+
 ## [0.1.1] — 2026-11-07
 
 Hardening pass: the control paths that could not be exercised against the live services were
