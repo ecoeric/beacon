@@ -39,7 +39,14 @@ PY
 )"
 PID=""
 cleanup() {
-    if [ -n "$PID" ]; then kill "$PID" 2>/dev/null || true; fi
+    if [ -n "$PID" ]; then
+        kill "$PID" 2>/dev/null || true
+        for _ in $(seq 1 20); do
+            kill -0 "$PID" 2>/dev/null || break
+            sleep 0.1
+        done
+        kill -9 "$PID" 2>/dev/null || true
+    fi
     rm -rf "$TMP"
 }
 trap cleanup EXIT
