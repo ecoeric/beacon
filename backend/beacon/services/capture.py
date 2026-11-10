@@ -242,8 +242,11 @@ def capture_window(settings: Settings, *, label: str = "", caption: str = "") ->
             "No X11 display configured for the service (set BEACON_X11_DISPLAY=:0 in deploy/beacon.env)",
             status_code=503,
         )
+    capture_env = {**os.environ}
+    if display:
+        capture_env["DISPLAY"] = display
     if authority and Path(authority).exists():
-        os.environ.setdefault("XAUTHORITY", authority)
+        capture_env.setdefault("XAUTHORITY", authority)
     settings.capture_dir.mkdir(parents=True, exist_ok=True)
     staging = settings.capture_dir / f"window-{int(time.time())}.png"
     command = [
@@ -268,7 +271,7 @@ def capture_window(settings: Settings, *, label: str = "", caption: str = "") ->
             capture_output=True,
             text=True,
             timeout=20,
-            env={**os.environ},
+            env=capture_env,
             check=False,
         )
     except (OSError, subprocess.SubprocessError) as exc:

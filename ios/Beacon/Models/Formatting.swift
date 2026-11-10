@@ -9,7 +9,7 @@ enum Format {
     static let byteFormatter: ByteCountFormatter = {
         let formatter = ByteCountFormatter()
         formatter.countStyle = .memory
-        formatter.allowedUnits = [.useMB, .useGB, .useTB]
+        formatter.allowedUnits = [.useBytes, .useKB, .useMB, .useGB, .useTB]
         formatter.isAdaptive = true
         return formatter
     }()

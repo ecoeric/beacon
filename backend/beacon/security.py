@@ -90,14 +90,15 @@ def verify_token(db: Database, raw: str | None) -> TokenInfo | None:
         return None
     digest = hash_token(raw)
     row = db.query_one(
-        "SELECT id, name, scopes FROM token WHERE token_sha256=? AND revoked_at IS NULL",
+        "SELECT id, name, scopes, token_sha256 FROM token "
+        "WHERE token_sha256=? AND revoked_at IS NULL",
         (digest,),
     )
     if row is None:
         return None
     # Constant-time comparison of the stored digest (defence in depth; the lookup above is
     # already by digest).
-    if not hmac.compare_digest(row["token_sha256"] if "token_sha256" in row.keys() else digest, digest):
+    if not hmac.compare_digest(row["token_sha256"], digest):
         return None
     db.execute(
         "UPDATE token SET last_used_at=? WHERE id=? AND (last_used_at IS NULL OR last_used_at < ?)",

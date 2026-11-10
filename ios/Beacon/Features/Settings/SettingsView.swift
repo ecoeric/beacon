@@ -50,7 +50,7 @@ struct SettingsView: View {
                 Section("Access") {
                     LabeledContent("Token", value: model.identityName ?? "unknown")
                     LabeledContent("Token id", value: tokenHint)
-                    LabeledContent("Scopes", value: model.capabilities == nil ? "read, action, admin" : "read · action · admin")
+                    LabeledContent("Scopes", value: model.tokenScopes.isEmpty ? "unknown" : model.tokenScopes.joined(separator: " · "))
                     LabeledContent("Certificate", value: AppSettings.shared.spkiPin == nil ? "private CA only" : "CA + SPKI pin")
                     Text("Traffic is validated against the private Beacon CA bundled in this app. The token and pin live in the iOS Keychain and are never sent anywhere except your server.")
                         .font(.beaconTiny)

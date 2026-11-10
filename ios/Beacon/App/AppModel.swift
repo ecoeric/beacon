@@ -45,6 +45,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var connection: Connection = .unknown
     @Published private(set) var isConfigured = false
     @Published private(set) var identityName: String?
+    @Published private(set) var tokenScopes: [String] = []
     @Published private(set) var hostLabel: String = ""
 
     // Data
@@ -110,6 +111,7 @@ final class AppModel: ObservableObject {
             }
             if let identity = try await client?.whoAmI() {
                 identityName = identity.name
+                tokenScopes = identity.scopes
             }
             await refresh(showSpinner: false)
             await refreshMilestones()
@@ -141,6 +143,7 @@ final class AppModel: ObservableObject {
         do {
             _ = try await testClient.health()
             let identity = try await testClient.whoAmI()
+            tokenScopes = identity.scopes
             try settings.save(baseURLString: url.absoluteString, token: trimmedToken, pin: configuration.spkiPin)
             testSession.invalidateAndCancel()
             identityName = identity.name
@@ -170,6 +173,7 @@ final class AppModel: ObservableObject {
         capabilities = nil
         statusSummary = nil
         identityName = nil
+        tokenScopes = []
         lastUpdated = nil
         isConfigured = false
         connection = .unknown

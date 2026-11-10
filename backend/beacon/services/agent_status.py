@@ -124,7 +124,6 @@ def derive_state(
         return "disconnected", notes
 
     if interrupt is not None and interrupt.status in {"signalled", "requested"}:
-        ack_age = _age_seconds(interrupt.requested_at, at=at) or 0.0
         newer_snapshot = snapshot is not None and snapshot.updated_at > interrupt.requested_at
         if not newer_snapshot or snapshot is not None and snapshot.state_override == "failed":
             notes.append(f"Last interrupt ({interrupt.mode}) has not been acknowledged by the agent yet")

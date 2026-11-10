@@ -240,3 +240,14 @@ changed intentionally, update the snapshot and the iOS fixture tests:
 ```bash
 backend/.venv/bin/python scripts/check_openapi_drift.py --write
 ```
+
+## Reproducible restore drill
+
+```bash
+beacon backup --to /tmp/beacon-backup
+scripts/restore_drill.sh /tmp/beacon-backup
+```
+
+The script starts a second TLS instance on a free loopback port from the archive, verifies
+health/database/milestones/screenshot bytes and the restored token, then stops it. The live
+service is untouched.
