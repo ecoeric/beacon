@@ -310,3 +310,28 @@ def test_stop_requires_force_when_players_are_online(tmp_path, monkeypatch):
         minecraft.stop(settings, force=False)
     assert excinfo.value.code == "players_online"
     assert excinfo.value.detail["players"] == ["ecoeric"]
+
+
+def test_stop_refuses_when_target_changes(tmp_path, monkeypatch):
+    server_dir = tmp_path / "minecraft"
+    proc = _fake_java_process(server_dir)
+    settings = _settings_with(minecraft_dir=server_dir, data_dir=tmp_path / "data")
+    monkeypatch.setattr(minecraft, "graceful_signal_supported", lambda _settings: (True, "hook"))
+    monkeypatch.setattr(minecraft, "_players_from_log", lambda _settings: [])
+    real_find = minecraft.find_process
+    calls = {"count": 0}
+
+    def flaky(settings_value):
+        calls["count"] += 1
+        return real_find(settings_value) if calls["count"] == 1 else None
+
+    monkeypatch.setattr(minecraft, "find_process", flaky)
+    try:
+        with pytest.raises(minecraft.MinecraftError) as excinfo:
+            minecraft.stop(settings)
+        assert excinfo.value.code == "target_changed"
+        assert proc.poll() is None, "the server must not be signalled after re-verification fails"
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)

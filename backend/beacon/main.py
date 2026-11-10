@@ -130,6 +130,15 @@ def create_app() -> FastAPI:
     @app.middleware("http")
     async def security_headers(request: Request, call_next):
         started = time.monotonic()
+        declared = request.headers.get("content-length")
+        if declared is not None and declared.isdigit() and int(declared) > settings.max_request_bytes:
+            return JSONResponse(
+                status_code=413,
+                content={
+                    "error": "payload_too_large",
+                    "message": f"request body exceeds {settings.max_request_bytes} bytes",
+                },
+            )
         response = await call_next(request)
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")

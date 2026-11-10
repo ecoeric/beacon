@@ -223,6 +223,15 @@ Deliberate trade-offs:
 
 ---
 
+## 10b. Request limits and PID re-verification
+
+* `BEACON_MAX_REQUEST_BYTES` (default 64 MiB) is enforced by middleware before the body is parsed;
+  `/api/v1/screenshots` uploads are additionally checked against `BEACON_SCREENSHOT_MAX_BYTES`
+  (default 12 MiB per file) before being read into memory.
+* Before sending `SIGINT`, both the agent interrupt and the Minecraft stop path re-resolve their
+  target. A changed pid produces `409 target_changed` / `target_changed` and **nothing is
+  signalled**.
+
 ## 11. Upgrade procedure
 
 ```bash

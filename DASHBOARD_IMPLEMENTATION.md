@@ -211,6 +211,9 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
   **The live agent runtime was never signalled during development** (it hosts this work).
 * **Limitations**: `signal` ends the runtime process — Cherry Studio reports the turn as
   interrupted and the session journal is preserved; there is no attempt to "pause" a single tool.
+* **Guards**: the runtime is re-resolved immediately before the signal; if the pid changed or
+  disappeared the request returns `409 target_changed` and nothing is sent. Rate limit 1/15 s,
+  admin scope, confirmation header, audit row.
 * **Debug**: `beacon agent interrupts`, `GET /agent/interrupts`, `journalctl -u beacon-api`.
 
 ## 2.10 Agent status snapshot publishing
@@ -360,9 +363,10 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
   error, `not_running` on stop), `tests/test_minecraft_protocols.py` covers every channel offline:
   the pty console path (start -> type `stop` -> process exits -> console log captured), the SIGINT
   fallback against a process whose cwd/argv match a server, the refusal when no safe channel
-  exists (the process must survive), the player-online `force` gate, and the RCON client against a
-  fake RCON server (auth success, auth rejection, missing password, command reply). Graceful-hook
-  detection was verified live against the installed jars.
+  exists (the process must survive), the player-online `force` gate, the target re-verification
+  refusal (pid changes between lookup and signal), and the RCON client against a fake RCON server
+  (auth success, auth rejection, missing password, command reply). Graceful-hook detection was
+  verified live against the installed jars.
 * **Limitations / honesty**:
   * The **live instance** was started manually in a terminal and has players; it was intentionally
     **not** stopped or restarted during development. Every control channel is now covered by
@@ -446,7 +450,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 
 | Harness | Command | Last result |
 |---|---|---|
-| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 121 passed |
+| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 125 passed |
 | Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
@@ -471,9 +475,11 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 * **Files**: `backend/tests/test_contract_and_security.py`,
   `backend/tests/test_integration_edges.py`, `scripts/check_openapi_drift.py`,
   `scripts/check_view_initialisers.py`.
-* **Test**: 121 pytest tests total (121 passing), contract checker exit 0.
+* **Test**: 125 pytest tests total (125 passing), contract checker exit 0.
 * **Limitations**: the secret scan is best-effort (binary files are skipped); static checks are
-  guardrails, not a proof of absence.
+  guardrails, not a proof of absence. A configurable request-body ceiling
+  (`BEACON_MAX_REQUEST_BYTES`, default 64 MiB) is enforced before parsing, and uploads are checked
+  against `BEACON_SCREENSHOT_MAX_BYTES` before being read into memory.
 
 ---
 

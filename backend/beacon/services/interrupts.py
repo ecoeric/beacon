@@ -230,6 +230,21 @@ def request_interrupt(
         )
         raise InterruptError("invalid_target", "Refusing to signal this pid", status_code=400)
 
+    # Re-resolve right before signalling so a recycled pid cannot be hit by mistake.
+    current = agent_runtime.resolve_runtime(settings, session_id)
+    if current is None or current.pid != runtime.pid:
+        _finish(
+            db,
+            interrupt_id,
+            status="refused",
+            error="the runtime process changed or disappeared before the signal was sent",
+            evidence=[f"pid {runtime.pid}", "target re-verification failed"],
+        )
+        raise InterruptError(
+            "target_changed",
+            "The agent runtime changed between resolution and signalling; nothing was sent",
+        )
+
     evidence = [f"pid {runtime.pid}", f"uid {runtime.uid}", f"cmdline {argv[:240]}"]
     try:
         os.kill(runtime.pid, signal.SIGINT)

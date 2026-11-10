@@ -12,6 +12,20 @@ Operational validation on the live deployment plus a small hardening increment.
   rotation, retention, agent operations, Minecraft/Pi-hole procedures, incident checklist,
   hardening posture and upgrades.
 
+### Security hardening
+* Configurable request-body ceiling (`BEACON_MAX_REQUEST_BYTES`, default 64 MiB) enforced in
+  middleware before parsing, plus a pre-read size check on multipart screenshot uploads, so an
+  oversized body cannot be buffered into memory.
+* The agent interrupt handler re-resolves the DSH runtime immediately before `SIGINT` and refuses
+  (`409 target_changed`) if the process changed or disappeared; the Minecraft stop path re-checks
+  `find_process` before signalling. Both are covered by tests where the second lookup fails and the
+  process must survive.
+* Writing to the supervised Minecraft console now maps `OSError` to a structured
+  `console_write_failed` error instead of an unhandled 500.
+* Window capture builds a subprocess environment instead of mutating the service's `os.environ`.
+* `verify_token` now compares the digest it actually selected (constant-time) and no longer reads a
+  column it did not fetch.
+
 ### Verified on the live host
 * **Production backup**: `VACUUM INTO` copy with `PRAGMA integrity_check = ok`; 4 milestones,
   16 screenshot rows, 12 live image files, 3 tokens, TLS material and secrets included (1.3 MB).

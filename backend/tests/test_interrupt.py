@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pytest
 
+from beacon.services import agent_runtime
+
 
 def _clear_limiter() -> None:
     from beacon import deps
@@ -169,3 +171,28 @@ def test_interrupt_mode_validation(client, auth, fake_session):
         headers=auth("admin", **{"X-Beacon-Confirm": "agent-interrupt"}),
     )
     assert response.status_code == 422
+
+
+def test_interrupt_refuses_when_target_changes_before_signal(client, auth, fake_session, tmp_path, monkeypatch):
+    proc, _bin, _composition = _spawn_fake_runtime(tmp_path / "run-change", fake_session)
+    original = agent_runtime.resolve_runtime
+    calls = {"count": 0}
+
+    def flaky(settings, session_id):
+        calls["count"] += 1
+        return original(settings, session_id) if calls["count"] == 1 else None
+
+    monkeypatch.setattr(agent_runtime, "resolve_runtime", flaky)
+    try:
+        response = client.post(
+            "/api/v1/agent/interrupt",
+            json={"mode": "signal"},
+            headers=auth("admin", **{"X-Beacon-Confirm": "agent-interrupt"}),
+        )
+        assert response.status_code == 409
+        assert response.json()["error"] == "target_changed"
+        assert proc.poll() is None, "the process must not be signalled after re-verification fails"
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)

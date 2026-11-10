@@ -138,6 +138,18 @@ async def upload_screenshots(
             detail={"code": "too_many_screenshots", "message": f"milestone already has {existing} screenshots (max 4)"},
         )
     caption_list = [part.strip() for part in (captions or "").split("|") if part.strip()]
+    for upload in uploads:
+        if upload.size is not None and upload.size > settings.screenshot_max_bytes:
+            from fastapi import HTTPException
+
+            raise HTTPException(
+                status_code=413,
+                detail={
+                    "code": "too_large",
+                    "message": f"{upload.filename or 'file'} exceeds "
+                    f"{settings.screenshot_max_bytes // (1024 * 1024)} MiB",
+                },
+            )
     stored: list[ScreenshotMeta] = []
     for index, upload in enumerate(uploads):
         content = await upload.read()

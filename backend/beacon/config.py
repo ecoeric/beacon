@@ -70,6 +70,7 @@ class Settings:
     docker_read_helper: Path
     screenshot_retention_days: int
     screenshot_max_bytes: int
+    max_request_bytes: int
     enable_docs: bool = False
     allowed_origins: list[str] = field(default_factory=list)
 
@@ -152,6 +153,7 @@ def load_settings() -> Settings:
         ),
         screenshot_retention_days=_env_int("BEACON_SCREENSHOT_RETENTION_DAYS", 7),
         screenshot_max_bytes=_env_int("BEACON_SCREENSHOT_MAX_BYTES", 12 * 1024 * 1024),
+        max_request_bytes=_env_int("BEACON_MAX_REQUEST_BYTES", 64 * 1024 * 1024),
         enable_docs=_env_bool("BEACON_ENABLE_DOCS", False),
         allowed_origins=_env_list("BEACON_ALLOWED_ORIGINS", []),
     )

@@ -54,7 +54,7 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 
 | Check | Result |
 |---|---|
-| `pytest backend/tests` | 121 passed |
+| `pytest backend/tests` | 125 passed |
 | `scripts/smoke_test.py` (live Pi-hole / Minecraft / Docker / agent) | 58 checks passed |
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
 | `swiftc -parse` on iOS sources | 22 files parsed |

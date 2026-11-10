@@ -475,7 +475,12 @@ class Supervisor:
         with self._lock:
             if not self.running() or self._master is None:
                 raise MinecraftError("not_supervised", "No supervised console is attached")
-            os.write(self._master, (text.strip() + "\n").encode("utf-8"))
+            try:
+                os.write(self._master, (text.strip() + "\n").encode("utf-8"))
+            except OSError as exc:
+                raise MinecraftError(
+                    "console_write_failed", f"could not write to the server console: {exc}"
+                ) from exc
             self.last_command_at = time.time()
 
     def stop(self, timeout: int) -> bool:
@@ -737,6 +742,12 @@ def stop(settings: Settings, *, force: bool = False, actor: str = "admin") -> di
             "no_safe_channel",
             "No safe stop channel available for this instance",
             detail={"graceful_signal": graceful, "hint": hint, "pid": pid},
+        )
+
+    if find_process(settings) != pid:
+        raise MinecraftError(
+            "target_changed",
+            f"the Minecraft process for pid {pid} changed or exited; nothing was signalled",
         )
 
     try:

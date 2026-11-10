@@ -229,7 +229,7 @@ systemd
 
 | Layer | Method | Result (last run) |
 |---|---|---|
-| API/service logic | 121 pytest tests with synthetic Cherry Studio DB, fake Minecraft/RCON servers, mocked Pi-hole transport and controlled processes | 121 passed |
+| API/service logic | 125 pytest tests with synthetic Cherry Studio DB, fake Minecraft/RCON servers, mocked Pi-hole transport and controlled processes | 125 passed |
 | Transport/auth | real Uvicorn TLS server + generated CA in tests | verified trust and rejection |
 | Live system | `scripts/smoke_test.py` against real Pi-hole/Minecraft/Docker/agent | 57 checks passed |
 | iOS logic | Swift 6 on Linux: compile + 13 decoding/formatting tests against live-captured fixtures | 13 passed |

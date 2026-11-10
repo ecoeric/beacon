@@ -111,3 +111,34 @@ def test_no_secret_values_are_committed():
                     raise AssertionError(f"secret from {secret_file.name} appears in {candidate}")
             except (UnicodeDecodeError, OSError):
                 continue
+
+
+def test_oversized_request_body_is_rejected_before_parsing(client, auth):
+    oversized = b"x" * (3 * 1024 * 1024)  # env fixture caps requests at 2 MiB
+    response = client.post(
+        "/api/v1/agent/messages",
+        content=oversized,
+        headers={**auth("admin"), "Content-Type": "application/json"},
+    )
+    assert response.status_code == 413
+    assert response.json()["error"] == "payload_too_large"
+
+
+def test_screenshot_store_enforces_byte_limit(env):
+    from dataclasses import replace
+
+    import pytest as _pytest
+
+    from beacon.db import get_db
+    from beacon.services import screenshots
+
+    small = replace(env, screenshot_max_bytes=512)
+    with _pytest.raises(screenshots.ScreenshotError) as excinfo:
+        screenshots.store(
+            small,
+            get_db(env),
+            milestone_id="m",
+            content=b"\x89PNG\r\n\x1a\n" + b"0" * 4096,
+            caption="too big",
+        )
+    assert excinfo.value.code == "too_large"

@@ -135,6 +135,7 @@ def env(tmp_path, monkeypatch, cherry):
     monkeypatch.setenv("BEACON_TLS_CERT", str(data / "tls" / "server.crt"))
     monkeypatch.setenv("BEACON_TLS_KEY", str(data / "tls" / "server.key"))
     monkeypatch.setenv("BEACON_STALE_WORKING_SECONDS", "90")
+    monkeypatch.setenv("BEACON_MAX_REQUEST_BYTES", str(2 * 1024 * 1024))
 
     from beacon.config import get_settings, reset_settings_for_tests
     from beacon.db import reset_db_for_tests
