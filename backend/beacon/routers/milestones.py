@@ -52,6 +52,7 @@ def get_milestone(milestone_id: str, db: DbDep, token: ReadDep) -> MilestoneMode
 def create_milestone(
     payload: MilestoneCreate, request: Request, db: DbDep, token: ElevatedDep
 ) -> MilestoneModel:
+    throttle(f"{token.id}:milestone-create", limit=10, window_seconds=60)
     settings = get_settings()
     if len(payload.screenshots) > 4:
         from fastapi import HTTPException
@@ -119,6 +120,7 @@ async def upload_screenshots(
     files: Annotated[list[UploadFile], File()] = None,
     captions: Annotated[str | None, Form()] = None,
 ) -> list[ScreenshotMeta]:
+    throttle(f"{token.id}:screenshot-upload", limit=10, window_seconds=60)
     settings = get_settings()
     if milestones.get(db, milestone_id) is None:
         from fastapi import HTTPException
@@ -205,7 +207,7 @@ def delete_screenshot(screenshot_id: str, db: DbDep, token: AdminDep, request: R
 def capture_screenshot(
     payload: CaptureRequest, db: DbDep, token: ElevatedDep, request: Request
 ) -> CaptureResult:
-    throttle(f"{token.name}:capture", limit=8, window_seconds=60)
+    throttle(f"{token.id}:capture", limit=8, window_seconds=60)
     settings = get_settings()
     result = capture.capture(
         settings,

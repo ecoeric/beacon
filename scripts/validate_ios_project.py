@@ -123,6 +123,7 @@ def main() -> int:
     bundle_ids = {setting(config, "PRODUCT_BUNDLE_IDENTIFIER") for config in app_configs}
     check(bundle_ids == {"dev.ericserver.beacon"}, "app bundle identifier is dev.ericserver.beacon")
     pbx_text = PROJECT.read_text(encoding="utf-8")
+    check(pbx_text.count("SWIFT_VERSION = 5.0;") >= 2, "Swift language mode is 5.0 (valid -swift-version)")
     check(
         pbx_text.count("IPHONEOS_DEPLOYMENT_TARGET = 17.0;") >= 2,
         "iOS deployment target is 17.0 in both build configurations",

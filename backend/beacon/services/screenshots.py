@@ -81,6 +81,15 @@ def store(
             f"image is larger than {settings.screenshot_max_bytes // (1024 * 1024)} MiB",
             status_code=413,
         )
+    used = int(
+        db.scalar("SELECT COALESCE(SUM(bytes),0) FROM screenshot WHERE deleted_at IS NULL") or 0
+    )
+    if used + len(content) > settings.screenshot_max_total_bytes:
+        raise ScreenshotError(
+            "quota_exceeded",
+            "the screenshot store is full; delete older images or raise the quota",
+            status_code=507,
+        )
     content_type = _detect_type(content)
     if content_type is None:
         raise ScreenshotError("unsupported_type", "only PNG, JPEG and WebP images are accepted", status_code=415)

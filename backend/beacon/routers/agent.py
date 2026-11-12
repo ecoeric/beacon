@@ -46,6 +46,7 @@ def _interrupt_model(record: interrupts.InterruptRecord) -> InterruptInfo:
         requested_at=record.requested_at,
         mode=record.mode,
         status=record.status,
+        session_id=record.session_id,
         reason=record.reason,
         pid=record.pid,
         signal=record.signal,
@@ -194,7 +195,7 @@ def list_messages(
 def create_message(
     payload: MessageCreate, request: Request, db: DbDep, token: ActionDep
 ) -> MessageModel:
-    throttle(f"{token.name}:queue", limit=20, window_seconds=60)
+    throttle(f"{token.id}:queue", limit=20, window_seconds=60)
     settings = get_settings()
     session = interrupts.resolve_session(settings, db)
     message, created = message_queue.enqueue(
@@ -219,7 +220,7 @@ def create_message(
 
 @router.post("/continue", response_model=MessageModel, status_code=status.HTTP_201_CREATED, summary="Tell the agent to continue")
 def continue_agent(payload: ContinueRequest, request: Request, db: DbDep, token: ActionDep) -> MessageModel:
-    throttle(f"{token.name}:continue", limit=10, window_seconds=60)
+    throttle(f"{token.id}:continue", limit=10, window_seconds=60)
     settings = get_settings()
     note = (payload.note or "").strip()
     body = f"{CONTINUE_DEFAULT}\n\n{note}" if note else CONTINUE_DEFAULT
@@ -285,7 +286,7 @@ def interrupt_agent(
     confirmation: Annotated[str | None, Header(alias="X-Beacon-Confirm")] = None,
 ) -> InterruptInfo:
     require_confirmation(confirmation, "agent-interrupt", "interrupting the agent")
-    throttle(f"{token.name}:interrupt", limit=1, window_seconds=15)
+    throttle(f"{token.id}:interrupt", limit=1, window_seconds=15)
     record = interrupts.request_interrupt(
         get_settings(),
         db,
@@ -293,6 +294,7 @@ def interrupt_agent(
         reason=payload.reason,
         actor=token.name,
         ip=client_ip(request),
+        requested_session=payload.session_id,
     )
     notifications.notify(
         db,
@@ -357,6 +359,17 @@ def checkpoint(db: DbDep, token: RuntimeDep) -> CheckpointResponse:
 def ack_message(message_id: str, payload: AckRequest, db: DbDep, token: RuntimeDep) -> MessageModel:
     message = message_queue.acknowledge(db, message_id, note=payload.note)
     audit(db, actor=token.name, action="agent.message.ack", target=message_id)
+    return message
+
+
+@router.post(
+    "/messages/{message_id}/nack",
+    response_model=MessageModel,
+    summary="Agent: return a delivered message to the queue",
+)
+def nack_message(message_id: str, payload: AckRequest, db: DbDep, token: RuntimeDep) -> MessageModel:
+    message = message_queue.nack(db, message_id, note=payload.note)
+    audit(db, actor=token.name, action="agent.message.nack", target=message_id)
     return message
 
 

@@ -43,6 +43,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..config import Settings
+from . import procs
 from ..schemas import (
     MinecraftControls,
     MinecraftStatus,
@@ -419,7 +420,11 @@ class Supervisor:
                 )
             script = settings.minecraft_dir / settings.minecraft_launch_script
             if not script.exists():
-                raise MinecraftError("no_launch_script", f"launch script not found: {script}", status_code=500)
+                raise MinecraftError(
+                    "no_launch_script",
+                    "launch script not found in the configured server folder",
+                    status_code=500,
+                )
             log_path = settings.logs_dir / "minecraft-console.log"
             log_path.parent.mkdir(parents=True, exist_ok=True)
             master, slave = pty.openpty()
@@ -751,7 +756,7 @@ def stop(settings: Settings, *, force: bool = False, actor: str = "admin") -> di
         )
 
     try:
-        os.kill(pid, signal.SIGINT)
+        mechanism = procs.send_signal(pid, signal.SIGINT)
     except OSError as exc:
         raise MinecraftError("signal_failed", f"could not signal pid {pid}: {exc}") from exc
     exited = _wait_gone(pid, settings.minecraft_stop_timeout_seconds)
@@ -767,7 +772,7 @@ def stop(settings: Settings, *, force: bool = False, actor: str = "admin") -> di
         "method": "sigint",
         "pid": pid,
         "stopped": True,
-        "detail": hint,
+        "detail": f"{hint} (signal via {mechanism})",
     }
 
 

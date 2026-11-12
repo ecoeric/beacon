@@ -30,7 +30,7 @@ from pathlib import Path
 
 from ..db import Database, new_id, now
 from ..security import audit
-from . import agent_runtime
+from . import agent_runtime, procs
 
 
 class InterruptError(RuntimeError):
@@ -131,19 +131,24 @@ def pending_interrupts(db: Database) -> list[InterruptRecord]:
     return [_to_record(row) for row in rows]
 
 
-def resolve_session(settings: Settings, db: Database) -> str | None:
+def trusted_sessions(settings: Settings) -> list[str]:
+    """Session ids that exist in the read-only Cherry Studio database, newest first.
+
+    The agent-pushed status snapshot is deliberately **not** used as a source: the agent could
+    otherwise point a privileged interrupt at a different session.
+    """
+    return [session.id for session in agent_runtime.list_sessions(settings, limit=25)]
+
+
+def resolve_session(
+    settings: Settings, db: Database, *, requested: str | None = None
+) -> str | None:
+    if requested:
+        return requested if requested in trusted_sessions(settings) else None
     if settings.session_id:
         return settings.session_id
-    row = db.query_one(
-        "SELECT session_id FROM agent_status WHERE session_id IS NOT NULL AND session_id != '' "
-        "ORDER BY updated_at DESC LIMIT 1"
-    )
-    if row is not None and row["session_id"]:
-        return str(row["session_id"])
-    sessions = agent_runtime.list_sessions(settings, limit=1)
-    if sessions:
-        return sessions[0].id
-    return None
+    sessions = trusted_sessions(settings)
+    return sessions[0] if sessions else None
 
 
 def request_interrupt(
@@ -155,11 +160,17 @@ def request_interrupt(
     actor: str = "admin",
     ip: str | None = None,
     settle_seconds: float = 5.0,
+    requested_session: str | None = None,
 ) -> InterruptRecord:
     if mode not in {"signal", "checkpoint"}:
         raise InterruptError("invalid_mode", "mode must be 'signal' or 'checkpoint'", status_code=422)
 
-    session_id = resolve_session(settings, db)
+    if requested_session and requested_session not in trusted_sessions(settings):
+        raise InterruptError(
+            "unknown_session",
+            "The requested session does not exist in the agent's read-only session list",
+        )
+    session_id = resolve_session(settings, db, requested=requested_session)
     interrupt_id = new_id()
     db.execute(
         "INSERT INTO interrupt(id, requested_at, reason, mode, status, session_id, requested_by) "
@@ -247,7 +258,7 @@ def request_interrupt(
 
     evidence = [f"pid {runtime.pid}", f"uid {runtime.uid}", f"cmdline {argv[:240]}"]
     try:
-        os.kill(runtime.pid, signal.SIGINT)
+        mechanism = procs.send_signal(runtime.pid, signal.SIGINT)
     except ProcessLookupError:
         _finish(
             db,
@@ -267,7 +278,7 @@ def request_interrupt(
         )
         raise InterruptError("permission_denied", "Permission denied sending SIGINT", status_code=403)
 
-    evidence.append("SIGINT delivered")
+    evidence.append(f"SIGINT delivered via {mechanism}")
     exit_observed = _wait_for_exit(runtime.pid, settle_seconds)
     if exit_observed:
         evidence.append(f"runtime process exited within {settle_seconds:.0f}s")

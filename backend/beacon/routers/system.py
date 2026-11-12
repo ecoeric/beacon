@@ -2,17 +2,19 @@
 
 from __future__ import annotations
 
+import logging
 import time
 
 from fastapi import APIRouter, HTTPException, Query
 
 from .. import __version__
 from ..config import get_settings
-from ..deps import AdminDep, DbDep, ReadDep, TokenDep
+from ..deps import ActionDep, AdminDep, DbDep, ReadDep, TokenDep
 from ..schemas import ActivityFeed, DashboardSummary, HealthResponse, WhoAmI
 from ..services import docker_monitor, minecraft, notifications, pihole, summary, system_metrics
 
 router = APIRouter(tags=["system"])
+logger = logging.getLogger("beacon.health")
 
 
 @router.get("/health", response_model=HealthResponse, summary="Unauthenticated liveness probe")
@@ -23,8 +25,10 @@ def health() -> HealthResponse:
         from ..db import get_db
 
         get_db(settings).scalar("SELECT 1")
-    except Exception as exc:  # pragma: no cover - only on a broken data directory
-        database = f"error: {exc}"
+    except Exception:  # pragma: no cover - only on a broken data directory
+        # Never expose the exception (it contains database paths) on an unauthenticated route.
+        logger.exception("health check: database query failed")
+        database = "error"
     return HealthResponse(
         status="ok" if database == "ok" else "degraded",
         version=__version__,
@@ -50,7 +54,7 @@ def activity(db: DbDep, token: ReadDep, limit: int = Query(default=30, ge=1, le=
 
 
 @router.post("/activity/{notification_id}/read", summary="Mark one activity item read")
-def mark_activity_read(notification_id: str, db: DbDep, token: ReadDep) -> dict:
+def mark_activity_read(notification_id: str, db: DbDep, token: ActionDep) -> dict:
     ok = notifications.mark_read(db, notification_id)
     if not ok:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "activity item not found"})
@@ -58,7 +62,7 @@ def mark_activity_read(notification_id: str, db: DbDep, token: ReadDep) -> dict:
 
 
 @router.post("/activity/read-all", summary="Mark all activity read")
-def mark_all_activity_read(db: DbDep, token: ReadDep) -> dict:
+def mark_all_activity_read(db: DbDep, token: ActionDep) -> dict:
     return {"read": notifications.mark_all_read(db)}
 
 

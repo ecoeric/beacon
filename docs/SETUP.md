@@ -40,8 +40,9 @@ sudo scripts/install.sh
 What it does, in order:
 
 1. creates `backend/.venv` and installs `backend/requirements.lock` (exact pinned versions);
-2. installs the read-only Docker helper at `/usr/local/lib/beacon/docker-read` plus
-   `/etc/sudoers.d/beacon-docker-read` (validated with `visudo -c`);
+2. installs the root-owned Docker snapshot timer (`beacon-docker.timer`, every 15 s) that writes
+   `/run/beacon/docker.json` with two fixed docker commands, and removes the previous sudo helper
+   and its sudoers rule;
 3. installs and enables `beacon-api.service` + `beacon-retention.timer`;
 4. runs `beacon init` **as `eric`**: data directory, SQLite schema, TLS material, tokens
    (`ios`, `agent`, `cli`), Pi-hole password import, copies `ca.crt` into the iOS bundle;
@@ -130,7 +131,7 @@ beacon retention run --local     # same command the timer runs
 ## 4. Testing
 
 ```bash
-# 1. backend unit + integration tests (125; no live services needed)
+# 1. backend unit + integration tests (147; no live services needed)
 cd ~/beacon/backend && .venv/bin/python -m pytest tests -q
 
 # 1b. OpenAPI snapshot must match the code
@@ -231,7 +232,7 @@ see **`docs/OPERATIONS.md`**.
 | Pi-hole "unreachable" | container running? `docker ps`; password file present? `beacon init` re-imports it |
 | Agent "disconnected" | Cherry Studio not running, or the session ended; reopen it, then `beacon agent status` shows a live runtime pid |
 | Interrupt answers 409 `no_runtime` | the session has no runtime process; use `mode=checkpoint` or resume the session |
-| Docker metrics missing | `sudo -n /usr/local/lib/beacon/docker-read ps`; reinstall with `scripts/install.sh` |
+| Docker metrics missing | `systemctl status beacon-docker.service`; `sudo cat /run/beacon/docker.json`; reinstall with `scripts/install.sh` |
 | Screenshot returns 410 | older than 7 days — expected; the milestone text remains |
 | `ffmpeg` capture fails | Service needs an active X session and read access to `~/.Xauthority`; `echo $DISPLAY` |
 | Swift validation fails after editing sources | add the file to `scripts/gen_xcodeproj.py` lists, regenerate, re-run validation |
@@ -248,5 +249,7 @@ see **`docs/OPERATIONS.md`**.
   helpers it may run are the fixed-argv Docker reader, `sensors`, `nvidia-smi`, `ffmpeg` and the
   allow-listed `beacon` capture commands.
 * Service controls require `admin` + a confirmation header, are rate limited, and are audited.
+* The API runs with `NoNewPrivileges=yes` and never calls `sudo`; Docker metrics come from a root
+  timer that runs exactly `docker ps` and `docker stats`.
 * Runtime endpoints (queue consumption, status publishing) require the `agent` token so UI tokens
   cannot consume instructions.

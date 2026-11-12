@@ -105,20 +105,29 @@ All state is in `data/` (mode 0700): `beacon.sqlite` (WAL), `secrets/*.token` (0
 
 * Transport: TLS 1.2+ only, ECDSA P-256 certificate issued by `beacon tls init`.
   The app performs SHA-256 **SPKI pinning**; there is no "ignore certificate errors" switch.
-* Authentication: opaque bearer tokens (32 random bytes, base64url). Only SHA-256 hashes are
-  stored in SQLite; plaintext is written once to `data/secrets/<name>.token` (0600).
+* Process containment: the API runs with `NoNewPrivileges=yes` (so a compromised process cannot
+  exec setuid `sudo` even though the interactive account has a NOPASSWD rule), `ProtectSystem=strict`,
+  `ProtectHome=read-only` plus `ReadWritePaths` for `data/` and the Minecraft folder,
+  `ProtectProc=invisible`, `SystemCallArchitectures=native`, and `InaccessiblePaths` masking
+  `~/.ssh`, `~/.gnupg`, `~/.mozilla` and Cherry Studio's `Credentials` directory. Residual risk:
+  the process still runs as `eric` and can read the Cherry Studio database (needed for agent
+  evidence) and other non-masked files owned by that account; it cannot gain root.
+* Authentication: opaque bearer tokens (32 random bytes, base64url) accepted **only** in the
+  `Authorization` header. Only SHA-256 hashes are stored in SQLite; plaintext is written once to
+  `data/secrets/<name>.token` (0600). `last_used_at` is flushed at most once per minute.
   Scopes: `read` < `action` < `admin`, plus a dedicated `agent` scope for the runtime CLI.
 * Authorisation: every route declares a required scope; destructive service controls require
   `admin` **and** a confirmation header (`X-Beacon-Confirm: <action>`), are rate limited,
   and write an audit row.
 * Input validation: strict Pydantic models, bounded message lengths, enumerated states,
-  no user-controlled paths or shell strings anywhere in the request path. The only child
-  processes spawned are `nvidia-smi` (fixed argv), the read-only docker wrapper (fixed
-  argv allowlist), `sensors` (fixed argv) and the Minecraft rcon client (host/port from
-  config, command from a fixed enum).
-* The systemd unit runs as `eric` with `ProtectSystem=strict`, `ProtectHome=read-only`
-  (the Cherry Studio directory is exposed read-only via a bind path in the unit), and
-  `ReadWritePaths` limited to `~/beacon/data`.
+  a chunked-safe request-body ceiling, per-file and total screenshot quotas, per-token throttles,
+  and no user-controlled paths or shell strings anywhere in the request path. The API spawns only
+  `nvidia-smi`, `sensors`, `ffmpeg` (x11grab), the allow-listed `beacon` capture commands and the
+  Minecraft rcon client (host/port from config, command from a fixed enum); it never runs `sudo`
+  and never touches the Docker socket.
+* The systemd unit runs as `eric` with `ProtectSystem=strict`, `ProtectHome=read-only`,
+  and `ReadWritePaths` limited to `~/beacon/data` and the Minecraft folder. Docker visibility is
+  provided by a separate root timer; see 8.5.
 * No arbitrary shell execution endpoint exists.
 
 ## 6. Agent state machine
@@ -170,7 +179,7 @@ system frameworks, zero packages.
 | `services/retention.py` | confined deletion sweep, storage summary |
 | `services/summary.py` | dashboard composition + service edge detection |
 | `services/system_metrics.py` | sampler and host metrics |
-| `services/docker_monitor.py` | read-only container list/stats via sudo helper |
+| `services/docker_monitor.py` | reads the root-written Docker snapshot file (no sudo, no socket) |
 | `services/pihole.py` | Pi-hole v6 client (session cache, stats, blocking) |
 | `services/minecraft.py` | ping, process, logs, backups, supervisor, guarded controls |
 | `services/notifications.py` | activity feed, dedupe, transitions |
@@ -207,12 +216,11 @@ Operational procedures: `docs/OPERATIONS.md`.
 systemd
 ├── beacon-api.service      eric, 192.168.1.83:8091 TLS, ProtectSystem=strict
 │                           ProtectHome=read-only + ReadWritePaths data + Minecraft folder
-│                           NoNewPrivileges=off (sudo allows only docker-read), PrivateTmp=off (X11)
+│                           NoNewPrivileges=yes, PrivateTmp=off (X11), credential dirs masked
 ├── beacon-retention.timer  daily 03:41 (Persistent), oneshot beacon-retention.service
+├── beacon-docker.timer     every 15 s, oneshot beacon-docker.service as root
+│                           two fixed docker commands → /run/beacon/docker.json (0644)
 └── (existing) pihole container, NeoForge java process, Caddy, WinLab, Cherry Studio
-
-/usr/local/lib/beacon/docker-read   root-owned wrapper, allow-list ps|stats
-/etc/sudoers.d/beacon-docker-read   eric may run exactly that wrapper
 ```
 
 ### 8.6 Deliberate deviations from the Phase 1 sketch
@@ -221,7 +229,7 @@ systemd
 |---|---|---|
 | Single retention trigger | read guard + hourly in-process sweep + daily systemd timer | cleanup must survive restarts and API downtime |
 | Interrupt only as SIGINT | SIGINT **and** cooperative checkpoint mode | signal is impossible when the runtime is gone; both bypass the queue |
-| Docker via socket | sudo allow-listed read-only wrapper | avoids giving the API root-equivalent Docker access |
+| Docker via socket | root timer writes a read-only snapshot file | avoids root-equivalent Docker access *and* lets the API run with NoNewPrivileges |
 | Screenshots from the app only | four server-side capture sources + upload endpoint | the UI cannot be rendered on this host; real artifacts are still capturable |
 | iOS build “on the server” | source + Linux compilation of Foundation logic + project validation | Xcode requires macOS |
 
@@ -229,7 +237,7 @@ systemd
 
 | Layer | Method | Result (last run) |
 |---|---|---|
-| API/service logic | 125 pytest tests with synthetic Cherry Studio DB, fake Minecraft/RCON servers, mocked Pi-hole transport and controlled processes | 125 passed |
+| API/service logic | 147 pytest tests with synthetic Cherry Studio DB, fake Minecraft/RCON servers, mocked Pi-hole transport and controlled processes | 147 passed |
 | Transport/auth | real Uvicorn TLS server + generated CA in tests | verified trust and rejection |
 | Live system | `scripts/smoke_test.py` against real Pi-hole/Minecraft/Docker/agent | 57 checks passed |
 | iOS logic | Swift 6 on Linux: compile + 13 decoding/formatting tests against live-captured fixtures | 13 passed |
@@ -237,5 +245,5 @@ systemd
 | Xcode project | `pbxproj` parser + cross-checks | 18 checks passed |
 | Retention | live drill via the systemd unit (aged screenshot) | deleted, 410 confirmed, history kept |
 | Backup / restore | `beacon backup` then serve the API from the restored data directory | milestone, token and image intact |
-| Contract & security | OpenAPI snapshot equality, static no-shell checks, helper allow-list | clean |
+| Contract & security | OpenAPI snapshot equality, static no-shell checks, snapshot-timer privilege checks | clean |
 | Agent messaging | live queue + checkpoint + ack + processed; interrupt signal path against a controlled process | verified |

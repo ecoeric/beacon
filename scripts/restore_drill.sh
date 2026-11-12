@@ -63,7 +63,7 @@ env \
     BEACON_TLS_CERT="$TMP/tls/server.crt" \
     BEACON_TLS_KEY="$TMP/tls/server.key" \
     BEACON_PIHOLE_PASSWORD_FILE="$TMP/secrets/pihole.password" \
-    BEACON_DOCKER_READ_HELPER=/nonexistent/docker-read \
+    BEACON_DOCKER_SNAPSHOT_FILE=/nonexistent/docker.json \
     HOME=/home/eric \
     "$PY" -m uvicorn beacon.asgi:app \
         --host 127.0.0.1 --port "$PORT" \

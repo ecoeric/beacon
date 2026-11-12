@@ -198,7 +198,7 @@ imported by `beacon init` from the container environment into `data/secrets/piho
 | Interrupt 409 `no_runtime` | `beacon agent status` session/runtime | use `--mode checkpoint`, or resume the session |
 | Pi-hole unreachable | `docker ps`; `curl http://192.168.1.83:8080/api/auth` | restart container (outside Beacon) |
 | Minecraft shows stopped | `ss -tlnp \| grep 25565`; server log | start it in its console or via Beacon |
-| Docker metrics missing | `sudo -n /usr/local/lib/beacon/docker-read ps` | re-run `scripts/install.sh` |
+| Docker metrics missing | `systemctl status beacon-docker.service`; `sudo cat /run/beacon/docker.json` | `sudo systemctl start beacon-docker.service`; re-run `scripts/install.sh` |
 | Disk pressure activity item | `df -h`; `beacon system show` | clean up; the item clears when below 92 % |
 | Screenshot 410 | expected after 7 days (or manual delete) | milestone text remains |
 
@@ -206,13 +206,15 @@ imported by `beacon init` from the container environment into `data/secrets/piho
 
 ## 10. Hardening posture
 
-`systemd-analyze security beacon-api.service` → **6.5 MEDIUM** (was 6.9 before adding
-`SystemCallArchitectures=native` and `ProtectProc=invisible`).
+`systemd-analyze security beacon-api.service` → **6.3 MEDIUM** (6.9 before the syscall/proc
+increment, 6.5 before the privilege split).
 
 Deliberate trade-offs:
 
-* `NoNewPrivileges=off` and `RestrictSUIDSGID` not set — the service calls the sudo-allow-listed,
-  read-only Docker helper; that wrapper only accepts `ps` and `stats`.
+* `NoNewPrivileges=yes` — the API no longer calls `sudo`: Docker metrics come from the root
+  snapshot timer, so a compromised API process cannot escalate to root. `RestrictSUIDSGID` is not
+  set only because the operator's CLI shells are not inside this unit; the unit itself cannot exec
+  setuid binaries.
 * `PrivateTmp=off` — `ffmpeg -f x11grab` needs `/tmp/.X11-unix` for real window captures.
 * `PrivateDevices=off` — `nvidia-smi` needs `/dev/nvidia*`.
 * `ProtectHome=read-only` with `ReadWritePaths` for `data/` and the Minecraft folder.
@@ -220,17 +222,37 @@ Deliberate trade-offs:
   service could not reach Pi-hole on the same host. The unit documents this. Exposure is instead
   limited by binding to `192.168.1.83` only (no port forward, no public listener).
 * API docs are disabled (`BEACON_ENABLE_DOCS=0`); `docs/openapi.json` is the reviewed contract.
+* Residual risk (documented): the API runs as `eric` and can read the Cherry Studio database and
+  other non-masked files owned by that account. It cannot gain root, cannot run arbitrary commands,
+  and can write only inside `data/` and the Minecraft folder.
 
 ---
 
+## 10a. Docker snapshot timer
+
+Docker metrics no longer come from `sudo` or the Docker socket inside the API:
+
+```bash
+systemctl status beacon-docker.service
+systemctl list-timers beacon-docker.timer
+sudo cat /run/beacon/docker.json     # {"fetched_at": ..., "containers": [...]}
+```
+
+The timer runs every 15 s and writes the file atomically (0644); the API reports Docker as
+unavailable when the file is missing, malformed or older than 90 s.
+
 ## 10b. Request limits and PID re-verification
 
-* `BEACON_MAX_REQUEST_BYTES` (default 64 MiB) is enforced by middleware before the body is parsed;
+* `BEACON_MAX_REQUEST_BYTES` (default 64 MiB) is enforced by an ASGI middleware before the body is
+  parsed (including chunked bodies);
   `/api/v1/screenshots` uploads are additionally checked against `BEACON_SCREENSHOT_MAX_BYTES`
   (default 12 MiB per file) before being read into memory.
 * Before sending `SIGINT`, both the agent interrupt and the Minecraft stop path re-resolve their
   target. A changed pid produces `409 target_changed` / `target_changed` and **nothing is
-  signalled**.
+  signalled**. Signals use a pidfd where the kernel supports it, so a recycled pid cannot receive
+  the signal.
+* The agent interrupt target is chosen only from the read-only Cherry Studio session list (or
+  `BEACON_SESSION_ID`), never from the agent-writable status snapshot.
 
 ## 11. Upgrade procedure
 

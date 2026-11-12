@@ -19,8 +19,8 @@ Authorization: Bearer <token>
 Scopes are hierarchical for human clients (`admin ⊃ action ⊃ read`); `agent` is separate.
 The agent token additionally gets `read` so it can see its own status.
 
-`GET /screenshots/{id}` also accepts `?token=` because `URLSession` image previews are easier that
-way; no mutating route accepts a query token.
+Tokens are accepted **only** in the `Authorization` header. Query-string tokens are not
+supported (they would be written to access logs); image requests carry the header as well.
 
 ## Errors
 
@@ -52,8 +52,8 @@ Confirmation headers: `agent-interrupt`, `pihole-blocking`, `minecraft-start`,
 | GET | `/whoami` | read | token id, name, scopes |
 | GET | `/summary` | read | everything the home screen needs |
 | GET | `/activity` | read | activity feed (`?limit=`) |
-| POST | `/activity/{id}/read` | read | mark one read |
-| POST | `/activity/read-all` | read | mark all read |
+| POST | `/activity/{id}/read` | action | mark one read |
+| POST | `/activity/read-all` | action | mark all read |
 | GET | `/capabilities` | read | what this deployment can read/control |
 | GET | `/audit` | admin | last 200 audit rows |
 
@@ -69,10 +69,11 @@ Confirmation headers: `agent-interrupt`, `pihole-blocking`, `minecraft-start`,
 | POST | `/agent/continue` | action | Continue (optional `note`) |
 | DELETE | `/agent/messages/{id}` | action | cancel while pending |
 | GET | `/agent/queue` | read | queue stats + last checkpoint age |
-| POST | `/agent/interrupt` | admin | `{mode:"signal"|"checkpoint", reason}` + confirm header |
+| POST | `/agent/interrupt` | admin | `{mode, reason?, session_id?}` + confirm header; target comes from Cherry Studio sessions, never the status snapshot |
 | GET | `/agent/interrupts` | read | interrupt history |
-| POST | `/agent/checkpoint` | agent | deliver pending messages + interrupts |
+| POST | `/agent/checkpoint` | agent | deliver pending/lease-expired messages + interrupts |
 | POST | `/agent/messages/{id}/ack` | agent | acknowledge delivery |
+| POST | `/agent/messages/{id}/nack` | agent | return a delivered message to the queue |
 | POST | `/agent/messages/{id}/processed` | agent | mark processed |
 | GET | `/agent/interrupts/pending` | agent | checkpoint interrupts awaiting ack |
 | POST | `/agent/interrupts/{id}/ack` | agent | acknowledge an interrupt |

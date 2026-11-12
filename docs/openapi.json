@@ -1116,6 +1116,74 @@
         }
       }
     },
+    "/api/v1/agent/messages/{message_id}/nack": {
+      "post": {
+        "tags": [
+          "agent"
+        ],
+        "summary": "Agent: return a delivered message to the queue",
+        "operationId": "nack_message_api_v1_agent_messages__message_id__nack_post",
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Message Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AckRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/agent/messages/{message_id}/processed": {
       "post": {
         "tags": [
@@ -3261,6 +3329,17 @@
             "type": "string",
             "title": "Status"
           },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
           "reason": {
             "type": "string",
             "title": "Reason",
@@ -3354,6 +3433,19 @@
             "maxLength": 500,
             "title": "Reason",
             "default": ""
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id",
+            "description": "Optional explicit session to interrupt. Must match a session that exists in the read-only Cherry Studio database; the agent-writable status snapshot is never used as a signalling target."
           }
         },
         "type": "object",

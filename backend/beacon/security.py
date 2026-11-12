@@ -17,6 +17,7 @@ import hashlib
 import hmac
 import json
 import secrets
+import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -85,6 +86,16 @@ def create_token(
     return raw, TokenInfo(id=token_id, name=name, scopes=scope_set)
 
 
+_last_used_flush: dict[str, float] = {}
+_last_used_lock = threading.Lock()
+LAST_USED_FLUSH_SECONDS = 60.0
+
+
+def reset_security_state_for_tests() -> None:
+    with _last_used_lock:
+        _last_used_flush.clear()
+
+
 def verify_token(db: Database, raw: str | None) -> TokenInfo | None:
     if not raw:
         return None
@@ -100,10 +111,19 @@ def verify_token(db: Database, raw: str | None) -> TokenInfo | None:
     # already by digest).
     if not hmac.compare_digest(row["token_sha256"], digest):
         return None
-    db.execute(
-        "UPDATE token SET last_used_at=? WHERE id=? AND (last_used_at IS NULL OR last_used_at < ?)",
-        (now(), row["id"], now() - 30),
-    )
+    # Throttle this write: it runs on an authenticated request path and SQLite has a single
+    # writer, so a burst of dashboard polls must not serialise on it.
+    current = time.monotonic()
+    with _last_used_lock:
+        last = _last_used_flush.get(row["id"], 0.0)
+        should_write = current - last >= LAST_USED_FLUSH_SECONDS
+        if should_write:
+            _last_used_flush[row["id"]] = current
+    if should_write:
+        db.execute(
+            "UPDATE token SET last_used_at=? WHERE id=? AND (last_used_at IS NULL OR last_used_at < ?)",
+            (now(), row["id"], now() - 30),
+        )
     scopes = frozenset(part for part in str(row["scopes"]).split(",") if part)
     return TokenInfo(id=row["id"], name=row["name"], scopes=scopes)
 

@@ -62,7 +62,7 @@ APP_BUNDLE_ID = "dev.ericserver.beacon"
 TEST_BUNDLE_ID = "dev.ericserver.beacon.tests"
 
 DEPLOYMENT_TARGET = "17.0"
-SWIFT_VERSION = "5.9"
+SWIFT_VERSION = "5.0"  # Swift-5 language mode; "5.9" is not a valid -swift-version value
 
 
 def oid(key: str) -> str:

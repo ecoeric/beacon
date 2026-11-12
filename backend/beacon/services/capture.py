@@ -248,7 +248,11 @@ def capture_window(settings: Settings, *, label: str = "", caption: str = "") ->
     if authority and Path(authority).exists():
         capture_env.setdefault("XAUTHORITY", authority)
     settings.capture_dir.mkdir(parents=True, exist_ok=True)
-    staging = settings.capture_dir / f"window-{int(time.time())}.png"
+    import tempfile
+
+    fd, staging_name = tempfile.mkstemp(prefix="window-", suffix=".png", dir=settings.capture_dir)
+    os.close(fd)
+    staging = Path(staging_name)
     command = [
         ffmpeg,
         "-hide_banner",
@@ -276,15 +280,17 @@ def capture_window(settings: Settings, *, label: str = "", caption: str = "") ->
         )
     except (OSError, subprocess.SubprocessError) as exc:
         raise CaptureError("capture_failed", f"x11grab failed: {exc}", status_code=500) from exc
-    if proc.returncode != 0 or not staging.exists():
-        message = (proc.stderr or proc.stdout or "no output").strip().splitlines()
-        raise CaptureError(
-            "capture_failed",
-            f"x11grab failed: {message[0][:200] if message else 'unknown error'}",
-            status_code=502,
-        )
-    content = staging.read_bytes()
-    staging.unlink(missing_ok=True)
+    try:
+        if proc.returncode != 0 or not staging.exists() or staging.stat().st_size == 0:
+            message = (proc.stderr or proc.stdout or "no output").strip().splitlines()
+            raise CaptureError(
+                "capture_failed",
+                f"x11grab failed: {message[0][:200] if message else 'unknown error'}",
+                status_code=502,
+            )
+        content = staging.read_bytes()
+    finally:
+        staging.unlink(missing_ok=True)
     content = _downscale(content)
     return _store_staging(
         settings,
@@ -323,14 +329,11 @@ def capture_file(settings: Settings, *, path: str, caption: str = "") -> Capture
     try:
         resolved = candidate.resolve(strict=True)
     except OSError as exc:
-        raise CaptureError("not_found", f"file not found: {path}", status_code=404) from exc
+        # Same response for "does not exist" and "not allowed": no filesystem oracle.
+        raise CaptureError("not_found", "file not found", status_code=404) from exc
     roots = _allowed_file_roots(settings)
     if not any(str(resolved).startswith(str(root) + "/") for root in roots):
-        raise CaptureError(
-            "path_not_allowed",
-            "file captures are limited to the project artifacts and capture directories",
-            status_code=403,
-        )
+        raise CaptureError("not_found", "file not found", status_code=404)
     content = resolved.read_bytes()
     if len(content) > settings.screenshot_max_bytes:
         raise ScreenshotError("too_large", "image is too large", status_code=413)

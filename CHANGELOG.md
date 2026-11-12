@@ -3,6 +3,57 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.3] — 2026-11-12
+
+Independent security review of the backend, with fixes for the two structural findings and the
+smaller issues.
+
+### Security
+* **Privilege boundary (HIGH):** the API no longer calls `sudo` and no longer uses a
+  sudo-allow-listed Docker wrapper. Docker metrics are produced by a root-owned oneshot timer
+  (`beacon-docker.timer`, 15 s) that runs exactly `docker ps` and `docker stats` and writes
+  `/run/beacon/docker.json` (0644, atomic); the API only reads that file. `NoNewPrivileges=yes` is
+  enabled on the API unit, so a compromised API process cannot exec setuid `sudo` even though the
+  interactive `eric` account has a NOPASSWD rule. Unrelated credential directories (`~/.ssh`,
+  `~/.gnupg`, `~/.mozilla`, Cherry Studio `Credentials`) are masked with `InaccessiblePaths`.
+  `systemd-analyze security` improves to **6.3 MEDIUM**. Residual risk documented: the API still
+  runs as `eric` and can read the Cherry Studio database (needed for agent evidence) and other
+  non-masked files owned by that account.
+* **Interrupt targeting (MEDIUM):** the signalling target comes only from the read-only Cherry
+  Studio session list (or `BEACON_SESSION_ID`), never from the agent-writable status snapshot; an
+  optional explicit `session_id` must exist in that list, and the runtime is re-resolved immediately
+  before the signal (`409 target_changed`). Signals use a **pidfd** where available.
+* **Message delivery (MEDIUM):** deliveries are leased and re-delivered after 120 s without an
+  acknowledgement (max 5 attempts), with a new agent `nack` endpoint, so an interrupted runtime can
+  no longer silently swallow an instruction. Idempotency keys are namespaced per client and use
+  `ON CONFLICT ... DO NOTHING` to survive concurrent retries.
+* **Abuse limits (MEDIUM):** chunked-safe request-body ceiling in an ASGI middleware (the previous
+  `Content-Length` check was bypassable), per-file and total screenshot quotas, throttles on
+  milestone/upload writes, and rate-limit keys based on the token id.
+* **Information leaks (LOW):** query-string bearer tokens removed (they were written to access
+  logs); `/health` no longer echoes database errors; file captures return one generic 404 for
+  missing vs disallowed paths; Docker/Pi-hole/Minecraft error messages no longer contain absolute
+  paths.
+* **Write amplification (MEDIUM):** activity mutations now require `action` scope (a read-only
+  token can no longer clear the operator's feed), `last_used_at` is flushed at most once per minute,
+  and `service_state` rows are only updated when their detail changes.
+* **Log reads:** `/minecraft/logs` tails the last 512 KiB with `seek` instead of reading the whole
+  file into memory.
+
+### Fixed
+* SQLite reader connections are cached per `Database` instance instead of in a module-level
+  thread-local keyed by `id(self)`; the previous scheme could hand back a connection to a freed
+  test database after CPython reused an address (flaky test failures).
+* Window-capture staging uses `mkstemp` and is always cleaned up.
+* Swift: added the missing `UIKit` import in the snapshot test, corrected `SWIFT_VERSION` to `5.0`
+  (the valid `-swift-version` value), and the foreground polling loop now starts on launch and after
+  sign-in rather than only on a later scene-phase change.
+
+### Verified
+* 147 pytest tests, 58 live smoke checks, `beacon doctor` green, OpenAPI contract up to date,
+  iOS validation unchanged (22 files parsed, 13 Swift tests, 109 call sites, project valid), live
+  Docker metrics served from the snapshot, X11 capture working with `NoNewPrivileges=yes`.
+
 ## [0.1.2] — 2026-11-10
 
 Operational validation on the live deployment plus a small hardening increment.

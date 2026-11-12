@@ -153,8 +153,12 @@ final class PinnedSessionDelegate: NSObject, URLSessionDelegate {
         SecTrustSetAnchorCertificatesOnly(trust, true)
 
         var error: CFError?
-        guard SecTrustEvaluateWithError(trust, &error),
-              let certificate = SecTrustGetCertificateAtIndex(trust, 0) else {
+        guard SecTrustEvaluateWithError(trust, &error) else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        let certificate = (SecTrustCopyCertificateChain(trust) as? [SecCertificate])?.first
+        guard let certificate else {
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }

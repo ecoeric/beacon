@@ -54,7 +54,7 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 
 | Check | Result |
 |---|---|
-| `pytest backend/tests` | 125 passed |
+| `pytest backend/tests` | 147 passed |
 | `scripts/smoke_test.py` (live Pi-hole / Minecraft / Docker / agent) | 58 checks passed |
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
 | `swiftc -parse` on iOS sources | 22 files parsed |
@@ -62,6 +62,7 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `scripts/check_openapi_drift.py` | contract up to date |
 | backup restore drill | restored DB, token and image served by the API |
 | crash recovery (`SIGKILL`) | systemd restart, API back in 3.8 s, data intact |
+| privilege boundary | API runs with `NoNewPrivileges=yes`; Docker reads via a fixed root timer |
 | `beacon doctor` | all checks passed |
 | Retention drill through `beacon-retention.service` | aged screenshot deleted, 410 confirmed, milestone text kept |
 

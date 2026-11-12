@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 import sqlite3
+import time
 from dataclasses import replace
 from pathlib import Path
 
@@ -16,92 +17,87 @@ from PIL import Image
 from beacon.db import get_db, get_db as get_database  # noqa: F401 - explicit import for clarity
 from beacon.services import agent_runtime, docker_monitor, milestones, screenshots
 
-PS_LINE = json.dumps(
-    {
-        "Command": '"start.sh"',
-        "ID": "9c4af01eb11b",
-        "Image": "pihole/pihole:2026.10.1",
-        "Names": "pihole",
-        "State": "running",
-        "Status": "Up 5 days (healthy)",
-    }
-)
-UNHEALTHY_LINE = json.dumps(
-    {
-        "Names": "broken",
-        "Image": "example/broken:1",
-        "State": "running",
-        "Status": "Up 2 minutes (unhealthy)",
-    }
-)
-STATS_LINE = json.dumps(
-    {
-        "Name": "pihole",
-        "CPUPerc": "0.39%",
-        "MemUsage": "37.09MiB / 15.48GiB",
-        "BlockIO": "131MB / 1.51GB",
-    }
-)
-
-
 def _png() -> bytes:
     buffer = io.BytesIO()
     Image.new("RGB", (80, 60), (10, 40, 90)).save(buffer, format="PNG")
     return buffer.getvalue()
 
 
-# --------------------------------------------------------------------------- docker
-def test_parse_ps_reports_state_and_health():
-    containers = docker_monitor._parse_ps(PS_LINE + "\n" + UNHEALTHY_LINE)
-    assert [container.name for container in containers] == ["pihole", "broken"]
-    assert containers[0].state == "running"
-    assert containers[0].health == "healthy"
-    assert containers[1].health == "unhealthy"
+def _snapshot_path(tmp_path, *, age: float = 0.0, containers: list[dict] | None = None):
+    path = tmp_path / "docker.json"
+    payload = {
+        "fetched_at": time.time() - age,
+        "containers": containers
+        if containers is not None
+        else [
+            {
+                "name": "pihole",
+                "image": "pihole/pihole:2026.10.1",
+                "state": "running",
+                "status": "Up 5 days (healthy)",
+                "health": "healthy",
+                "cpu_percent": 0.39,
+                "memory_bytes": 38_895_616,
+                "memory_limit_bytes": 16_619_683_840,
+                "started_at": None,
+                "error": None,
+            }
+        ],
+    }
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
 
 
-def test_merge_stats_parses_cpu_and_memory():
-    containers = docker_monitor._parse_ps(PS_LINE)
-    docker_monitor._merge_stats(containers, STATS_LINE)
-    container = containers[0]
+def test_snapshot_reads_fresh_file(env, tmp_path):
+    settings = replace(env, docker_snapshot_file=_snapshot_path(tmp_path))
+    docker_monitor.reset_cache()
+    snapshot = docker_monitor.snapshot(settings, cache_seconds=0)
+    assert snapshot.available is True
+    assert [container.name for container in snapshot.containers] == ["pihole"]
+    container = snapshot.containers[0]
+    assert container.health == "healthy"
     assert container.cpu_percent == pytest.approx(0.39)
-    assert container.memory_bytes == int(37.09 * 1024**2)
-    assert container.memory_limit_bytes == int(15.48 * 1024**3)
-
-
-def test_snapshot_is_cached_and_reports_helper_errors(env, monkeypatch):
-    calls = {"count": 0}
-
-    def fake_helper(_settings, args, timeout=12.0):
-        calls["count"] += 1
-        if args == ["ps"]:
-            return 0, PS_LINE, ""
-        return 0, STATS_LINE, ""
-
-    docker_monitor.reset_cache()
-    monkeypatch.setattr(docker_monitor, "_run_helper", fake_helper)
-    first = docker_monitor.snapshot(env)
-    second = docker_monitor.snapshot(env)
-    assert first.available is True
-    assert first is second  # cached object inside the TTL
-    assert calls["count"] == 2  # ps + stats once
-
-    docker_monitor.reset_cache()
-    monkeypatch.setattr(
-        docker_monitor, "_run_helper", lambda *a, **k: (1, "", "permission denied (sudo)")
-    )
-    failed = docker_monitor.snapshot(env)
-    assert failed.available is False
-    assert "permission denied" in (failed.error or "")
-    assert failed.containers == []
+    assert container.memory_bytes == 38_895_616
+    assert docker_monitor.find_container(snapshot, "pihole") is container
     docker_monitor.reset_cache()
 
 
-def test_snapshot_without_helper(env):
+def test_snapshot_reports_missing_file(env, tmp_path):
+    settings = replace(env, docker_snapshot_file=tmp_path / "absent.json")
     docker_monitor.reset_cache()
-    snapshot = docker_monitor.snapshot(env)
+    snapshot = docker_monitor.snapshot(settings, cache_seconds=0)
     assert snapshot.available is False
-    assert snapshot.error
-    assert "helper" in snapshot.error.lower()
+    assert "not available" in (snapshot.error or "").lower()
+    assert snapshot.containers == []
+    docker_monitor.reset_cache()
+
+
+def test_snapshot_reports_staleness(env, tmp_path):
+    settings = replace(env, docker_snapshot_file=_snapshot_path(tmp_path, age=300))
+    docker_monitor.reset_cache()
+    snapshot = docker_monitor.snapshot(settings, cache_seconds=0)
+    assert snapshot.available is False
+    assert "stale" in (snapshot.error or "").lower()
+    docker_monitor.reset_cache()
+
+
+def test_snapshot_reports_malformed_file(env, tmp_path):
+    path = tmp_path / "docker.json"
+    path.write_text("not json", encoding="utf-8")
+    settings = replace(env, docker_snapshot_file=path)
+    docker_monitor.reset_cache()
+    snapshot = docker_monitor.snapshot(settings, cache_seconds=0)
+    assert snapshot.available is False
+    assert "unreadable" in (snapshot.error or "").lower()
+    docker_monitor.reset_cache()
+
+
+def test_snapshot_is_cached(tmp_path, env):
+    settings = replace(env, docker_snapshot_file=_snapshot_path(tmp_path))
+    docker_monitor.reset_cache()
+    first = docker_monitor.snapshot(settings)
+    second = docker_monitor.snapshot(settings)
+    assert first is second
     docker_monitor.reset_cache()
 
 
@@ -242,3 +238,22 @@ def test_backup_can_be_restored_and_served(env, tokens, tmp_path, monkeypatch):
         assert image.content == _png()
     reset_settings_for_tests()
     reset_db_for_tests()
+
+
+def test_screenshot_store_enforces_total_quota(env):
+    from dataclasses import replace
+
+    from beacon.db import get_db
+    from beacon.services import screenshots
+
+    small = replace(env, screenshot_max_total_bytes=100)
+    db = get_db(env)
+    with pytest.raises(screenshots.ScreenshotError) as excinfo:
+        screenshots.store(
+            small,
+            db,
+            milestone_id="m",
+            content=_png(),
+            caption="quota",
+        )
+    assert excinfo.value.code == "quota_exceeded"

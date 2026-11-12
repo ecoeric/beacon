@@ -120,9 +120,11 @@ def transition(
         return None
     was_online = bool(row["online"])
     if was_online == online:
-        db.execute(
-            "UPDATE service_state SET detail=?, updated_at=? WHERE key=?", (detail_json, now(), key)
-        )
+        if row["detail"] != detail_json:
+            db.execute(
+                "UPDATE service_state SET detail=?, updated_at=? WHERE key=?",
+                (detail_json, now(), key),
+            )
         return None
     db.execute(
         "UPDATE service_state SET online=?, detail=?, updated_at=? WHERE key=?",

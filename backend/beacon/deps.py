@@ -31,13 +31,14 @@ SettingsDep = Annotated[Settings, Depends(settings_dep)]
 
 
 def _extract_token(authorization: str | None, request: Request) -> str | None:
-    if authorization:
-        scheme, _, value = authorization.partition(" ")
-        if scheme.lower() == "bearer" and value.strip():
-            return value.strip()
+    # Bearer header only. A `?token=` fallback used to exist for image URLs, but query strings
+    # are written verbatim to the access log, which would leak an admin-capable token; the iOS
+    # client sends the header for image requests too.
+    if not authorization:
         return None
-    if request.method == "GET" and request.url.path.startswith("/api/v1/screenshots/"):
-        return request.query_params.get("token")
+    scheme, _, value = authorization.partition(" ")
+    if scheme.lower() == "bearer" and value.strip():
+        return value.strip()
     return None
 
 

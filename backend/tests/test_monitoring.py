@@ -177,3 +177,37 @@ def test_sampler_produces_cpu_delta():
     state = sampler.state()
     assert state["cpu_percent"] is None or state["cpu_percent"] >= 0
     sampler.stop()
+
+
+def test_activity_mutations_require_action_scope(client, auth, env):
+    db = get_db(env)
+    notification_id = notifications.notify(db, kind="test", severity="info", title="scoped")
+    read_only = client.post(f"/api/v1/activity/{notification_id}/read", headers=auth("read"))
+    assert read_only.status_code == 403
+    read_all = client.post("/api/v1/activity/read-all", headers=auth("read"))
+    assert read_all.status_code == 403
+    allowed = client.post(f"/api/v1/activity/{notification_id}/read", headers=auth("admin"))
+    assert allowed.status_code == 200
+
+
+def test_service_state_is_not_rewritten_when_unchanged(env):
+    db = get_db(env)
+    notifications.transition(db, key="pihole", online=True)
+    first = db.query_one("SELECT updated_at, detail FROM service_state WHERE key='pihole'")
+    time.sleep(0.05)
+    notifications.transition(db, key="pihole", online=True)
+    second = db.query_one("SELECT updated_at, detail FROM service_state WHERE key='pihole'")
+    assert first["updated_at"] == second["updated_at"]
+
+
+def test_minecraft_logs_are_tailed_not_fully_loaded(client, auth, env):
+    log_dir = env.minecraft_dir / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / "latest.log"
+    lines = [f"[line {index:05d}] filler content" for index in range(5000)]
+    log_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    response = client.get("/api/v1/minecraft/logs", params={"lines": 20}, headers=auth())
+    assert response.status_code == 200
+    payload = response.json()
+    assert len(payload["lines"]) == 20
+    assert payload["lines"][-1].startswith("[line 04999]")

@@ -31,12 +31,25 @@ fi
 "$UV" pip install --python "$PY" -q -r "$BACKEND/requirements.lock"
 "$PY" -c "import fastapi, uvicorn, PIL, cryptography, httpx; print('deps ok')"
 
-step "2/6 read-only docker helper + sudoers"
+step "2/6 privileged docker snapshot timer"
 sudo install -d -o root -g root -m 0755 /usr/local/lib/beacon
-sudo install -o root -g root -m 0755 "$PROJECT/deploy/docker-read" /usr/local/lib/beacon/docker-read
-sudo install -o root -g root -m 0440 "$PROJECT/deploy/sudoers-beacon" /etc/sudoers.d/beacon-docker-read
-sudo visudo -cf /etc/sudoers.d/beacon-docker-read
-sudo -n /usr/local/lib/beacon/docker-read ps >/dev/null && echo "docker helper works"
+sudo install -o root -g root -m 0755 "$PROJECT/deploy/docker-snapshot" /usr/local/lib/beacon/docker-snapshot
+# Remove the previous sudo-based helper: the API no longer has a privileged path.
+sudo rm -f /usr/local/lib/beacon/docker-read /etc/sudoers.d/beacon-docker-read
+sudo install -o root -g root -m 0644 "$PROJECT/deploy/beacon-docker.service" /etc/systemd/system/beacon-docker.service
+sudo install -o root -g root -m 0644 "$PROJECT/deploy/beacon-docker.timer" /etc/systemd/system/beacon-docker.timer
+sudo systemctl daemon-reload
+sudo systemctl enable --now beacon-docker.timer
+sudo systemctl start beacon-docker.service
+for _ in $(seq 1 30); do
+    if [ -f /run/beacon/docker.json ]; then break; fi
+    sleep 0.5
+done
+if [ -f /run/beacon/docker.json ]; then
+    echo "docker snapshot: $(python3 -c 'import json;print(len(json.load(open("/run/beacon/docker.json"))["containers"]))') container(s)"
+else
+    echo "docker snapshot not written yet (will catch up on the next timer run)" >&2
+fi
 
 step "3/6 systemd units"
 sudo install -o root -g root -m 0644 "$PROJECT/deploy/beacon-api.service" /etc/systemd/system/beacon-api.service

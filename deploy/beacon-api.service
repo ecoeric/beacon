@@ -23,12 +23,16 @@ TimeoutStopSec=20
 KillSignal=SIGINT
 
 # Hardening notes:
-#  * NoNewPrivileges is deliberately OFF: the service calls the sudo-allow-listed, read-only
-#    `docker-read` wrapper. That wrapper only accepts `ps` and `stats` (see /usr/local/lib/beacon).
+#  * The API never runs `sudo` and never touches the Docker socket: Docker metrics come from
+#    /run/beacon/docker.json, written by the root `beacon-docker.timer` with two fixed commands.
+#    That allows NoNewPrivileges=yes here, so a compromised API process cannot exec setuid sudo
+#    even though the interactive `eric` account has a NOPASSWD rule.
 #  * PrivateTmp is OFF so `ffmpeg -f x11grab` can reach /tmp/.X11-unix for real window captures.
 #  * PrivateDevices is OFF because nvidia-smi needs /dev/nvidia*.
-# Everything else is locked down; the process writes only to the data directory and the
-# Minecraft server folder (needed to start the server).
+#  * The service still runs as `eric` and can read the Cherry Studio database; credentials that
+#    have nothing to do with Beacon are masked with InaccessiblePaths below.
+NoNewPrivileges=yes
+InaccessiblePaths=-/home/eric/.ssh -/home/eric/.gnupg -/home/eric/.mozilla -/home/eric/.config/CherryStudio/Credentials
 ProtectSystem=strict
 ProtectHome=read-only
 ReadWritePaths=/home/eric/beacon/data /home/eric/Desktop/NeoForgeServer

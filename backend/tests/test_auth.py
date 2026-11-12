@@ -78,3 +78,25 @@ def test_capabilities_are_honest_about_unavailable_sources(client, auth):
     assert payload["monitoring"]["pihole"] is False
     assert payload["notifications"]["push"] is False
     assert payload["screenshots"]["retention_days"] == 7
+
+
+def test_token_last_used_is_throttled(client, auth, env, monkeypatch):
+    from beacon.db import get_db
+    from beacon.security import reset_security_state_for_tests, verify_token
+
+    reset_security_state_for_tests()
+    db = get_db(env)
+    raw = auth("read")["Authorization"].split(" ", 1)[1]
+    updates = []
+    original = db.execute
+
+    def counting(sql, params=()):
+        if "UPDATE token SET last_used_at" in sql:
+            updates.append(sql)
+        return original(sql, params)
+
+    monkeypatch.setattr(db, "execute", counting)
+    assert verify_token(db, raw) is not None
+    assert verify_token(db, raw) is not None
+    assert len(updates) == 1, "last_used_at must be flushed at most once per window"
+    reset_security_state_for_tests()

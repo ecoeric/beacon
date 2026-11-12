@@ -143,6 +143,14 @@ def _systemctl(*args: str) -> int:
     return subprocess.call(["sudo", "-n", "systemctl", *args])
 
 
+def _unit_has(settings, needle: str) -> bool:
+    path = Path("/etc/systemd/system/beacon-api.service")
+    try:
+        return needle in path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+
+
 def _ago(timestamp: float | None) -> str:
     if not timestamp:
         return "n/a"
@@ -329,6 +337,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         ["systemctl", "is-active", "beacon-api.service"], capture_output=True, text=True
     ).stdout.strip()
     check("beacon-api.service active", active == "active", active or "unknown")
+    check("NoNewPrivileges on the API unit", _unit_has(settings, "NoNewPrivileges=yes"), "systemd")
     timer = subprocess.run(
         ["systemctl", "is-active", "beacon-retention.timer"], capture_output=True, text=True
     ).stdout.strip()
@@ -349,13 +358,27 @@ def cmd_doctor(args: argparse.Namespace) -> int:
                 f"queue pending={status['queue']['pending']}"
             )
 
-    docker_helper = settings.docker_read_helper
-    check("docker read helper installed", docker_helper.exists(), str(docker_helper))
-    if docker_helper.exists():
-        probe = subprocess.run(
-            ["sudo", "-n", str(docker_helper), "ps"], capture_output=True, text=True, timeout=15
-        )
-        check("docker read helper usable", probe.returncode == 0, probe.stderr.strip()[:120])
+    docker_timer = subprocess.run(
+        ["systemctl", "is-active", "beacon-docker.timer"], capture_output=True, text=True
+    ).stdout.strip()
+    check("beacon-docker.timer active", docker_timer == "active", docker_timer or "unknown")
+    snapshot_file = settings.docker_snapshot_file
+    snapshot_ok = False
+    if snapshot_file.exists():
+        try:
+            payload = json.loads(snapshot_file.read_text(encoding="utf-8"))
+            fetched = float(payload.get("fetched_at") or 0)
+            age = max(0.0, time.time() - fetched)
+            snapshot_ok = age <= 90
+            check(
+                "docker snapshot fresh",
+                snapshot_ok,
+                f"{len(payload.get('containers') or [])} containers, {int(age)}s old",
+            )
+        except (OSError, ValueError):
+            check("docker snapshot readable", False, str(snapshot_file))
+    else:
+        check("docker snapshot file", False, f"{snapshot_file} missing")
 
     if api is not None:
         pihole_status = api.get("/api/v1/pihole/status")
@@ -632,7 +655,7 @@ def cmd_agent(args: argparse.Namespace) -> int:
         _confirm(f"interrupt the agent ({args.mode})", args.yes)
         data = api.post(
             "/api/v1/agent/interrupt",
-            json={"mode": args.mode, "reason": args.reason or ""},
+            json={"mode": args.mode, "reason": args.reason or "", "session_id": args.session},
             headers={"X-Beacon-Confirm": "agent-interrupt"},
         )
         ok(f"interrupt {data['status']} · mode={data['mode']} pid={data.get('pid')}")
@@ -909,6 +932,7 @@ def main(argv: list[str] | None = None) -> int:
     interrupt = agent_sub.add_parser("interrupt")
     interrupt.add_argument("--mode", choices=["signal", "checkpoint"], default="signal")
     interrupt.add_argument("--reason")
+    interrupt.add_argument("--session", help="explicit session id to interrupt")
     interrupt.add_argument("--yes", action="store_true")
     interrupt.set_defaults(func=cmd_agent)
     interrupt_ack = agent_sub.add_parser("interrupt-ack")

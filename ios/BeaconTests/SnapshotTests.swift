@@ -17,6 +17,7 @@
 // `scripts/publish_snapshots.py` then attaches those PNGs to a milestone on the server.
 
 import SwiftUI
+import UIKit
 import XCTest
 
 @testable import Beacon

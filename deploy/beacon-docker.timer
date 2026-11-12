@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh the Beacon Docker snapshot every 15 seconds
+
+[Timer]
+OnBootSec=20s
+OnUnitActiveSec=15s
+AccuracySec=2s
+Unit=beacon-docker.service
+
+[Install]
+WantedBy=timers.target

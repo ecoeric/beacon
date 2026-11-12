@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import json
 import logging
 import time
 from contextlib import asynccontextmanager
@@ -41,6 +42,89 @@ SERVICE_ERRORS = (
     capture.CaptureError,
     pihole.PiholeError,
 )
+
+
+class BodySizeLimitMiddleware:
+    """Reject oversized request bodies before FastAPI parses them.
+
+    A declared ``Content-Length`` is checked first; bodies without one (chunked) are read up to
+    the limit + 1 byte and rejected, so a chunked upload cannot bypass the ceiling or be spooled
+    to disk in full. Accepted bodies are replayed to the application unchanged.
+    """
+
+    def __init__(self, app, max_bytes: int) -> None:
+        self.app = app
+        self.max_bytes = max_bytes
+
+    async def __call__(self, scope, receive, send) -> None:
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+        headers = {key.lower(): value for key, value in scope.get("headers", [])}
+        declared = headers.get(b"content-length")
+        chunked = b"transfer-encoding" in headers
+        if declared is None and not chunked:
+            # No body is expected at all (GET/HEAD, or a bodyless request). Passing the original
+            # receive through keeps streaming responses and disconnect listeners working.
+            await self.app(scope, receive, send)
+            return
+        if declared is not None:
+            try:
+                size = int(declared)
+            except ValueError:
+                size = None
+            if size is not None and size > self.max_bytes:
+                await self._reject(send)
+                return
+        body = bytearray()
+        while True:
+            message = await receive()
+            if message.get("type") == "http.disconnect":
+                return
+            chunk = message.get("body", b"")
+            if chunk:
+                body.extend(chunk)
+                if len(body) > self.max_bytes:
+                    await self._reject(send)
+                    return
+            if not message.get("more_body", False):
+                break
+        delivered = False
+        response_finished = asyncio.Event()
+
+        async def guarded_send(message):
+            await send(message)
+            if message.get("type") == "http.response.body" and not message.get("more_body", False):
+                response_finished.set()
+
+        async def replay():
+            nonlocal delivered
+            if not delivered:
+                delivered = True
+                return {"type": "http.request", "body": bytes(body), "more_body": False}
+            # Mirror a real server: after the body, receive() waits for the exchange to finish
+            # rather than returning immediately (Starlette's disconnect listener awaits this).
+            await response_finished.wait()
+            return {"type": "http.disconnect"}
+
+        await self.app(scope, replay, guarded_send)
+
+    async def _reject(self, send) -> None:
+        payload = json.dumps(
+            {"error": "payload_too_large", "message": "request body exceeds the configured limit"}
+        ).encode()
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 413,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"content-length", str(len(payload)).encode()),
+                    (b"cache-control", b"no-store"),
+                ],
+            }
+        )
+        await send({"type": "http.response.body", "body": payload})
 
 
 def _error_handler(exc: Exception) -> JSONResponse:
@@ -116,6 +200,8 @@ def create_app() -> FastAPI:
     app.include_router(milestones.router, prefix="/api/v1")
     app.include_router(monitoring.router, prefix="/api/v1")
 
+    app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_bytes)
+
     for error_type in SERVICE_ERRORS:
         app.add_exception_handler(error_type, lambda request, exc: _error_handler(exc))
 
@@ -130,15 +216,6 @@ def create_app() -> FastAPI:
     @app.middleware("http")
     async def security_headers(request: Request, call_next):
         started = time.monotonic()
-        declared = request.headers.get("content-length")
-        if declared is not None and declared.isdigit() and int(declared) > settings.max_request_bytes:
-            return JSONResponse(
-                status_code=413,
-                content={
-                    "error": "payload_too_large",
-                    "message": f"request body exceeds {settings.max_request_bytes} bytes",
-                },
-            )
         response = await call_next(request)
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")

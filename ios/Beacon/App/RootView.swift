@@ -45,7 +45,7 @@ struct RootView: View {
             }
         }
         .task { await model.bootstrap() }
-        .onChange(of: scenePhase) { phase in
+        .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .active:
                 model.startPolling()

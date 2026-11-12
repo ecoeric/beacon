@@ -55,6 +55,8 @@ class Settings:
     session_id: str
     stale_working_seconds: int
     stale_disconnect_seconds: int
+    message_lease_seconds: int
+    message_max_attempts: int
 
     pihole_url: str
     pihole_password_file: Path
@@ -67,9 +69,10 @@ class Settings:
     minecraft_rcon_password_file: Path
     minecraft_stop_timeout_seconds: int
 
-    docker_read_helper: Path
+    docker_snapshot_file: Path
     screenshot_retention_days: int
     screenshot_max_bytes: int
+    screenshot_max_total_bytes: int
     max_request_bytes: int
     enable_docs: bool = False
     allowed_origins: list[str] = field(default_factory=list)
@@ -133,6 +136,8 @@ def load_settings() -> Settings:
         session_id=_env("BEACON_SESSION_ID", ""),
         stale_working_seconds=_env_int("BEACON_STALE_WORKING_SECONDS", 90),
         stale_disconnect_seconds=_env_int("BEACON_STALE_DISCONNECT_SECONDS", 86400),
+        message_lease_seconds=_env_int("BEACON_MESSAGE_LEASE_SECONDS", 120),
+        message_max_attempts=_env_int("BEACON_MESSAGE_MAX_ATTEMPTS", 5),
         pihole_url=_env("BEACON_PIHOLE_URL", "http://192.168.1.83:8080"),
         pihole_password_file=Path(
             _env("BEACON_PIHOLE_PASSWORD_FILE", str(data_dir / "secrets" / "pihole.password"))
@@ -148,11 +153,14 @@ def load_settings() -> Settings:
             _env("BEACON_MINECRAFT_RCON_PASSWORD_FILE", str(data_dir / "secrets" / "minecraft.rcon"))
         ).expanduser(),
         minecraft_stop_timeout_seconds=_env_int("BEACON_MINECRAFT_STOP_TIMEOUT_SECONDS", 120),
-        docker_read_helper=Path(
-            _env("BEACON_DOCKER_READ_HELPER", "/usr/local/lib/beacon/docker-read")
+        docker_snapshot_file=Path(
+            _env("BEACON_DOCKER_SNAPSHOT_FILE", "/run/beacon/docker.json")
         ),
         screenshot_retention_days=_env_int("BEACON_SCREENSHOT_RETENTION_DAYS", 7),
         screenshot_max_bytes=_env_int("BEACON_SCREENSHOT_MAX_BYTES", 12 * 1024 * 1024),
+        screenshot_max_total_bytes=_env_int(
+            "BEACON_SCREENSHOT_MAX_TOTAL_BYTES", 512 * 1024 * 1024
+        ),
         max_request_bytes=_env_int("BEACON_MAX_REQUEST_BYTES", 64 * 1024 * 1024),
         enable_docs=_env_bool("BEACON_ENABLE_DOCS", False),
         allowed_origins=_env_list("BEACON_ALLOWED_ORIGINS", []),

@@ -61,7 +61,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var isPerformingAction = false
     @Published private(set) var isStatusLoading = false
     @Published var errorMessage: String?
-    @Published var banner: String?
+
     @Published private(set) var lastUpdated: Date?
     @Published private(set) var setupError: String?
     @Published private(set) var statusSummary: StatusSummaryResponse?
@@ -116,6 +116,7 @@ final class AppModel: ObservableObject {
             await refresh(showSpinner: false)
             await refreshMilestones()
             await loadCapabilities()
+            startPolling()
         } catch {
             handle(error, prefix: "Connecting")
         }
@@ -152,6 +153,7 @@ final class AppModel: ObservableObject {
             await refresh()
             await refreshMilestones()
             await loadCapabilities()
+            startPolling()
             return true
         } catch {
             testSession.invalidateAndCancel()
@@ -365,7 +367,7 @@ final class AppModel: ObservableObject {
         guard pollTask == nil, isConfigured, !previewMode else { return }
         pollTask = Task { [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 15_000_000_000)
+                try? await Task.sleep(for: .seconds(15))
                 if Task.isCancelled { return }
                 guard let self else { return }
                 await self.refresh(showSpinner: false)
@@ -392,7 +394,7 @@ final class AppModel: ObservableObject {
         return "Updated \(Format.age(stamp.timeIntervalSince1970))"
     }
 
-    private func handle(_ error: Error, prefix: String) {
+    private func handle(_ error: Error, prefix _: String) {
         let text = message(for: error)
         errorMessage = text
         if let beacon = error as? BeaconError {

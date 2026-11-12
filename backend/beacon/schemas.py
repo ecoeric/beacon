@@ -70,6 +70,7 @@ class InterruptInfo(BaseModel):
     requested_at: float
     mode: str
     status: str
+    session_id: str | None = None
     reason: str = ""
     pid: int | None = None
     signal: str | None = None
@@ -149,6 +150,15 @@ class ContinueRequest(BaseModel):
 class InterruptRequest(BaseModel):
     mode: Literal["signal", "checkpoint"] = "signal"
     reason: str = Field(default="", max_length=500)
+    session_id: str | None = Field(
+        default=None,
+        max_length=80,
+        description=(
+            "Optional explicit session to interrupt. Must match a session that exists in the "
+            "read-only Cherry Studio database; the agent-writable status snapshot is never used "
+            "as a signalling target."
+        ),
+    )
 
 
 class AckRequest(BaseModel):

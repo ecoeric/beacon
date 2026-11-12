@@ -58,24 +58,50 @@ def enqueue(
     if not body:
         raise QueueError("empty_message", "message text must not be empty", status_code=422)
 
-    if idempotency_key:
+    # Namespace the key by client so two devices that happen to use "1" cannot read or collide
+    # with each other's messages.
+    effective_key = f"{client or 'unknown'}:{idempotency_key}" if idempotency_key else None
+    if effective_key:
         existing = db.query_one(
-            "SELECT * FROM agent_message WHERE idempotency_key=?", (idempotency_key,)
+            "SELECT * FROM agent_message WHERE idempotency_key=?", (effective_key,)
         )
         if existing is not None:
             return _row_to_model(existing), False
 
     message_id = new_id()
+    created = True
     with db.transaction() as conn:
         seq = int(conn.execute("SELECT COALESCE(MAX(seq),0)+1 FROM agent_message").fetchone()[0])
-        conn.execute(
-            """
-            INSERT INTO agent_message(
-                id, seq, kind, body, status, created_at, idempotency_key, client, session_id
-            ) VALUES (?,?,?,?,?,?,?,?,?)
-            """,
-            (message_id, seq, kind, body, "pending", now(), idempotency_key, client, session_id),
+        if effective_key:
+            # One statement closes the race: a concurrent duplicate inserts nothing and we
+            # return the winner's row instead of raising IntegrityError.
+            cursor = conn.execute(
+                """
+                INSERT INTO agent_message(
+                    id, seq, kind, body, status, created_at, idempotency_key, client, session_id
+                ) VALUES (?,?,?,?,?,?,?,?,?)
+                ON CONFLICT(idempotency_key) DO NOTHING
+                """,
+                (message_id, seq, kind, body, "pending", now(), effective_key, client, session_id),
+            )
+            if cursor.rowcount == 0:
+                created = False
+                message_id = ""
+        else:
+            conn.execute(
+                """
+                INSERT INTO agent_message(
+                    id, seq, kind, body, status, created_at, idempotency_key, client, session_id
+                ) VALUES (?,?,?,?,?,?,?,?,?)
+                """,
+                (message_id, seq, kind, body, "pending", now(), None, client, session_id),
+            )
+    if not created:
+        row = db.query_one(
+            "SELECT * FROM agent_message WHERE idempotency_key=?", (effective_key,)
         )
+        assert row is not None
+        return _row_to_model(row), False
     row = db.query_one("SELECT * FROM agent_message WHERE id=?", (message_id,))
     assert row is not None
     return _row_to_model(row), True
@@ -106,10 +132,22 @@ def checkpoint(
     """Hand pending messages to the agent. Delivery is atomic per message."""
     limit = max(1, min(limit, 25))
     delivered_rows = []
+    lease_seconds = getattr(settings, "message_lease_seconds", 120)
+    max_attempts = getattr(settings, "message_max_attempts", 5)
+    lease_cutoff = now() - lease_seconds
     with db.transaction() as conn:
+        # Pending work, plus deliveries whose lease expired without an acknowledgement (the
+        # agent may have died mid-request). Bodies are never rewritten.
         rows = conn.execute(
-            "SELECT * FROM agent_message WHERE status='pending' ORDER BY seq LIMIT ?",
-            (limit,),
+            """
+            SELECT * FROM agent_message
+             WHERE status='pending'
+                OR (status='delivered' AND delivered_at IS NOT NULL AND delivered_at <= ?
+                    AND attempts < ?)
+             ORDER BY seq
+             LIMIT ?
+            """,
+            (lease_cutoff, max_attempts, limit),
         ).fetchall()
         stamp = now()
         for row in rows:
@@ -117,7 +155,7 @@ def checkpoint(
                 """
                 UPDATE agent_message
                    SET status='delivered', delivered_at=?, attempts=attempts+1, session_id=COALESCE(?, session_id)
-                 WHERE id=? AND status='pending'
+                 WHERE id=? AND status IN ('pending', 'delivered')
                 """,
                 (stamp, session_id, row["id"]),
             )
@@ -154,6 +192,24 @@ def _mirror_to_inbox(settings, messages: list[MessageModel]) -> None:
     except OSError:
         # The queue is still authoritative; the mirror is best-effort telemetry.
         pass
+
+
+def nack(db: Database, message_id: str, *, note: str | None = None) -> MessageModel:
+    """Return a delivered message to the queue (agent could not process it)."""
+    with db.transaction() as conn:
+        row = conn.execute("SELECT * FROM agent_message WHERE id=?", (message_id,)).fetchone()
+        if row is None:
+            raise QueueError("not_found", "message not found", status_code=404)
+        if row["status"] != "delivered":
+            raise QueueError(
+                "invalid_transition",
+                f"cannot nack a message in state '{row['status']}'",
+            )
+        conn.execute(
+            "UPDATE agent_message SET status='pending', delivered_at=NULL, ack_note=? WHERE id=?",
+            (note or row["ack_note"], message_id),
+        )
+    return get(db, message_id)  # type: ignore[return-value]
 
 
 def acknowledge(db: Database, message_id: str, *, note: str | None = None) -> MessageModel:

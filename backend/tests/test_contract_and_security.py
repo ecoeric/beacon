@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import json
 import re
+
+import pytest
 from pathlib import Path
 
 from beacon.main import create_app
@@ -69,20 +71,31 @@ def test_capture_allow_lists_are_fixed_and_simple():
         assert ".." not in path
 
 
-def test_docker_helper_is_read_only():
-    script = (ROOT / "deploy" / "docker-read").read_text(encoding="utf-8")
-    assert "ps)" in script and "stats)" in script
-    for mutation in ("docker rm", "docker stop", "docker start", "docker restart", "docker exec", "docker run"):
-        assert mutation not in script, f"docker-read should not reference {mutation!r}"
-    assert "exec \"$DOCKER\" ps" in script
-    assert "exec \"$DOCKER\" stats" in script
+def test_docker_snapshot_script_is_fixed():
+    script = (ROOT / "deploy" / "docker-snapshot").read_text(encoding="utf-8")
+    assert '"ps"' in script and '"stats"' in script
+    assert "subprocess.run" in script
+    assert "[DOCKER, *args]" in script
+    for forbidden in ('docker exec', 'docker rm', '"run"', 'shell=True'):
+        assert forbidden not in script, f"docker snapshot must not support {forbidden!r}"
 
 
-def test_systemd_units_do_not_run_as_root():
+def test_systemd_units_do_not_run_the_api_as_root():
     for name in ("beacon-api.service", "beacon-retention.service"):
         unit = (ROOT / "deploy" / name).read_text(encoding="utf-8")
         assert "User=eric" in unit, name
         assert "User=root" not in unit, name
+    assert "NoNewPrivileges=yes" in (ROOT / "deploy" / "beacon-api.service").read_text(encoding="utf-8")
+
+
+def test_docker_timer_privileges_are_minimal():
+    unit = (ROOT / "deploy" / "beacon-docker.service").read_text(encoding="utf-8")
+    assert "User=root" in unit
+    assert "NoNewPrivileges=yes" in unit
+    assert "CapabilityBoundingSet=" in unit
+    assert "ReadOnlyPaths=/var/run/docker.sock" in unit
+    assert "ReadWritePaths=/run/beacon" in unit
+    assert "ProtectSystem=strict" in unit
 
 
 def test_no_secret_values_are_committed():
@@ -142,3 +155,53 @@ def test_screenshot_store_enforces_byte_limit(env):
             caption="too big",
         )
     assert excinfo.value.code == "too_large"
+
+
+def test_chunked_body_limit_is_enforced(client, auth):
+    def oversized_chunks():
+        for _ in range(3):
+            yield b"x" * (1024 * 1024)  # env fixture limit is 2 MiB, no Content-Length
+
+    response = client.post(
+        "/api/v1/agent/messages",
+        content=oversized_chunks(),
+        headers={**auth("admin"), "Content-Type": "application/json"},
+    )
+    assert response.status_code == 413
+    assert response.json()["error"] == "payload_too_large"
+
+
+def test_health_does_not_leak_database_errors(env, monkeypatch):
+    import beacon.db as db_module
+
+    def boom(_settings):
+        raise RuntimeError("unable to open /home/eric/beacon/data/beacon.sqlite: secret detail")
+
+    monkeypatch.setattr(db_module, "get_db", boom)
+    from fastapi.testclient import TestClient
+
+    from beacon.main import create_app
+
+    with TestClient(create_app()) as client:
+        response = client.get("/api/v1/health")
+        assert response.status_code == 200
+        body = response.json()
+        assert body["database"] == "error"
+        assert body["status"] == "degraded"
+        text = response.text
+        assert "secret detail" not in text
+        assert "/home/eric" not in text
+
+
+def test_capture_file_has_no_existence_oracle():
+    from beacon.config import get_settings
+    from beacon.services import capture
+
+    settings = get_settings()
+    with pytest.raises(capture.CaptureError) as existing:
+        capture.capture_file(settings, path="/etc/passwd")
+    with pytest.raises(capture.CaptureError) as missing:
+        capture.capture_file(settings, path="/tmp/definitely-not-a-beacon-file-92837.png")
+    assert existing.value.status_code == 404
+    assert missing.value.status_code == 404
+    assert existing.value.message == missing.value.message == "file not found"

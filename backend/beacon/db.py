@@ -154,7 +154,6 @@ CREATE TABLE IF NOT EXISTS service_state (
 );
 """
 
-_local = threading.local()
 _write_lock = threading.RLock()
 
 
@@ -169,6 +168,8 @@ def now() -> float:
 class Database:
     def __init__(self, path: Path) -> None:
         self.path = path
+        self._conns: dict[int, sqlite3.Connection] = {}
+        self._conn_lock = threading.Lock()
 
     # -- connections -------------------------------------------------------
     def connect(self) -> sqlite3.Connection:
@@ -181,13 +182,28 @@ class Database:
         return conn
 
     def conn(self) -> sqlite3.Connection:
-        """Thread-local read connection."""
-        key = f"conn_{id(self)}"
-        conn = getattr(_local, key, None)
-        if conn is None:
-            conn = self.connect()
-            setattr(_local, key, conn)
-        return conn
+        """Per-thread read connection owned by this Database instance.
+
+        The cache lives on the instance (keyed by thread id) rather than in a module-level
+        thread-local keyed by ``id(self)``: the latter could hand back a connection to a
+        previously freed Database when CPython reused the object address.
+        """
+        ident = threading.get_ident()
+        with self._conn_lock:
+            conn = self._conns.get(ident)
+            if conn is None:
+                conn = self.connect()
+                self._conns[ident] = conn
+            return conn
+
+    def close(self) -> None:
+        with self._conn_lock:
+            for conn in self._conns.values():
+                try:
+                    conn.close()
+                except sqlite3.Error:
+                    continue
+            self._conns.clear()
 
     # -- lifecycle ---------------------------------------------------------
     def initialise(self) -> None:
@@ -268,4 +284,6 @@ def get_db(settings) -> Database:
 def reset_db_for_tests() -> None:
     global _database
     with _db_lock:
+        if _database is not None:
+            _database.close()
         _database = None

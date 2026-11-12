@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import logging
+import os
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Header, HTTPException, Query, Request, status
@@ -20,6 +22,21 @@ from ..security import audit
 from ..services import docker_monitor, minecraft, notifications, pihole, system_metrics
 
 router = APIRouter(tags=["monitoring"])
+logger = logging.getLogger("beacon.monitoring")
+
+
+def _tail_lines(path, count: int, max_bytes: int = 512 * 1024) -> list[str]:
+    """Return the last ``count`` lines without loading the whole file into memory."""
+    with open(path, "rb") as handle:
+        handle.seek(0, os.SEEK_END)
+        size = handle.tell()
+        start = max(0, size - max_bytes)
+        handle.seek(start)
+        data = handle.read().decode("utf-8", "replace")
+    lines = data.splitlines()
+    if start > 0 and lines:
+        lines = lines[1:]  # first line may be truncated
+    return lines[-count:]
 
 
 class BlockingUpdate(BaseModel):
@@ -77,7 +94,7 @@ async def set_pihole_blocking(
     from ..deps import require_confirmation
 
     require_confirmation(confirmation, "pihole-blocking", "changing Pi-hole blocking")
-    throttle(f"{token.name}:pihole-blocking", limit=5, window_seconds=60)
+    throttle(f"{token.id}:pihole-blocking", limit=5, window_seconds=60)
     settings = get_settings()
     result = await pihole.get_client(settings).set_blocking(payload.enabled)
     audit(
@@ -136,16 +153,15 @@ def minecraft_logs(
             status_code=404, detail={"code": "no_log", "message": "latest.log not found"}
         )
     analysis = minecraft.analyse_logs(settings)
-    tail = []
     try:
-        with open(path, "r", encoding="utf-8", errors="replace") as handle:
-            tail = handle.readlines()[-lines:]
+        tail = _tail_lines(path, lines)
     except OSError as exc:
+        logger.exception("could not read the Minecraft log")
         raise HTTPException(
-            status_code=500, detail={"code": "log_unreadable", "message": str(exc)}
+            status_code=500, detail={"code": "log_unreadable", "message": "log file is not readable"}
         ) from exc
     return {
-        "lines": [minecraft.COLOUR.sub("", line.rstrip("\n"))[:400] for line in tail],
+        "lines": [minecraft.COLOUR.sub("", line)[:400] for line in tail],
         "errors": analysis["errors"],
         "events": analysis["events"],
         "tick_warnings": analysis["tick_warnings"],
@@ -164,7 +180,7 @@ async def minecraft_control(
     from ..deps import require_confirmation
 
     require_confirmation(confirmation, f"minecraft-{payload.action}", f"minecraft {payload.action}")
-    throttle(f"{token.name}:minecraft-{payload.action}", limit=2, window_seconds=60)
+    throttle(f"{token.id}:minecraft-{payload.action}", limit=2, window_seconds=60)
     settings = get_settings()
 
     if payload.action == "start":

@@ -196,3 +196,101 @@ def test_interrupt_refuses_when_target_changes_before_signal(client, auth, fake_
         if proc.poll() is None:
             proc.kill()
             proc.wait(timeout=5)
+
+
+def test_agent_cannot_redirect_interrupt_via_status_snapshot(client, auth, fake_session, tmp_path, monkeypatch):
+    """The agent-writable snapshot must never choose the signalling target."""
+    from beacon.config import reset_settings_for_tests
+
+    monkeypatch.setenv("BEACON_SESSION_ID", "")
+    reset_settings_for_tests()
+    _clear_limiter()
+    proc, _bin, _composition = _spawn_fake_runtime(tmp_path / "run-trust", fake_session)
+    try:
+        # The agent publishes a snapshot claiming a different session id.
+        published = client.put(
+            "/api/v1/agent/status",
+            json={"project": "Beacon", "session_id": "attacker-chosen-session"},
+            headers=auth("agent"),
+        )
+        assert published.status_code == 200
+        response = client.post(
+            "/api/v1/agent/interrupt",
+            json={"mode": "signal"},
+            headers=auth("admin", **{"X-Beacon-Confirm": "agent-interrupt"}),
+        )
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert body["session_id"] == fake_session, "target must come from Cherry Studio evidence"
+        assert body["pid"] == proc.pid
+        proc.wait(timeout=5)
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)
+
+
+def test_explicit_unknown_session_is_rejected(client, auth, fake_session):
+    _clear_limiter()
+    response = client.post(
+        "/api/v1/agent/interrupt",
+        json={"mode": "checkpoint", "session_id": "not-a-real-session"},
+        headers=auth("admin", **{"X-Beacon-Confirm": "agent-interrupt"}),
+    )
+    assert response.status_code == 409
+    assert response.json()["error"] == "unknown_session"
+
+
+def test_explicit_trusted_session_is_used(client, auth, fake_session, tmp_path):
+    _clear_limiter()
+    proc, _bin, _composition = _spawn_fake_runtime(tmp_path / "run-explicit", fake_session)
+    try:
+        response = client.post(
+            "/api/v1/agent/interrupt",
+            json={"mode": "signal", "session_id": fake_session},
+            headers=auth("admin", **{"X-Beacon-Confirm": "agent-interrupt"}),
+        )
+        assert response.status_code == 200, response.text
+        assert response.json()["session_id"] == fake_session
+        proc.wait(timeout=5)
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)
+
+
+def test_query_token_is_not_accepted(env, tokens):
+    """A bearer token in the query string must not authenticate (it would leak into logs)."""
+    from fastapi.testclient import TestClient
+
+    from beacon.main import create_app
+
+    with TestClient(create_app()) as raw:
+        response = raw.get("/api/v1/summary", params={"token": tokens["admin"]})
+        assert response.status_code == 401
+
+
+def test_interrupt_falls_back_when_pidfd_is_unavailable(client, auth, fake_session, tmp_path, monkeypatch):
+    _clear_limiter()
+    from beacon.services import procs
+
+    proc, _bin, _composition = _spawn_fake_runtime(tmp_path / "run-pidfd", fake_session)
+
+    def no_pidfd(pid):
+        raise OSError("pidfd unavailable")
+
+    monkeypatch.setattr(procs.os, "pidfd_open", no_pidfd, raising=False)
+    try:
+        response = client.post(
+            "/api/v1/agent/interrupt",
+            json={"mode": "signal"},
+            headers=auth("admin", **{"X-Beacon-Confirm": "agent-interrupt"}),
+        )
+        assert response.status_code == 200, response.text
+        evidence = " ".join(response.json()["evidence"])
+        assert "via kill" in evidence
+        proc.wait(timeout=5)
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)

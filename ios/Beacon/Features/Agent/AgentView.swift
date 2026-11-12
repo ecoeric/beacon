@@ -200,7 +200,7 @@ struct AgentView: View {
                 .focused($composerFocused)
                 .padding(12)
                 .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: Theme.innerRadius, style: .continuous))
-                .onChange(of: draft) { value in
+                .onChange(of: draft) { _, value in
                     if value.count > 4000 {
                         draft = String(value.prefix(4000))
                     }

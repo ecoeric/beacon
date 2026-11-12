@@ -1,4 +1,0 @@
-# Read-only Docker monitoring for the Beacon dashboard API.
-# The wrapper only implements `ps` and `stats`; no mutation subcommand is reachable.
-eric ALL=(root) NOPASSWD: /usr/local/lib/beacon/docker-read
-Defaults:eric !requiretty

@@ -51,7 +51,7 @@ class PiholeClient:
         if not password:
             raise PiholeError(
                 "no_password",
-                f"Pi-hole API password file is missing ({self.settings.pihole_password_file})",
+                "The Pi-hole API password is not configured on the server",
                 status_code=503,
             )
         try:
