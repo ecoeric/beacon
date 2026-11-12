@@ -27,8 +27,9 @@ for the first install.
 ## What you need
 
 - An iPhone running **iOS 17 or newer** (Settings → General → About).
-- A **Mac** with the current **Xcode** from the Mac App Store. Xcode is a large download
-  (roughly 10–20 GB); start it early.
+- A **Mac** running **macOS Sonoma 14.5 or newer** with **Xcode 16+**. Xcode is a large download
+  (roughly 10–20 GB); start it early. See [Old Macs and older Xcode](#old-macs-and-older-xcode) —
+  an un-updated Mac may need a different Xcode, and Xcode 15 cannot install on iOS 18 phones.
 - Your **Apple ID** (the normal one you use on the iPhone). A free account is fine.
 - A USB cable for the iPhone.
 - The iPhone and the server on the **same Wi-Fi/LAN**.
@@ -106,6 +107,44 @@ exactly from `beacon tls show`.
 
 ---
 
+## Old Macs and older Xcode
+
+Check the Mac first: **Apple menu → About This Mac**. The macOS version decides which Xcode you
+can run.
+
+From Apple's own release notes:
+
+| Xcode | Minimum macOS | iOS SDK | Notes |
+|---|---|---|---|
+| Xcode 16.x | Sonoma **14.5** | up to iOS 18 | recommended; runs `simulator` apps and installs on iOS 18 phones |
+| Xcode 15.4 | Sonoma **14** | iOS 17.5 | can install on iOS 17 devices |
+| Xcode 15.x | Ventura **13.5** | iOS 17.0 | installs on iOS 17 devices only |
+| Xcode 14.3 | Ventura 13.0 / Monterey 12.5+ | iOS 16.4 | **cannot install on an iOS 17 or 18 phone** |
+
+Real-world consequences:
+
+- **Mac on macOS 13 (Ventura)** → newest possible is Xcode 15.x, iOS 17 SDK. That builds Beacon
+  (which targets iOS 17) but only installs on phones running **iOS 17**. If the phone is on iOS 18
+  or later, Xcode will refuse to install it.
+- **Mac on macOS 12 (Monterey) or older** → Xcode 14/15.0 at best — not enough for iOS 17.
+
+Your options in that case, cheapest first:
+
+1. **Update the Mac's macOS** (System Settings → General → Software Update). Free, but on
+   Intel Macs the newest macOS often cannot be installed. Do a Time Machine backup first.
+2. **Build on the Mac, install the app to an iOS 17 device.** Check the phone's version first.
+3. **Use the iPad/iPhone-equivalent route: a cloud Mac.** MacinCloud and similar rent a
+   current-macOS Mac by the hour with Xcode pre-installed. They can build and run the simulator;
+   a physical iPhone usually cannot be attached, so this proves the app but may not install it.
+4. **Use the GitHub Actions workflow** in this repository (`.github/workflows/ios-build.yml`):
+   it builds and tests on a current Xcode for free. It produces proof the app compiles, but it
+   does not install anything on a phone.
+5. **Borrow/upgrade to an Apple-silicon Mac.** macOS 26 (Tahoe) and Xcode 26 require Apple
+   silicon or a few late Intel models, so an Intel Mac from 2020 has a limited window.
+
+> Do not install a newer Xcode than the Mac's macOS supports — the installer refuses, and
+> unofficial patchers are not recommended for a first-time setup.
+
 ## Free Apple ID limits
 
 With a free Personal Team:
@@ -158,6 +197,8 @@ The least painful path for a first install is still a borrowed Mac with a USB ca
 | Cannot connect | Same Wi-Fi, VPN off, port 8091 reachable, router client isolation disabled |
 | “Token rejected” | Use `ios.token`; check `beacon token list` scopes and that the token was not revoked |
 | App stops opening after a week | Free provisioning expired — re-run from Xcode |
+| “Xcode requires macOS 14.5 or later” | The Mac needs a newer macOS, or use an older Xcode as described above |
+| “Unsupported OS version” / device OS too new | Xcode 15 cannot install on iOS 18+ phones; use Xcode 16 on macOS 14.5+ |
 | Simulator works but phone does not | Check the phone is on the LAN and the Local Network permission is allowed |
 
 The app does **not** require installing the private CA as a phone profile: it validates the
