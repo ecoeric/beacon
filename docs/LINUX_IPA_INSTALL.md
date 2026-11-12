@@ -9,6 +9,11 @@ for this step.
 
 Target device: **iPhone 16e, iOS 26.2**. The app deployment target is iOS 17.0.
 
+**Compatibility note:** the maintained NG fork documents iOS 26.4+/27 signing fixes and was tested
+by its maintainer on iOS 27.0, not specifically 26.2. iOS 26.2 is expected to work, but this exact
+combination has not been verified on this host (no iPhone is attached). If it fails, capture the
+AltServer error and stop after one or two attempts rather than retrying repeatedly.
+
 ---
 
 ## 1. Prerequisites
