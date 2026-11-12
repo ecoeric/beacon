@@ -1,5 +1,80 @@
 [
  {
+  "id": "4683e1a0f18c48208e05811521c8c93f",
+  "seq": 5,
+  "title": "Security review applied: privilege split, trusted interrupts, leased delivery",
+  "summary": "Acted on an independent security review: removed the API's sudo/root path in favour of a fixed root Docker snapshot timer, enabled NoNewPrivileges, made interrupt targeting depend only on read-only session evidence, added leased queue redelivery with nack, and closed upload, logging and information-leak gaps. Swift compile-review items were also fixed.",
+  "changes": [
+   "Docker reads moved to beacon-docker.timer; API no longer runs sudo and now has NoNewPrivileges=yes and masked credential directories",
+   "Interrupt target from Cherry Studio sessions only; explicit session ids validated; pidfd signalling with re-verification",
+   "Queue deliveries leased and re-delivered after 120s (max 5 attempts) plus agent nack; per-client idempotency keys",
+   "Chunked-safe request ceiling, per-file and total screenshot quotas, upload throttles, action scope for activity writes",
+   "No query-string tokens, generic health errors, bounded log tailing, no absolute paths in user-facing errors",
+   "Swift review fixes: UIKit import, SWIFT_VERSION 5.0, polling starts on launch/sign-in"
+  ],
+  "phase": "Phase 6",
+  "created_at": 1794507963.5568962,
+  "screenshots": [
+   {
+    "id": "19445c90f6f84e12b34c6b9dfe001202",
+    "caption": "Host metrics after hardening: CPU, memory, GPU, disks and Docker from the root snapshot",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 44593,
+    "width": 1120,
+    "height": 421,
+    "created_at": 1794507963.5572066,
+    "expires_at": 1795112763.5572066,
+    "url": "/api/v1/screenshots/19445c90f6f84e12b34c6b9dfe001202",
+    "sha256": "41d7a49d17b6379b0126ff8846b7e56f17e813e4fadac7271210af377510c7b2",
+    "expired": false
+   },
+   {
+    "id": "f75c2e581d62461c8834ca6d0c8d9f93",
+    "caption": "Capabilities after the review: privileged path removed, limits and scopes reported honestly",
+    "source": "api",
+    "content_type": "image/png",
+    "bytes": 68741,
+    "width": 1120,
+    "height": 1135,
+    "created_at": 1794507963.5578847,
+    "expires_at": 1795112763.5578847,
+    "url": "/api/v1/screenshots/f75c2e581d62461c8834ca6d0c8d9f93",
+    "sha256": "d3023b9e7d078f00eb3f5862e6311f8c0bf808d0df330d4a66e61f10e595c682",
+    "expired": false
+   },
+   {
+    "id": "d7d18f55a7484759a509a96fd08225e4",
+    "caption": "Milestone history including the security review work",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 23230,
+    "width": 1120,
+    "height": 232,
+    "created_at": 1794507963.5583944,
+    "expires_at": 1795112763.5583944,
+    "url": "/api/v1/screenshots/d7d18f55a7484759a509a96fd08225e4",
+    "sha256": "ec7c017328cb50a7ae1bd96207909dfdc465c55ea516d6f83f8c5b44d3ae9a08",
+    "expired": false
+   },
+   {
+    "id": "fa800b5fdd98435399bd0af002a14a0c",
+    "caption": "Milestone history including the security review work",
+    "source": "text",
+    "content_type": "image/png",
+    "bytes": 23230,
+    "width": 1120,
+    "height": 232,
+    "created_at": 1794507963.5588672,
+    "expires_at": 1795112763.5588672,
+    "url": "/api/v1/screenshots/fa800b5fdd98435399bd0af002a14a0c",
+    "sha256": "ec7c017328cb50a7ae1bd96207909dfdc465c55ea516d6f83f8c5b44d3ae9a08",
+    "expired": false
+   }
+  ],
+  "expired_screenshots": 0
+ },
+ {
   "id": "df7d98c6a03e4687a774d67479db86a7",
   "seq": 4,
   "title": "Hardening: protocol tests, restore drill and contract guardrails",
@@ -145,20 +220,5 @@
    }
   ],
   "expired_screenshots": 0
- },
- {
-  "id": "ca19163a14ca4e428ab4d94284b31199",
-  "seq": 2,
-  "title": "Retention drill: 7-day cleanup verified",
-  "summary": "Self-test of the automatic screenshot retention: one screenshot is aged past its window, the systemd retention unit is run, and the file must disappear while the milestone text survives.",
-  "changes": [
-   "Screenshot captured and attached through the API",
-   "expires_at moved into the past to simulate day 8",
-   "beacon-retention.service triggered manually (same command the daily timer runs)"
-  ],
-  "phase": "Phase 4",
-  "created_at": 1794028091.3096402,
-  "screenshots": [],
-  "expired_screenshots": 1
  }
 ]

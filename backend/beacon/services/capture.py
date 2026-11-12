@@ -60,6 +60,7 @@ API_PATHS = {
     "/api/v1/minecraft/status",
     "/api/v1/activity",
     "/api/v1/health",
+    "/api/v1/capabilities",
     "/api/v1/retention/status",
     "/api/v1/audit",
 }

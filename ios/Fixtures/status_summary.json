@@ -1,8 +1,8 @@
 {
- "summary": "The agent is working on Beacon \u2014 native iOS server dashboard (Phase 6 complete: hardened, tested and documented \u2014 macOS build remains) on Hardening pass finished: 117 backend tests, protocol coverage and a restore drill. Last completed: Milestone #4: hardening, protocol tests and restore drill. Next: Build and run the app on macOS (docs/SETUP.md \u00a75).",
+ "summary": "The agent is working on Beacon \u2014 native iOS server dashboard (Phase 6 complete: security review applied \u2014 macOS build pending) on Fixed the review's structural findings: no sudo path, NoNewPrivileges, trusted interrupts, leased delivery. Last completed: Milestone #5: security review applied (privilege split, trusted interrupts, leased delivery). Next: Build and run the app on macOS (docs/SETUP.md \u00a75).",
  "state": "working",
- "generated_at": 1794084980.9981182,
- "data_age_seconds": 236.81387519836426,
+ "generated_at": 1794507968.231458,
+ "data_age_seconds": 13.171064138412476,
  "is_stale": false,
  "based_on": [
   "agent_snapshot",

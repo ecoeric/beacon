@@ -2,17 +2,17 @@
  "state": "working",
  "state_label": "Working",
  "project": "Beacon \u2014 native iOS server dashboard",
- "stage": "Phase 6 complete: hardened, tested and documented \u2014 macOS build remains",
- "activity": "Hardening pass finished: 117 backend tests, protocol coverage and a restore drill",
- "last_milestone": "Milestone #4: hardening, protocol tests and restore drill",
+ "stage": "Phase 6 complete: security review applied \u2014 macOS build pending",
+ "activity": "Fixed the review's structural findings: no sudo path, NoNewPrivileges, trusted interrupts, leased delivery",
+ "last_milestone": "Milestone #5: security review applied (privilege split, trusted interrupts, leased delivery)",
  "next_action": "Build and run the app on macOS (docs/SETUP.md \u00a75)",
  "blockers": [
   "iOS compilation and device deployment need a macOS machine with Xcode"
  ],
  "awaiting_input": true,
  "progress": null,
- "updated_at": 1794084744.171329,
- "data_age_seconds": 236.78835129737854,
+ "updated_at": 1794507955.0557923,
+ "data_age_seconds": 13.161777973175049,
  "is_stale": false,
  "stale_after_seconds": 90,
  "snapshot_source": "agent",
@@ -21,24 +21,25 @@
   "name": "# Master Implementation Prompt: Native iOS Server",
   "agent_id": "cc33efa9-6b9f-41f0-bf75-86dbc6e27096",
   "agent_name": "agent",
-  "runtime_pid": 496352,
+  "runtime_pid": 11404,
   "runtime_alive": true,
-  "last_activity_at": 1794084978.6205359,
+  "last_activity_at": 1794507967.929834,
   "last_activity_kind": "Assistant turn running",
   "turn_running": true,
-  "transcript_updated_at": 1794084978.6205359
+  "transcript_updated_at": 1794507967.929834
  },
  "queue": {
   "pending": 0,
   "delivered": 0,
   "acknowledged": 0,
-  "processed_last_24h": 9
+  "processed_last_24h": 2
  },
  "latest_interrupt": {
-  "id": "119af61a88aa4c899fd66fd1797f0f99",
-  "requested_at": 1794084896.4228559,
+  "id": "96f440fd82774b81a4d12f501d390620",
+  "requested_at": 1794507925.5735495,
   "mode": "checkpoint",
   "status": "acknowledged",
+  "session_id": null,
   "reason": "smoke test",
   "pid": null,
   "signal": null,
@@ -52,17 +53,17 @@
  "evidence": [
   {
    "source": "agent_snapshot",
-   "detail": "Pushed by agent at 1794084744",
-   "age_seconds": 236.78835129737854
+   "detail": "Pushed by agent at 1794507955",
+   "age_seconds": 13.161777973175049
   },
   {
    "source": "cherry_session",
    "detail": "agent \u00b7 # Master Implementation Prompt: Native iOS Server",
-   "age_seconds": 2.339144468307495
+   "age_seconds": 0.2877364158630371
   },
   {
    "source": "runtime_process",
-   "detail": "pid 496352 serving this session",
+   "detail": "pid 11404 serving this session",
    "age_seconds": null
   },
   {
@@ -72,8 +73,8 @@
   },
   {
    "source": "interrupt",
-   "detail": "checkpoint interrupt acknowledged at 1794084896",
-   "age_seconds": 84.53682446479797
+   "detail": "checkpoint interrupt acknowledged at 1794507926",
+   "age_seconds": 42.644020795822144
   }
  ],
  "notes": []

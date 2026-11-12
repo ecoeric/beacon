@@ -1,6 +1,276 @@
 {
- "unread": 22,
+ "unread": 42,
  "items": [
+  {
+   "id": "1ead3fada542461daee0fd8590cb2699",
+   "kind": "milestone_completed",
+   "severity": "success",
+   "title": "Milestone 5: Security review applied: privilege split, trusted interrupts, leased delivery",
+   "body": "Acted on an independent security review: removed the API's sudo/root path in favour of a fixed root Docker snapshot timer, enabled NoNewPrivileges, made interrupt targeting depend only on read-only session evidence, added leased queue redelivery with nack, and closed upload, logging and information-",
+   "created_at": 1794507963.5593846,
+   "read_at": null,
+   "payload": {
+    "milestone_id": "4683e1a0f18c48208e05811521c8c93f",
+    "seq": 5,
+    "phase": "Phase 6"
+   }
+  },
+  {
+   "id": "374af659de3343499cee532618e7af12",
+   "kind": "agent_waiting_for_input",
+   "severity": "warning",
+   "title": "Agent is waiting for your input",
+   "body": "Fixed the review's structural findings: no sudo path, NoNewPrivileges, trusted interrupts, leased delivery",
+   "created_at": 1794507955.0562594,
+   "read_at": null,
+   "payload": {
+    "project": "Beacon \u2014 native iOS server dashboard",
+    "stage": "Phase 6 complete: security review applied \u2014 macOS build pending"
+   }
+  },
+  {
+   "id": "bc0f9f22725a4fd5bd153c716d6ffd51",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794507925.5746026,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "96f440fd82774b81a4d12f501d390620",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "0523313731d04e81bc477d6481db163d",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794507925.5446413,
+   "read_at": null,
+   "payload": {
+    "message_id": "c650a33a11e046f3b4c74e97fc9ad807",
+    "seq": 33
+   }
+  },
+  {
+   "id": "91823106cdf84b9fa075690c88e73941",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794507828.1067274,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "b77aa059801443a1b4fe142196257251",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "dd24a4963b9e4951bb91d09a86002ac3",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794507828.0759747,
+   "read_at": null,
+   "payload": {
+    "message_id": "2ab8b013feac4ab78d7541aa28594863",
+    "seq": 31
+   }
+  },
+  {
+   "id": "779bcc552e414659b867810fe53f372b",
+   "kind": "minecraft_online",
+   "severity": "success",
+   "title": "Minecraft server is online",
+   "body": "1.21.1 \u00b7 0 players",
+   "created_at": 1794507784.119888,
+   "read_at": null,
+   "payload": {
+    "service": "minecraft",
+    "online": true,
+    "state": "running"
+   }
+  },
+  {
+   "id": "b8b13d74fac141bba3601339d2bbd74f",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794344730.7427318,
+   "read_at": null,
+   "payload": {
+    "message_id": "68e972edcd2f4f79a0969cae3a4897bb",
+    "seq": 29
+   }
+  },
+  {
+   "id": "bc29f352ccf74daab5526a7d9400cbac",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794344729.3735461,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "c70775320d464a149659f916a1d11dd7",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "d39de85b27ef4a34b826439d1c1c0500",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794344729.3503816,
+   "read_at": null,
+   "payload": {
+    "message_id": "fac3fd1dfc284ad3a5bda9a7edd48e2b",
+    "seq": 27
+   }
+  },
+  {
+   "id": "83ed9d38a17e45ecb8b2b6cc14be886e",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794344703.9451213,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "2369af95f8c1418ababaa99592920fef",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "62441b32a1a143e3a693c74f8899cd6e",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794344703.9235082,
+   "read_at": null,
+   "payload": {
+    "message_id": "e5f2b9ae3d3843a09fe9fb6bf91a0004",
+    "seq": 25
+   }
+  },
+  {
+   "id": "ab3300129c8546b6a210e25c073d1aa7",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794344589.9463706,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "c265dd83979446f882fb3220765c4fc4",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "d580cfb0c9504bf9937dd8c2b8430f34",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794344589.9211838,
+   "read_at": null,
+   "payload": {
+    "message_id": "2363a2d5e4454ddf93b0bc97e5b5974b",
+    "seq": 23
+   }
+  },
+  {
+   "id": "41fd752596364b97a6e852303c530c08",
+   "kind": "agent_waiting_for_input",
+   "severity": "warning",
+   "title": "Agent is waiting for your input",
+   "body": "Production backup/restore, SIGKILL recovery and hardening checks passed; awaiting the macOS build",
+   "created_at": 1794344540.806837,
+   "read_at": null,
+   "payload": {
+    "project": "Beacon \u2014 native iOS server dashboard",
+    "stage": "Phase 6 complete: operational drills green \u2014 macOS build pending"
+   }
+  },
+  {
+   "id": "c4cca5c9decd4a769fe88cc4631c326c",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794344502.186046,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "ad7db71809674d88aaf28a4e31ef723f",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "2e6a8cf776454a41bd39e64f86510b0a",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794344502.156203,
+   "read_at": null,
+   "payload": {
+    "message_id": "fe94d2fc943142958f7fccd86c6dd2f8",
+    "seq": 21
+   }
+  },
+  {
+   "id": "a34b49e307b74ffab86129d5ce210349",
+   "kind": "minecraft_offline",
+   "severity": "error",
+   "title": "Minecraft server went offline",
+   "body": "The server no longer answers on its port.",
+   "created_at": 1794344466.8191338,
+   "read_at": null,
+   "payload": {
+    "service": "minecraft",
+    "online": false,
+    "state": "stopped"
+   }
+  },
+  {
+   "id": "275f2cd312b94b51a7244651a4e7dd5c",
+   "kind": "agent_interrupted",
+   "severity": "warning",
+   "title": "Agent interrupted",
+   "body": "smoke test",
+   "created_at": 1794084992.7602773,
+   "read_at": null,
+   "payload": {
+    "interrupt_id": "6a7a072649f24d3da621dc031ee0d373",
+    "mode": "checkpoint",
+    "pid": null
+   }
+  },
+  {
+   "id": "d93ea6ff807f41f89144bdda30da6979",
+   "kind": "agent_message_delivered",
+   "severity": "info",
+   "title": "Instruction delivered to the agent",
+   "body": "Beacon smoke test \u2014 no action required.",
+   "created_at": 1794084992.7295418,
+   "read_at": null,
+   "payload": {
+    "message_id": "ace0051d78ff4f75b0d3e6af6f1dd851",
+    "seq": 19
+   }
+  },
   {
    "id": "dd27e5a9131d4e50aae5d5d2b6659c81",
    "kind": "agent_interrupted",
@@ -133,169 +403,6 @@
    "payload": {
     "message_id": "6c2827cf858d405683321648fd39d631",
     "seq": 11
-   }
-  },
-  {
-   "id": "053dca867a554373b89e3dbbcc1ef5cd",
-   "kind": "agent_interrupted",
-   "severity": "warning",
-   "title": "Agent interrupted",
-   "body": "smoke test",
-   "created_at": 1794028258.767605,
-   "read_at": null,
-   "payload": {
-    "interrupt_id": "8ff5d939cb8446009953b0f7cfc073bf",
-    "mode": "checkpoint",
-    "pid": null
-   }
-  },
-  {
-   "id": "9aeafe7614144aa5b02a0a8e1752137a",
-   "kind": "agent_message_delivered",
-   "severity": "info",
-   "title": "Instruction delivered to the agent",
-   "body": "Beacon smoke test \u2014 no action required.",
-   "created_at": 1794028258.7416487,
-   "read_at": null,
-   "payload": {
-    "message_id": "280f29b0dbb04448a4082cdf865706fc",
-    "seq": 9
-   }
-  },
-  {
-   "id": "5e1b47b8760a4f558ef81a6fa4c69302",
-   "kind": "milestone_completed",
-   "severity": "success",
-   "title": "Milestone 3: Final validation pass: live integrations, tests and retention drill",
-   "body": "Validated the whole system against the real services: 82 backend tests, 58 live checks, 13 Swift tests on Linux, all iOS sources parsed, the Xcode project structurally validated, and a live retention drill through the systemd unit.",
-   "created_at": 1794028236.0053377,
-   "read_at": null,
-   "payload": {
-    "milestone_id": "4645d5816c214e0b89eaab6704efeaa7",
-    "seq": 3,
-    "phase": "Phase 6"
-   }
-  },
-  {
-   "id": "14c2babc259542aaa516d64f8e530543",
-   "kind": "agent_interrupted",
-   "severity": "warning",
-   "title": "Agent interrupted",
-   "body": "smoke test",
-   "created_at": 1794028201.7092633,
-   "read_at": null,
-   "payload": {
-    "interrupt_id": "708ef5b7c67245479cc4d19627b28a48",
-    "mode": "checkpoint",
-    "pid": null
-   }
-  },
-  {
-   "id": "e1155d507089431f9a5ae196bfde5a05",
-   "kind": "agent_message_delivered",
-   "severity": "info",
-   "title": "Instruction delivered to the agent",
-   "body": "Beacon smoke test \u2014 no action required.",
-   "created_at": 1794028201.6819756,
-   "read_at": null,
-   "payload": {
-    "message_id": "8aff6a25d08d47ef943cd48f843f51cb",
-    "seq": 7
-   }
-  },
-  {
-   "id": "0a51625181ec49eeacefd64695954078",
-   "kind": "milestone_completed",
-   "severity": "success",
-   "title": "Milestone 2: Retention drill: 7-day cleanup verified",
-   "body": "Self-test of the automatic screenshot retention: one screenshot is aged past its window, the systemd retention unit is run, and the file must disappear while the milestone text survives.",
-   "created_at": 1794028091.310693,
-   "read_at": null,
-   "payload": {
-    "milestone_id": "ca19163a14ca4e428ab4d94284b31199",
-    "seq": 2,
-    "phase": "Phase 4"
-   }
-  },
-  {
-   "id": "6724e5cc72834676824b54d2aad833d0",
-   "kind": "milestone_completed",
-   "severity": "success",
-   "title": "Milestone 1: Audited backend, live integrations and native iOS foundation",
-   "body": "Verified the host and the agent runtime, then shipped the Beacon backend over pinned HTTPS with the agent status, queue and interrupt paths, real Pi-hole and Minecraft monitoring, screenshot retention, and the complete native SwiftUI app source with decoding tests.",
-   "created_at": 1794027976.598905,
-   "read_at": null,
-   "payload": {
-    "milestone_id": "6fd3e34cfa2742bbbb87d3a924b978d8",
-    "seq": 1,
-    "phase": "Phase 1-2"
-   }
-  },
-  {
-   "id": "1fc8c4a38c79412b99dc2a59c18c6ebf",
-   "kind": "agent_interrupted",
-   "severity": "warning",
-   "title": "Agent interrupted",
-   "body": "smoke test",
-   "created_at": 1794027934.2791848,
-   "read_at": null,
-   "payload": {
-    "interrupt_id": "6d9aaaa4d304455aa79773467d851ce4",
-    "mode": "checkpoint",
-    "pid": null
-   }
-  },
-  {
-   "id": "a898011ce1d049f19843718ea1d34c09",
-   "kind": "agent_message_delivered",
-   "severity": "info",
-   "title": "Instruction delivered to the agent",
-   "body": "Beacon smoke test \u2014 no action required.",
-   "created_at": 1794027934.257814,
-   "read_at": null,
-   "payload": {
-    "message_id": "7512a28dc9914365917a0e05ab15b318",
-    "seq": 5
-   }
-  },
-  {
-   "id": "14337cbb4f4e42c18d10ce288ebd2cf7",
-   "kind": "agent_message_delivered",
-   "severity": "info",
-   "title": "Instruction delivered to the agent",
-   "body": "Beacon smoke test \u2014 no action required.",
-   "created_at": 1794027912.071095,
-   "read_at": null,
-   "payload": {
-    "message_id": "9ad353a0f36e46228fdd85dac80e4b99",
-    "seq": 3
-   }
-  },
-  {
-   "id": "85bc2fc240cc4398b246dbed766647d8",
-   "kind": "agent_interrupted",
-   "severity": "warning",
-   "title": "Agent interrupted",
-   "body": "smoke test",
-   "created_at": 1794027907.3879385,
-   "read_at": null,
-   "payload": {
-    "interrupt_id": "360ddd0282e643adbb8824bdc6ba54f3",
-    "mode": "checkpoint",
-    "pid": null
-   }
-  },
-  {
-   "id": "1eb3856f887e44208e62ddf664b2d99b",
-   "kind": "agent_message_delivered",
-   "severity": "info",
-   "title": "Instruction delivered to the agent",
-   "body": "Beacon smoke test \u2014 no action required.",
-   "created_at": 1794027907.3634484,
-   "read_at": null,
-   "payload": {
-    "message_id": "248b18f602b24994bd0026a4ba03ca7f",
-    "seq": 1
    }
   }
  ]
