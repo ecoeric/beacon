@@ -81,8 +81,9 @@ the PNGs to a milestone.
 
 ## Status
 
-The workflow is implemented and its shell/YAML is locally syntax-checked, but it has **not been
-executed**: this repository has no GitHub remote configured on this host. The Linux-side typecheck
+The workflow is implemented and locally linted with `actionlint` 1.7.12; every `run:` block also
+passes `bash -n`. It has **not been executed**: this repository has no GitHub remote configured on
+this host. The Linux-side typecheck
 *has* run and passes; it previously found a real compile blocker (a `Section` with more than ten
 direct children), which was fixed.
 
