@@ -65,7 +65,7 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `scripts/smoke_test.py` (live Pi-hole / Minecraft / Docker / agent) | 58 checks passed |
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
 | `swiftc -parse` on iOS sources | 22 files parsed |
-| `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 18 app files + 2 test files typecheck, 0 errors |
+| `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 19 app files + 2 test files typecheck, 0 errors |
 | `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | committed; not yet run — no GitHub remote configured |
 | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached to this host) |
 | `scripts/validate_ios_project.py` | 18 checks passed |

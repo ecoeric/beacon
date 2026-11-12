@@ -35,7 +35,7 @@ mkdir -p "$WORK/Sources" "$WORK/Tests" "$WORK/Shim" "$WORK/Modules" "$WORK/Logs"
 while IFS= read -r file; do
     base="$(basename "$file")"
     case "$base" in
-        BeaconApp.swift|Keychain.swift|PinnedSession.swift) continue ;;
+        Keychain.swift|PinnedSession.swift) continue ;;
     esac
     cp "$file" "$WORK/Sources/$base"
 done < <(find "$ROOT/ios/Beacon" -name '*.swift' | sort)

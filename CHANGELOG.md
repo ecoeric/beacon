@@ -42,8 +42,9 @@ run on this host (it has no Xcode or iOS SDK).
   (result builders, property wrappers, modifiers, styles, shapes). They exist **only** for
   typechecking and are excluded from the Xcode project and the app target.
 * `scripts/typecheck_ios_views.sh` — builds the mock modules in Docker `swift:6.0` and typechecks
-  every app source and both Xcode test files with the real Swift compiler (18 app files + 2 test
-  files, 0 errors). It is now step 3 of `scripts/validate_ios.sh`.
+  every app source and both Xcode test files with the real Swift compiler. It now includes
+  `BeaconApp.swift` via mock `App`/`Scene`/`WindowGroup` declarations (19 app files + 2 test files,
+  0 errors) and is step 3 of `scripts/validate_ios.sh`.
 * `.github/workflows/ios-build.yml` and `docs/CI.md` — a real Xcode build and simulator test run,
   with logs and the `.xcresult` uploaded as artifacts. The workflow is committed but has not been
   executed: no GitHub remote is configured on this host.

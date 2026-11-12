@@ -6,7 +6,7 @@
 // not prove an iOS build (that still needs Xcode).
 
 @_exported import Foundation
-import Combine
+@_exported import Combine
 import UIKit
 
 // MARK: - View protocol and result builder
@@ -552,6 +552,8 @@ public struct EnvironmentObject<ObjectType: ObservableObject> {
 
 // MARK: - Scene phase
 
+public enum ColorScheme { case light, dark }
+
 public enum ScenePhase: Equatable {
     case active
     case inactive
@@ -565,6 +567,38 @@ public struct PlainButtonStyle: ButtonStyle {
 
 public extension ButtonStyle where Self == PlainButtonStyle {
     static var plain: PlainButtonStyle { PlainButtonStyle() }
+}
+
+
+// MARK: - App and Scene (entry point)
+
+@MainActor
+public protocol Scene {
+    associatedtype Body: Scene
+    @SceneBuilder var body: Body { get }
+}
+
+@resultBuilder
+public enum SceneBuilder {
+    public static func buildBlock<Content: Scene>(_ content: Content) -> Content { content }
+}
+
+@MainActor
+public protocol App {
+    associatedtype Body: Scene
+    @SceneBuilder var body: Body { get }
+    static func main()
+}
+
+public extension App {
+    static func main() {}
+}
+
+extension Never: Scene {}
+
+public struct WindowGroup<Content: View>: Scene {
+    public init(@ViewBuilder content: () -> Content) {}
+    public var body: Never { fatalError() }
 }
 
 // MARK: - Image rendering (used by the snapshot test)

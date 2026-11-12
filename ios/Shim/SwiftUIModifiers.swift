@@ -111,6 +111,7 @@ public extension View {
 
     // environment
     func environmentObject<T: ObservableObject>(_ object: T) -> Self { self }
+    func preferredColorScheme(_ colorScheme: ColorScheme?) -> Self { self }
     func modifier<M: ViewModifier>(_ modifier: M) -> Self { self }
 }
 
