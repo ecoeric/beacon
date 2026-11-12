@@ -76,13 +76,20 @@ sudo chown -R eric:eric "$PROJECT/data" "$PROJECT/ios/Beacon/Resources" 2>/dev/n
 step "5/6 API service"
 sudo systemctl enable beacon-api.service
 sudo systemctl restart beacon-api.service
+set -a; . "$ENV_FILE"; set +a
+ready=0
 for _ in $(seq 1 60); do
-    if systemctl is-active --quiet beacon-api.service; then break; fi
+    if systemctl is-active --quiet beacon-api.service && \
+       curl -s -o /dev/null --cacert "$BEACON_DATA_DIR/tls/ca.crt" \
+            "https://$BEACON_BIND:$BEACON_PORT/api/v1/health"; then
+        ready=1
+        break
+    fi
     sleep 0.5
 done
-if ! systemctl is-active --quiet beacon-api.service; then
-    echo "beacon-api failed to start:" >&2
-    sudo journalctl -u beacon-api.service -n 30 --no-pager >&2
+if [ "$ready" -ne 1 ]; then
+    echo "beacon-api did not become healthy:" >&2
+    sudo journalctl -u beacon-api.service -n 40 --no-pager >&2
     exit 1
 fi
 sudo journalctl -u beacon-api.service -n 5 --no-pager || true

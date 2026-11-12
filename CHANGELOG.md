@@ -3,6 +3,27 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.4] — 2026-11-12
+
+Verification pass for the security work and installer robustness.
+
+### Added
+* `docs/SECURITY_REVIEW.md`: findings/resolution matrix, the privilege-split rationale, verification
+  commands and the accepted residual risks.
+* Static guardrail tests that request-handling code contains no `sudo` capability and that the API
+  unit has no privileged dependency (149 pytest tests total).
+
+### Fixed
+* `scripts/install.sh` now waits for the TLS health endpoint (not merely `systemctl is-active`)
+  before running `beacon doctor`; a re-run is fully idempotent and exits 0.
+* The installer removes the obsolete Docker helper/sudoers rule on upgrade.
+
+### Verified
+* `sudo` inside a `NoNewPrivileges=yes` unit is refused (control: the interactive account can still
+  use it), the Docker snapshot refreshes every ~15 s, the production backup restores and serves
+  5 milestones / 16 screenshots, 149 pytest tests pass, `doctor` is green and the OpenAPI contract
+  is current.
+
 ## [0.1.3] — 2026-11-12
 
 Independent security review of the backend, with fixes for the two structural findings and the

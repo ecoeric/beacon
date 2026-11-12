@@ -33,6 +33,7 @@ Repository root: `/home/eric/beacon`.
 | iOS tests | `ios/SharedTests/ModelDecodingTests.swift`, `ios/BeaconTests/SnapshotTests.swift` |
 | iOS validation harness | `ios/Package.swift`, `scripts/validate_ios.sh`, `scripts/validate_ios_project.py` |
 | API contract snapshot | `docs/openapi.json`, `docs/API.md` |
+| Security review record | `docs/SECURITY_REVIEW.md` |
 | Live checks | `scripts/smoke_test.py` |
 
 Runtime footprint on this host: one Python process (`beacon-api.service`, ~40 MB RSS), one
@@ -467,7 +468,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 
 | Harness | Command | Last result |
 |---|---|---|
-| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 147 passed |
+| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 149 passed |
 | Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
@@ -492,7 +493,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 * **Files**: `backend/tests/test_contract_and_security.py`,
   `backend/tests/test_integration_edges.py`, `scripts/check_openapi_drift.py`,
   `scripts/check_view_initialisers.py`.
-* **Test**: 147 pytest tests total (147 passing), contract checker exit 0.
+* **Test**: 149 pytest tests total (149 passing), contract checker exit 0.
 * **Limitations**: the secret scan is best-effort (binary files are skipped); static checks are
   guardrails, not a proof of absence. A configurable request-body ceiling
   (`BEACON_MAX_REQUEST_BYTES`, default 64 MiB) is enforced by an ASGI middleware that also covers

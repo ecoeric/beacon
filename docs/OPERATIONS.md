@@ -206,6 +206,9 @@ imported by `beacon init` from the container environment into `data/secrets/piho
 
 ## 10. Hardening posture
 
+The audit record (findings, fixes, residual risks, verification commands) is
+**`docs/SECURITY_REVIEW.md`**.
+
 `systemd-analyze security beacon-api.service` → **6.3 MEDIUM** (6.9 before the syscall/proc
 increment, 6.5 before the privilege split).
 

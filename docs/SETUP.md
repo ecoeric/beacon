@@ -131,7 +131,7 @@ beacon retention run --local     # same command the timer runs
 ## 4. Testing
 
 ```bash
-# 1. backend unit + integration tests (147; no live services needed)
+# 1. backend unit + integration tests (149; no live services needed)
 cd ~/beacon/backend && .venv/bin/python -m pytest tests -q
 
 # 1b. OpenAPI snapshot must match the code

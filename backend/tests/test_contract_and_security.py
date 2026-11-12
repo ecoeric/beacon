@@ -205,3 +205,25 @@ def test_capture_file_has_no_existence_oracle():
     assert existing.value.status_code == 404
     assert missing.value.status_code == 404
     assert existing.value.message == missing.value.message == "file not found"
+
+
+def test_request_path_has_no_privilege_escalation():
+    """Only the operator CLI may invoke sudo; request-handling code must not."""
+    offenders = []
+    for directory in ("services", "routers"):
+        for path in (BACKEND / directory).glob("*.py"):
+            text = path.read_text(encoding="utf-8")
+            # String literals, not prose: `["sudo", ...]`, `'sudo'`, f"sudo …"
+            if '"sudo"' in text or "'sudo'" in text or "sudo -n" in text:
+                offenders.append(str(path.relative_to(BACKEND)))
+    assert offenders == [], offenders
+
+
+def test_api_unit_has_no_privileged_dependency():
+    unit = (ROOT / "deploy" / "beacon-api.service").read_text(encoding="utf-8")
+    assert "NoNewPrivileges=yes" in unit
+    assert "InaccessiblePaths=" in unit
+    assert "sudoers" not in unit.lower()
+    # The sudo-based helper must not exist in the repository any more.
+    assert not (ROOT / "deploy" / "sudoers-beacon").exists()
+    assert not (ROOT / "deploy" / "docker-read").exists()
