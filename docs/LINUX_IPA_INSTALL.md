@@ -85,7 +85,13 @@ private CA (`ca.crt`); the workflow fails if the CA is missing.
 
 ## 3. Sign and install
 
-From the repository root:
+From the repository root, first run the preflight (no password, no install):
+
+```bash
+./scripts/install_ipa_linux.sh --check --ipa /path/to/Beacon-unsigned.ipa
+```
+
+If that passes, sign and install:
 
 ```bash
 ./scripts/install_ipa_linux.sh --ipa /path/to/Beacon-unsigned.ipa

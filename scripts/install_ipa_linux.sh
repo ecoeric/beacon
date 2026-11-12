@@ -24,6 +24,7 @@ IPA=""
 UDID=""
 APPLE_ID=""
 ALTSERVER=""
+CHECK_ONLY=0
 
 usage() {
     cat <<'EOF'
@@ -34,6 +35,7 @@ Usage: install_ipa_linux.sh [options]
   --udid UDID         Device UDID; detected automatically if exactly one iPhone is connected
   --apple-id EMAIL    Apple ID; prompted if omitted
   --altserver PATH    Use an existing AltServer-Linux-NG binary instead of downloading it
+  --check             Verify the IPA, device and tools, then exit before asking for a password
   -h, --help          Show this help
 
 Environment:
@@ -53,6 +55,7 @@ while [ $# -gt 0 ]; do
         --udid) UDID="${2:-}"; shift 2 ;;
         --apple-id) APPLE_ID="${2:-}"; shift 2 ;;
         --altserver) ALTSERVER="${2:-}"; shift 2 ;;
+        --check) CHECK_ONLY=1; shift ;;
         -h|--help) usage; exit 0 ;;
         -*) echo "unknown option: $1" >&2; usage >&2; exit 2 ;;
         *) IPA="$1"; shift ;;
@@ -125,6 +128,12 @@ else
     fi
     echo "$SHA256  $ALTSERVER" | sha256sum -c - >/dev/null \
         || die "cached AltServer checksum mismatch; remove $ALTSERVER and retry"
+fi
+
+if [ "$CHECK_ONLY" = 1 ]; then
+    echo "preflight: IPA structure, device detection, tooling and AltServer are OK."
+    echo "           Run again without --check to sign and install."
+    exit 0
 fi
 
 if [ -z "$APPLE_ID" ]; then
