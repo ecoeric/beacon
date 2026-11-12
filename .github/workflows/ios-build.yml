@@ -1,0 +1,108 @@
+name: iOS build & tests
+
+# The Beacon app is generated and developed on a Linux host with no Xcode. This workflow performs
+# the real iOS-SDK build and simulator test run on a GitHub-hosted macOS runner, so a compile
+# failure is caught without owning a Mac.
+#
+# Push this repository to GitHub and run the workflow from the Actions tab (or let it run on
+# push). See docs/CI.md for setup, costs, artifacts and limitations.
+
+on:
+  push:
+    paths:
+      - "ios/**"
+      - "scripts/gen_xcodeproj.py"
+      - "scripts/validate_ios_project.py"
+      - ".github/workflows/ios-build.yml"
+  pull_request:
+    paths:
+      - "ios/**"
+      - "scripts/gen_xcodeproj.py"
+      - "scripts/validate_ios_project.py"
+      - ".github/workflows/ios-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  xcode:
+    name: Xcode build + simulator tests
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          xcrun simctl list runtimes
+          swift --version
+
+      - name: Verify the committed Xcode project matches the generator
+        run: |
+          python3 scripts/gen_xcodeproj.py
+          git diff --exit-code -- ios/Beacon.xcodeproj
+
+      - name: Pick an available iPhone simulator
+        id: sim
+        run: |
+          DEVICE="$(xcrun simctl list devices available | awk -F '[(]' '/iPhone/ {print $1; exit}' | xargs)"
+          if [ -z "$DEVICE" ]; then
+            echo "No iPhone simulator available" >&2
+            xcrun simctl list devices available >&2
+            exit 1
+          fi
+          echo "Using simulator: $DEVICE"
+          echo "name=$DEVICE" >> "$GITHUB_OUTPUT"
+
+      - name: Build for the iOS Simulator
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project ios/Beacon.xcodeproj \
+            -scheme Beacon \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build | tee build.log
+
+      - name: Run unit and layout-snapshot tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project ios/Beacon.xcodeproj \
+            -scheme Beacon \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO | tee test.log
+
+      - name: Upload build log, test log and xcresult
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-and-test
+          path: |
+            build.log
+            test.log
+            TestResults.xcresult
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Summarise result
+        if: always()
+        run: |
+          {
+            echo "### iOS build & tests"
+            echo ""
+            echo "- Xcode: $(xcodebuild -version | head -1)"
+            echo "- Simulator: ${{ steps.sim.outputs.name }}"
+            echo "- Result: ${{ job.status }}"
+            echo ""
+            echo "Rendered screenshots are stored as attachments in the \`TestResults.xcresult\` artifact."
+          } >> "$GITHUB_STEP_SUMMARY"

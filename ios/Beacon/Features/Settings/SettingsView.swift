@@ -58,7 +58,7 @@ struct SettingsView: View {
                 }
 
                 if let capabilities = model.capabilities {
-                    Section("Backend") {
+                    Section("Agent") {
                         LabeledContent("Agent binding", value: capabilities.agent.bindingMode)
                         if let agentId = capabilities.agent.configuredAgentId {
                             LabeledContent("Agent id", value: String(agentId.prefix(8)))
@@ -66,6 +66,10 @@ struct SettingsView: View {
                         LabeledContent("Status source", value: capabilities.agent.statusSource)
                         LabeledContent("Message delivery", value: capabilities.messageDelivery.mode)
                         LabeledContent("Interrupt modes", value: capabilities.interrupt.modes.joined(separator: ", "))
+                        LabeledContent("Push notifications", value: capabilities.notifications.push ? "enabled" : "not configured")
+                    }
+
+                    Section("Monitoring") {
                         LabeledContent("Screenshot retention", value: "\(capabilities.screenshots.retentionDays) days")
                         LabeledContent("Screenshot sources", value: capabilities.screenshots.sources.joined(separator: ", "))
                         LabeledContent("Docker metrics", value: capabilities.monitoring.docker ? "available" : "unavailable")
@@ -76,7 +80,6 @@ struct SettingsView: View {
                         if !capabilities.monitoring.minecraftControlActions.isEmpty {
                             LabeledContent("Minecraft controls", value: capabilities.monitoring.minecraftControlActions.joined(separator: ", "))
                         }
-                        LabeledContent("Push notifications", value: capabilities.notifications.push ? "enabled" : "not configured")
                     }
                 }
 

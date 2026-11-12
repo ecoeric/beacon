@@ -424,8 +424,9 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
   `KeyValueRow`, `SectionHeader`, `ErrorBanner`, `EmptyState`, `InlineNote`, `ActivityRow`,
   `AsyncScreenshot`, `LoadingCard`; three button styles incl. a distinct destructive style.
 * **Files**: `ios/Beacon/Design/Theme.swift`, `ios/Beacon/Design/Components.swift`.
-* **Test**: snapshot test renders the four screens (`ios/BeaconTests/SnapshotTests.swift`),
-  requires macOS; syntax validated here by `swiftc -parse`.
+* **Test**: snapshot test renders the four screens (`ios/BeaconTests/SnapshotTests.swift`);
+  every view also typechecks here against mock SwiftUI/UIKit modules
+  (`scripts/typecheck_ios_views.sh`). A real Xcode render runs in CI (`docs/CI.md`).
 * **Limitations**: no custom fonts or images (system-only, dependency-free).
 
 ## 2.24 iOS networking, pinning, Keychain
@@ -451,8 +452,9 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Server | `Features/Server/ServerView.swift` | host tiles + details, disks, containers, Pi-hole card + statistics + blocking toggle, Minecraft card + logs + controls |
 | Settings | `Features/Settings/SettingsView.swift` | connection test, identity/scopes, certificate mode, backend capabilities, disconnect |
 
-* **Test**: `swiftc -parse` for all 22 Swift files; Xcode build/simulator run is the remaining
-  step and requires macOS (see §5).
+* **Test**: `swiftc -parse` for all 22 Swift files plus a full typecheck of 18 app files and both
+  Xcode test files against mock SwiftUI/UIKit/Combine/XCTest modules (real Swift compiler). The Xcode build/simulator run is
+  prepared in `.github/workflows/ios-build.yml`; it has not run yet (no GitHub remote).
 * **Limitations**: no iPad layout (iPhone portrait only), no widgets, no watch app.
 
 ## 2.26 iOS snapshot screenshot test
@@ -461,8 +463,11 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
   `ImageRenderer` at 393×852@3x. With `BEACON_SNAPSHOT_BASE_URL`/`BEACON_SNAPSHOT_TOKEN` it
   renders **live** data and real milestone images; without them it renders DEBUG fixtures
   (screenshot tiles show "Unavailable", never invented images). Writes PNGs + `manifest.json`.
-* **Test**: requires macOS; `scripts/publish_snapshots.py` will attach the PNGs to a milestone.
-* **Limitations**: cannot run in this environment (no iOS SDK).
+* **Test**: renders in CI or on a Mac; every PNG is attached to the `.xcresult` bundle so CI can
+  upload rendered screens without host filesystem access. `scripts/publish_snapshots.py` attaches
+  PNGs to a milestone.
+* **Limitations**: cannot run in this environment (no iOS SDK); CI renders fixture/layout mode
+  because a hosted runner cannot reach the private LAN.
 
 ## 2.27 Validation harnesses
 
@@ -472,6 +477,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
+| SwiftUI typecheck (real compiler, mock frameworks) | `scripts/typecheck_ios_views.sh` | 18 app files + 2 test files, 0 errors; found and fixed a 13-child `Section` |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 18 checks passed |
 | SwiftUI memberwise call sites | `python3 scripts/check_view_initialisers.py` (heuristic) | 109 call sites / 11 views, no missing arguments |
 | OpenAPI contract drift | `backend/.venv/bin/python scripts/check_openapi_drift.py` | up to date (36 paths) |
@@ -541,9 +547,11 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 
 ## 5. Known limitations and deliberate exclusions
 
-1. **iOS build/run on this host**: no macOS/Xcode → the app cannot be compiled or launched here.
-   All non-UI Swift code is compiled and tested; all Swift files are parsed; the Xcode project is
-   structurally validated. Building and simulator screenshots are macOS steps (§`docs/SETUP.md`).
+1. **iOS build/run on this host**: no macOS/Xcode → an iOS-SDK build cannot run here. All non-UI
+   Swift code is compiled and tested, every Swift file is parsed, every view typechecks against
+   mock SwiftUI/UIKit modules, and the Xcode project is structurally validated. The real Xcode
+   build and simulator screenshots run in `.github/workflows/ios-build.yml` (`docs/CI.md`) or on a
+   Mac on the LAN (`docs/SETUP.md`). The workflow is committed but has not been executed yet.
 2. **iPhone installation/signing/distribution**: explicitly out of scope for this project.
 3. **Push notifications (APNs)**: not implemented; the activity feed is in-app. `payload` and
    `kind` fields are the extension point.

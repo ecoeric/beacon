@@ -206,7 +206,11 @@ Documentation endpoints are disabled in production (`BEACON_ENABLE_DOCS=0`).
 * `ios/Beacon/Design` — `Theme`, reusable components.
 * `ios/Beacon/Features` — Setup, Dashboard, Agent, Milestones (+ viewer), Server, Settings.
 * `ios/SharedTests` — decoding/formatting tests shared with the Linux SwiftPM package.
-* `ios/BeaconTests/SnapshotTests` — renders four screens to PNG on macOS (live or fixture mode).
+* `ios/BeaconTests/SnapshotTests` — renders four screens to PNG on macOS (live or fixture mode)
+  and attaches them to the `.xcresult`.
+* `ios/Shim` — mock SwiftUI/UIKit/Combine modules used only by the Linux typecheck; never
+  compiled into the app.
+* `.github/workflows/ios-build.yml` — real Xcode build + simulator tests on a macOS runner.
 
 ### 8.5 Deployment topology (actual)
 
@@ -231,7 +235,7 @@ systemd
 | Interrupt only as SIGINT | SIGINT **and** cooperative checkpoint mode | signal is impossible when the runtime is gone; both bypass the queue |
 | Docker via socket | root timer writes a read-only snapshot file | avoids root-equivalent Docker access *and* lets the API run with NoNewPrivileges |
 | Screenshots from the app only | four server-side capture sources + upload endpoint | the UI cannot be rendered on this host; real artifacts are still capturable |
-| iOS build “on the server” | source + Linux compilation of Foundation logic + project validation | Xcode requires macOS |
+| iOS build “on the server” | source + Linux Foundation tests + mock-framework SwiftUI typecheck + CI Xcode workflow | Xcode requires macOS; CI supplies the real iOS-SDK build |
 
 ## 9. Testing strategy
 
@@ -239,9 +243,11 @@ systemd
 |---|---|---|
 | API/service logic | 149 pytest tests with synthetic Cherry Studio DB, fake Minecraft/RCON servers, mocked Pi-hole transport and controlled processes | 149 passed |
 | Transport/auth | real Uvicorn TLS server + generated CA in tests | verified trust and rejection |
-| Live system | `scripts/smoke_test.py` against real Pi-hole/Minecraft/Docker/agent | 57 checks passed |
+| Live system | `scripts/smoke_test.py` against real Pi-hole/Minecraft/Docker/agent | 58 checks passed |
 | iOS logic | Swift 6 on Linux: compile + 13 decoding/formatting tests against live-captured fixtures | 13 passed |
 | iOS syntax | `swiftc -parse` on all 22 Swift files | parsed |
+| iOS SwiftUI typecheck | real Swift 6 compiler against mock SwiftUI/UIKit/Combine modules (`scripts/typecheck_ios_views.sh`) | 18 app files, 0 errors |
+| iOS SDK build | GitHub Actions `macos-15` runner (`docs/CI.md`) | workflow committed, not yet run |
 | Xcode project | `pbxproj` parser + cross-checks | 18 checks passed |
 | Retention | live drill via the systemd unit (aged screenshot) | deleted, 410 confirmed, history kept |
 | Backup / restore | `beacon backup` then serve the API from the restored data directory | milestone, token and image intact |

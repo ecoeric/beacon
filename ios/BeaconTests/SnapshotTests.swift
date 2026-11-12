@@ -116,6 +116,13 @@ final class SnapshotTests: XCTestCase {
         }
         try data.write(to: url)
         print("snapshot: \(url.path) - \(caption)")
+
+        // Attach the PNG to the .xcresult bundle so CI can download rendered screens even
+        // though the simulator's temporary directory is not on the host filesystem.
+        let attachment = XCTAttachment(contentsOfFile: url)
+        attachment.name = url.lastPathComponent
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
 
     private func writeManifest(_ screens: [(String, String)]) throws {

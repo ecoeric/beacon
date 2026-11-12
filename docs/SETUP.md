@@ -140,8 +140,8 @@ cd ~/beacon && backend/.venv/bin/python scripts/check_openapi_drift.py
 # 2. live end-to-end checks (real Pi-hole, Minecraft, Docker, agent runtime)
 ~/beacon/backend/.venv/bin/python ~/beacon/scripts/smoke_test.py
 
-# 3. iOS: parse every source, compile+test the Foundation subset, check view call sites,
-#    validate the Xcode project
+# 3. iOS: parse every source, compile+test the Foundation subset, typecheck every view against
+#    mock SwiftUI/UIKit modules, check view call sites, validate the Xcode project
 cd ~/beacon && scripts/validate_ios.sh
 
 # 4. deployment health
@@ -149,7 +149,9 @@ beacon doctor
 ```
 
 `scripts/validate_ios.sh` needs Docker (image `swift:6.0`) and `uv` with the `pbxproj` package.
-It does **not** build the UI — that requires Xcode.
+Step 3 runs the real Swift compiler against mock SwiftUI/UIKit/Combine modules, so type errors in
+the views are caught here; it is still **not** an iOS-SDK build. For that, use the GitHub Actions
+workflow in `docs/CI.md` or a Mac (§5).
 
 ---
 
@@ -184,25 +186,34 @@ uv run --with pbxproj python scripts/validate_ios_project.py
 ```bash
 cd ios
 xcodebuild test -project Beacon.xcodeproj -scheme Beacon \
-  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
   -only-testing:BeaconTests/ModelDecodingTests
 
 # Four real screenshots of the running app against the live server:
 mkdir -p ~/beacon/artifacts/snapshots
+SIMCTL_CHILD_BEACON_SNAPSHOT_DIR="$HOME/beacon/artifacts/snapshots" \
+SIMCTL_CHILD_BEACON_SNAPSHOT_BASE_URL="https://192.168.1.83:8091" \
+SIMCTL_CHILD_BEACON_SNAPSHOT_TOKEN="$(cat ~/beacon/data/secrets/ios.token)" \
 xcodebuild test -project Beacon.xcodeproj -scheme Beacon \
-  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
-  -only-testing:BeaconTests/SnapshotTests \
-  BEACON_SNAPSHOT_DIR=$HOME/beacon/artifacts/snapshots \
-  BEACON_SNAPSHOT_BASE_URL=https://192.168.1.83:8091 \
-  BEACON_SNAPSHOT_TOKEN="$(cat ~/beacon/data/secrets/ios.token)"
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -only-testing:BeaconTests/SnapshotTests
 
 # Attach those PNGs to a milestone on the server:
 python3 ~/beacon/scripts/publish_snapshots.py --dir ~/beacon/artifacts/snapshots \
-  --title "Native UI screens" --summary "Rendered on the iPhone 16 Pro simulator"
+  --title "Native UI screens" --summary "Rendered on the iPhone 16 simulator"
 ```
 
-Without `BEACON_SNAPSHOT_BASE_URL/TOKEN` the test renders DEBUG fixture data (layout check only).
-Screenshot tiles then show "Unavailable" — the test never fabricates images.
+`SIMCTL_CHILD_` is the simulator's environment passthrough; the variables are also settable in
+**Product → Scheme → Edit Scheme → Test → Arguments → Environment Variables**. Without the URL and
+token the test renders DEBUG fixture data (layout check only). Screenshot tiles then show
+"Unavailable" — the test never fabricates images. Rendered PNGs are attached to the `.xcresult`
+bundle, which is what the CI workflow uploads.
+
+### No Mac? Run the real build in CI
+
+Push the repository to GitHub and run **Actions → iOS build & tests**. The macOS runner performs
+a real Xcode build and simulator tests without signing. See `docs/CI.md` for artifacts, cost and
+the live-data limitation (a GitHub runner cannot reach the private LAN).
 
 ---
 

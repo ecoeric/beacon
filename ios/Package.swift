@@ -9,8 +9,9 @@
 //
 //   cd ios && swift test
 //
-// The SwiftUI layer is validated separately: all Swift sources are at least parsed by
-// `swiftc -parse` (scripts/validate_ios.sh) and compiled by Xcode on macOS.
+// The SwiftUI layer is validated separately: every app and test source is typechecked against
+// mock SwiftUI/UIKit/Combine/XCTest modules by scripts/typecheck_ios_views.sh (real Swift
+// compiler), all sources are parsed, and the real iOS-SDK build runs in CI (.github/workflows).
 
 import PackageDescription
 

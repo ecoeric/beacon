@@ -3,6 +3,37 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.5] — 2026-11-12
+
+Real compiler validation for the SwiftUI layer, plus a prepared macOS CI build. No iOS build was
+run on this host (it has no Xcode or iOS SDK).
+
+### Added
+* `ios/Shim/` — mock SwiftUI, UIKit and Combine modules that reproduce the API surface Beacon uses
+  (result builders, property wrappers, modifiers, styles, shapes). They exist **only** for
+  typechecking and are excluded from the Xcode project and the app target.
+* `scripts/typecheck_ios_views.sh` — builds the mock modules in Docker `swift:6.0` and typechecks
+  every app source and both Xcode test files with the real Swift compiler (18 app files + 2 test
+  files, 0 errors). It is now step 3 of `scripts/validate_ios.sh`.
+* `.github/workflows/ios-build.yml` and `docs/CI.md` — a real Xcode build and simulator test run,
+  with logs and the `.xcresult` uploaded as artifacts. The workflow is committed but has not been
+  executed: no GitHub remote is configured on this host.
+* Snapshot tests now attach each rendered PNG to the `.xcresult`, so a CI runner can retrieve the
+  four screens without access to the simulator's filesystem.
+
+### Fixed
+* **Compile-blocking SwiftUI bug found by the typecheck:** the Settings "Backend" `Section` had 13
+  direct children, above SwiftUI's ten-child `ViewBuilder` limit. It is split into "Agent" and
+  "Monitoring" sections. This would have failed the first real Xcode build.
+* `AppModel.swift` now conditionally imports `FoundationNetworking` so `URLSession` resolves under
+  the Linux typecheck; iOS is unaffected (`canImport` is false there).
+* `scripts/validate_ios_project.py` ignores `ios/Shim/` when checking for unreferenced Swift files.
+
+### Verified
+* `scripts/typecheck_ios_views.sh`: 18 app files + 2 test files + 6 stub files, exit 0.
+* The real iOS-SDK build remains the one unexecuted verification step; it is now reproducible in CI
+  without a Mac.
+
 ## [0.1.4] — 2026-11-12
 
 Verification pass for the security work and installer robustness.

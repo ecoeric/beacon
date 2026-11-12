@@ -12,7 +12,7 @@ iPhone (SwiftUI, no web views)
 beacon-api  (FastAPI, 192.168.1.83:8091, systemd, SQLite WAL)
         ├── agent status / message queue / interrupt  ──► Cherry Studio DSH runtime + SQLite (read-only)
         ├── milestones + screenshots + 7-day retention ──► data/screenshots
-        ├── system metrics                              ──► /proc, sensors, nvidia-smi, read-only docker wrapper
+        ├── system metrics                              ──► /proc, sensors, nvidia-smi, root-written Docker snapshot
         ├── Pi-hole                                     ──► http://192.168.1.83:8080/api (v6)
         └── Minecraft                                   ──► server-list ping :25565, logs, /proc, (rcon/systemd if enabled)
 ```
@@ -24,7 +24,7 @@ beacon-api  (FastAPI, 192.168.1.83:8091, systemd, SQLite WAL)
 | `backend/beacon/` | FastAPI application (API, services, CLI) |
 | `backend/tests/` | pytest suite (unit + live integration) |
 | `ios/` | Xcode project, SwiftUI app sources, validation harness |
-| `deploy/` | systemd units, env file, sudoers drop-in, docker read wrapper |
+| `deploy/` | systemd units, env file, root Docker snapshot timer |
 | `docs/` | architecture, setup, API reference, phase discovery notes |
 | `DASHBOARD_IMPLEMENTATION.md` | feature registry: every feature, files, endpoints, tests, limits |
 | `CHANGELOG.md` | implementation history and decisions |
@@ -38,12 +38,13 @@ systemctl status beacon-api
 beacon doctor
 ```
 
-Documentation: `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/OPERATIONS.md`, `docs/SECURITY_REVIEW.md`, `DASHBOARD_IMPLEMENTATION.md`.
+Documentation: `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/OPERATIONS.md`, `docs/SECURITY_REVIEW.md`, `docs/CI.md`, `DASHBOARD_IMPLEMENTATION.md`.
 
 ## Building the iPhone app
 
-Requires macOS with Xcode 16+ (`xcodebuild`). See `docs/SETUP.md` § iOS. Nothing in this
-repository installs, signs, or distributes the app — deployment to a device is a separate step.
+Requires macOS with Xcode 16+ (`xcodebuild`) or the GitHub Actions macOS runner
+(`.github/workflows/ios-build.yml`, see `docs/CI.md`). Nothing in this repository installs, signs,
+or distributes the app — deployment to a device is a separate step.
 
 ## Status vocabulary
 
@@ -58,6 +59,8 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `scripts/smoke_test.py` (live Pi-hole / Minecraft / Docker / agent) | 58 checks passed |
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
 | `swiftc -parse` on iOS sources | 22 files parsed |
+| `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 18 app files + 2 test files typecheck, 0 errors |
+| `.github/workflows/ios-build.yml` (real Xcode build) | committed; not yet run — no GitHub remote configured |
 | `scripts/validate_ios_project.py` | 18 checks passed |
 | `scripts/check_openapi_drift.py` | contract up to date |
 | backup restore drill | restored DB, token and image served by the API |
@@ -72,5 +75,9 @@ screenshots expire automatically after seven days while milestone summaries rema
 ## Status of the iPhone build
 
 The native project (Xcode project, SwiftUI app, pinned-TLS client, tests) is complete and
-version-controlled here. Building it requires Xcode on macOS; see `docs/SETUP.md` §5. No
-installation, signing or distribution to a phone was performed — that is a separate project.
+version-controlled here. Every app source typechecks with the real Swift compiler against mock
+SwiftUI/UIKit modules; that is compiler validation, **not** an iOS build. A real Xcode build and
+simulator test run are available through `.github/workflows/ios-build.yml` (see `docs/CI.md`) or a
+Mac on the LAN (see `docs/SETUP.md` §5). The workflow has not been executed yet because this
+repository has no GitHub remote. No installation, signing or distribution to a phone was
+performed — that is a separate project.

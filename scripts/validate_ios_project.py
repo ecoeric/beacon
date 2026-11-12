@@ -155,6 +155,7 @@ def main() -> int:
         for path in IOS.rglob("*.swift")
         if path.name != "Package.swift"
         and "/.build/" not in str(path)
+        and not str(path.relative_to(IOS)).startswith("Shim/")
         and str(path.relative_to(IOS)) not in app_sources
         and str(path.relative_to(IOS)) not in test_sources
     ]
