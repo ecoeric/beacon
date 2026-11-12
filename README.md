@@ -42,12 +42,15 @@ Documentation: `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/OPERATIONS.md`, `d
 
 ## Building the iPhone app
 
-Requires macOS with Xcode 16+ (`xcodebuild`) or the GitHub Actions macOS runner
-(`.github/workflows/ios-build.yml`, see `docs/CI.md`). For a beginner-friendly install on a
-physical iPhone, including free-Apple-ID signing, see `docs/INSTALL_IPHONE.md`. To hand the whole
-install brief to another AI assistant, use the self-contained
-`BEACON_IPHONE_INSTALL.md`. Nothing in this repository installs, signs, or distributes the app
-automatically — the final Run from Xcode is yours.
+Two routes:
+
+- **Borrowed Mac:** open `ios/Beacon.xcodeproj` and Run (see `docs/INSTALL_IPHONE.md`).
+- **Linux-only:** GitHub Actions builds an unsigned IPA (`.github/workflows/ios-build.yml`), and
+  `scripts/install_ipa_linux.sh` signs and installs it with a free Apple ID
+  (see `docs/LINUX_IPA_INSTALL.md`).
+
+`docs/CI.md` covers the workflow and its artifacts. Nothing in this repository pushes, signs or
+distributes the app automatically; the final signing/install is an explicit user action.
 
 ## Status vocabulary
 
@@ -63,7 +66,8 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
 | `swiftc -parse` on iOS sources | 22 files parsed |
 | `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 18 app files + 2 test files typecheck, 0 errors |
-| `.github/workflows/ios-build.yml` (real Xcode build) | committed; not yet run — no GitHub remote configured |
+| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | committed; not yet run — no GitHub remote configured |
+| `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached to this host) |
 | `scripts/validate_ios_project.py` | 18 checks passed |
 | `scripts/check_openapi_drift.py` | contract up to date |
 | backup restore drill | restored DB, token and image served by the API |
@@ -79,8 +83,8 @@ screenshots expire automatically after seven days while milestone summaries rema
 
 The native project (Xcode project, SwiftUI app, pinned-TLS client, tests) is complete and
 version-controlled here. Every app source typechecks with the real Swift compiler against mock
-SwiftUI/UIKit modules; that is compiler validation, **not** an iOS build. A real Xcode build and
-simulator test run are available through `.github/workflows/ios-build.yml` (see `docs/CI.md`) or a
-Mac on the LAN (see `docs/SETUP.md` §5). The workflow has not been executed yet because this
-repository has no GitHub remote. No installation, signing or distribution to a phone was
-performed — that is a separate project.
+SwiftUI/UIKit modules; that is compiler validation, **not** an iOS build. The GitHub Actions
+workflow builds an unsigned arm64 IPA with Xcode 26.2 and runs simulator tests; the Linux install
+script signs and installs that IPA with a free Apple ID. Neither has been executed yet: this
+repository has no GitHub remote, and no iPhone is attached to this host. No installation, signing
+or distribution to a phone has been performed.

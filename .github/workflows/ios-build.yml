@@ -1,11 +1,14 @@
-name: iOS build & tests
+name: iOS build, tests & unsigned IPA
 
-# The Beacon app is generated and developed on a Linux host with no Xcode. This workflow performs
-# the real iOS-SDK build and simulator test run on a GitHub-hosted macOS runner, so a compile
-# failure is caught without owning a Mac.
+# Beacon is developed on Linux with no Xcode. This workflow does the real iOS-SDK work on a
+# GitHub-hosted macOS 26 runner:
 #
-# Push this repository to GitHub and run the workflow from the Actions tab (or let it run on
-# push). See docs/CI.md for setup, costs, artifacts and limitations.
+#   * simulator tests (separate job; a test failure does not block the IPA)
+#   * an unsigned arm64 device build packaged as Payload/Beacon.app in a .ipa
+#
+# The IPA is intentionally UNSIGNED. It contains the app and its bundled private CA, but no
+# Apple provisioning profile. Sign it with a free Apple ID on the Linux host before installing;
+# see docs/LINUX_IPA_INSTALL.md.
 
 on:
   push:
@@ -29,30 +32,173 @@ concurrency:
   group: ios-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PROJECT: ios/Beacon.xcodeproj
+  SCHEME: Beacon
+  XCODE_APP: /Applications/Xcode_26.2.app
+  XCODE_VERSION: "26.2"
+
 jobs:
-  xcode:
-    name: Xcode build + simulator tests
-    runs-on: macos-15
-    timeout-minutes: 30
+  unsigned-ipa:
+    name: Unsigned IPA (device, arm64)
+    runs-on: macos-26
+    timeout-minutes: 45
     steps:
       - name: Check out
         uses: actions/checkout@v4
-
-      - name: Show toolchain
-        run: |
-          xcodebuild -version
-          xcrun simctl list runtimes
-          swift --version
 
       - name: Verify the committed Xcode project matches the generator
         run: |
           python3 scripts/gen_xcodeproj.py
           git diff --exit-code -- ios/Beacon.xcodeproj
 
+      - name: Select Xcode 26.2 and verify the iOS SDK
+        run: |
+          if [ ! -d "$XCODE_APP" ]; then
+            echo "Xcode 26.2 is not installed at $XCODE_APP" >&2
+            echo "Available Xcode installations:" >&2
+            ls -d /Applications/Xcode*.app 2>/dev/null || true
+            exit 1
+          fi
+          sudo xcode-select -s "$XCODE_APP"
+          xcodebuild -version
+          SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
+          echo "iOS device SDK: $SDK_VERSION"
+          case "$SDK_VERSION" in
+            26.*) ;;
+            *) echo "Expected an iOS 26 SDK, got $SDK_VERSION" >&2; exit 1 ;;
+          esac
+          xcodebuild -list -project "$PROJECT"
+
+      - name: Build unsigned arm64 app for the device
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$PWD/build/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            ONLY_ACTIVE_ARCH=NO \
+            ARCHS=arm64 \
+            VALIDATE_PRODUCT=NO \
+            clean build 2>&1 | tee build.log
+
+      - name: Package and verify the unsigned IPA
+        run: |
+          set -euo pipefail
+          APP_PATH="$PWD/build/DerivedData/Build/Products/Release-iphoneos/Beacon.app"
+          if [ ! -d "$APP_PATH" ]; then
+            APP_PATH="$(find "$PWD/build/DerivedData/Build/Products" -maxdepth 2 -name Beacon.app -type d | head -n 1)"
+          fi
+          if [ -z "${APP_PATH:-}" ] || [ ! -d "$APP_PATH" ]; then
+            echo "Beacon.app was not produced" >&2
+            find "$PWD/build" -maxdepth 5 -type d -name '*.app' -print >&2 || true
+            exit 1
+          fi
+          echo "APP_PATH=$APP_PATH" | tee build-info.txt
+
+          test -f "$APP_PATH/Info.plist"
+          if [ ! -f "$APP_PATH/ca.crt" ]; then
+            echo "The bundled CA is missing from $APP_PATH" >&2
+            exit 1
+          fi
+          test -f "$APP_PATH/Beacon"
+          file "$APP_PATH/Beacon" | tee -a build-info.txt
+          lipo -info "$APP_PATH/Beacon" | tee -a build-info.txt
+
+          # The build must not be signed: Xcode's signing flags above are deliberately off.
+          if codesign -dv "$APP_PATH" >/dev/null 2>&1; then
+            echo "WARNING: Xcode produced a signed app; inspecting it" | tee -a build-info.txt
+            codesign -dv "$APP_PATH" 2>&1 | tee -a build-info.txt || true
+          else
+            echo "codesign: app is unsigned (expected)" | tee -a build-info.txt
+          fi
+
+          rm -rf build/Payload
+          mkdir -p build/Payload
+          cp -R "$APP_PATH" build/Payload/
+          (cd build && zip -qry Beacon-unsigned.ipa Payload)
+          mv build/Beacon-unsigned.ipa .
+
+          unzip -l Beacon-unsigned.ipa | grep -q 'Payload/Beacon.app/Beacon'
+          unzip -l Beacon-unsigned.ipa | grep -q 'Payload/Beacon.app/ca.crt'
+
+          {
+            echo "git_sha=$(git rev-parse HEAD)"
+            echo "xcode=$(xcodebuild -version | tr '\n' ' ')"
+            echo "ios_sdk=$(xcrun --sdk iphoneos --show-sdk-version)"
+            echo "bundle_id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/Info.plist")"
+            echo "version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Info.plist" 2>/dev/null || echo unknown)"
+            echo "build=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP_PATH/Info.plist" 2>/dev/null || echo unknown)"
+            echo "minimum_os=$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$APP_PATH/Info.plist" 2>/dev/null || echo unknown)"
+            echo "signed=false"
+          } | tee -a build-info.txt
+
+          shasum -a 256 Beacon-unsigned.ipa | tee Beacon-unsigned.ipa.sha256
+          ls -lh Beacon-unsigned.ipa
+
+      - name: Upload IPA, checksum and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Beacon-unsigned-ipa
+          path: |
+            Beacon-unsigned.ipa
+            Beacon-unsigned.ipa.sha256
+            build-info.txt
+            build.log
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Summarise IPA result
+        if: always()
+        run: |
+          {
+            echo "### Unsigned Beacon IPA"
+            echo ""
+            echo "- Runner: \`macos-26\`"
+            echo "- Xcode: $(xcodebuild -version | head -1)"
+            echo "- Result: ${{ job.status }}"
+            echo "- Artifact: \`Beacon-unsigned-ipa\`"
+            echo ""
+            echo "The IPA is unsigned. Do not attempt to install it directly; sign it first (docs/LINUX_IPA_INSTALL.md)."
+            echo ""
+            echo "If this job failed, download the artifact and read \`build.log\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  simulator-tests:
+    name: Simulator tests
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 26.2
+        run: |
+          if [ ! -d "$XCODE_APP" ]; then
+            echo "Xcode 26.2 is not installed at $XCODE_APP" >&2
+            ls -d /Applications/Xcode*.app 2>/dev/null || true
+            exit 1
+          fi
+          sudo xcode-select -s "$XCODE_APP"
+          xcodebuild -version
+          xcrun simctl list runtimes
+
       - name: Pick an available iPhone simulator
         id: sim
         run: |
-          DEVICE="$(xcrun simctl list devices available | awk -F '[(]' '/iPhone/ {print $1; exit}' | xargs)"
+          # Prefer the same model as the target phone, then any available iPhone.
+          DEVICE="$(xcrun simctl list devices available | awk -F '[(]' '/iPhone 16e/ {print $1; exit}' | xargs)"
+          if [ -z "$DEVICE" ]; then
+            DEVICE="$(xcrun simctl list devices available | awk -F '[(]' '/iPhone/ {print $1; exit}' | xargs)"
+          fi
           if [ -z "$DEVICE" ]; then
             echo "No iPhone simulator available" >&2
             xcrun simctl list devices available >&2
@@ -61,48 +207,35 @@ jobs:
           echo "Using simulator: $DEVICE"
           echo "name=$DEVICE" >> "$GITHUB_OUTPUT"
 
-      - name: Build for the iOS Simulator
-        run: |
-          set -o pipefail
-          xcodebuild \
-            -project ios/Beacon.xcodeproj \
-            -scheme Beacon \
-            -configuration Debug \
-            -destination 'generic/platform=iOS Simulator' \
-            CODE_SIGNING_ALLOWED=NO \
-            build | tee build.log
-
       - name: Run unit and layout-snapshot tests
         run: |
           set -o pipefail
           xcodebuild test \
-            -project ios/Beacon.xcodeproj \
-            -scheme Beacon \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
             -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
             -resultBundlePath TestResults.xcresult \
-            CODE_SIGNING_ALLOWED=NO | tee test.log
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" 2>&1 | tee test.log
 
-      - name: Upload build log, test log and xcresult
+      - name: Upload test logs and xcresult
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-build-and-test
+          name: Beacon-simulator-tests
           path: |
-            build.log
             test.log
             TestResults.xcresult
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Summarise result
+      - name: Summarise test result
         if: always()
         run: |
           {
-            echo "### iOS build & tests"
+            echo "### Simulator tests"
             echo ""
-            echo "- Xcode: $(xcodebuild -version | head -1)"
             echo "- Simulator: ${{ steps.sim.outputs.name }}"
             echo "- Result: ${{ job.status }}"
-            echo ""
-            echo "Rendered screenshots are stored as attachments in the \`TestResults.xcresult\` artifact."
           } >> "$GITHUB_STEP_SUMMARY"

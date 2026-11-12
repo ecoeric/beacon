@@ -158,7 +158,9 @@ workflow in `docs/CI.md` or a Mac (§5).
 ## 5. Building the iPhone app (macOS)
 
 For a step-by-step first install on a physical phone (free Apple ID, Developer Mode, FAQ), see
-[`docs/INSTALL_IPHONE.md`](INSTALL_IPHONE.md).
+[`docs/INSTALL_IPHONE.md`](INSTALL_IPHONE.md). For the no-Mac path, see
+[`docs/LINUX_IPA_INSTALL.md`](LINUX_IPA_INSTALL.md): GitHub Actions builds an unsigned IPA and
+`scripts/install_ipa_linux.sh` signs/installs it with AltServer-Linux-NG.
 
 ```bash
 git clone <this repo> beacon            # or copy ~/beacon/ios

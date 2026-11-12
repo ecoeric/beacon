@@ -69,7 +69,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | 2.22 | Audit trail | Implemented |
 | 2.23 | iOS design system | Implemented |
 | 2.24 | iOS networking, pinning, Keychain | Implemented (typechecked + tested on Linux) |
-| 2.25 | iOS screens (Home, Agent, Progress, Server, Settings, Setup) | Implemented (source complete; compiled by Xcode on macOS) |
+| 2.25 | iOS screens (Home, Agent, Progress, Server, Settings, Setup) | Implemented (source complete; CI Xcode 26.2 build prepared) |
 | 2.26 | iOS snapshot screenshot test | Implemented (requires macOS/Xcode to run) |
 | 2.27 | Validation harnesses | Implemented |
 | 2.28 | Contract, security and backup guardrails | Implemented |
@@ -479,6 +479,8 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
 | SwiftUI typecheck (real compiler, mock frameworks) | `scripts/typecheck_ios_views.sh` | 18 app files + 2 test files, 0 errors; found and fixed a 13-child `Section` |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 18 checks passed |
+| Xcode 26.2 unsigned IPA | `.github/workflows/ios-build.yml` (`macos-26`) | prepared; not executed (no GitHub remote) |
+| Linux sign + install | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached) |
 | SwiftUI memberwise call sites | `python3 scripts/check_view_initialisers.py` (heuristic) | 109 call sites / 11 views, no missing arguments |
 | OpenAPI contract drift | `backend/.venv/bin/python scripts/check_openapi_drift.py` | up to date (36 paths) |
 | Security guardrails | `tests/test_contract_and_security.py` | no shell execution, helper allow-list, units not root |
@@ -550,9 +552,12 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 1. **iOS build/run on this host**: no macOS/Xcode → an iOS-SDK build cannot run here. All non-UI
    Swift code is compiled and tested, every Swift file is parsed, every view typechecks against
    mock SwiftUI/UIKit modules, and the Xcode project is structurally validated. The real Xcode
-   build and simulator screenshots run in `.github/workflows/ios-build.yml` (`docs/CI.md`) or on a
-   Mac on the LAN (`docs/SETUP.md`). The workflow is committed but has not been executed yet.
-2. **iPhone installation/signing/distribution**: explicitly out of scope for this project.
+   26.2 build produces an unsigned IPA in `.github/workflows/ios-build.yml` (`docs/CI.md`); the
+   Linux sign/install path is `scripts/install_ipa_linux.sh` (`docs/LINUX_IPA_INSTALL.md`). Neither
+   has been executed: this repository has no GitHub remote and no iPhone is attached.
+2. **iPhone installation/signing/distribution**: a Linux-only path is prepared but not executed;
+   no signed IPA exists and no app was installed on a phone. App Store distribution remains out
+   of scope.
 3. **Push notifications (APNs)**: not implemented; the activity feed is in-app. `payload` and
    `kind` fields are the extension point.
 4. **Live interrupt of the real agent runtime**: not executed (it hosts this work). Signal-mode

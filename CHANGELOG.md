@@ -3,6 +3,35 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.6] — 2026-11-12
+
+iPhone distribution pipeline: a real Xcode 26.2 CI build that produces an unsigned IPA, plus a
+Linux signing/install path. No IPA was produced on this host and no phone install was performed.
+
+### Added
+* Reworked `.github/workflows/ios-build.yml` for `macos-26` with Xcode **26.2** selected explicitly.
+  Two independent jobs:
+  * **Unsigned IPA** — Release device build (`-sdk iphoneos`, arm64), signing disabled, packaged as
+    `Payload/Beacon.app` and uploaded as `Beacon-unsigned-ipa` with checksum, `build-info.txt` and
+    `build.log`. The job verifies the arm64 executable and the bundled `ca.crt`.
+  * **Simulator tests** — the existing test target on an iPhone simulator, with `test.log` and
+    `TestResults.xcresult` artifacts. Test failures do not block the IPA job.
+* `scripts/install_ipa_linux.sh` — downloads the pinned **AltServer-Linux-NG** release
+  (`ng-2026-11-05`, SHA-256 verified), detects the iPhone over usbmuxd, prompts for a free Apple
+  ID, signs and installs the IPA. No password is written to disk; it is passed to AltServer as an
+  argument (briefly visible to `ps`).
+* `docs/LINUX_IPA_INSTALL.md` — Linux-only signing/installation guide, including the free-Apple-ID
+  7-day limit, 2FA/SMS handling, iOS 26.2 compatibility notes, USB vs netmuxd and troubleshooting.
+
+### Notes
+* The IPA is intentionally **unsigned**: CI needs no Apple account, certificate or provisioning
+  profile. Signing happens locally with a free Apple ID.
+* AltServer-Linux v0.0.5 is not used: it fails on modern iOS. The maintained NG fork fixes the
+  iOS 26.4+/27 signature rejection and the 2026 Apple sign-in changes.
+* The workflow and install script are prepared but **not executed**: this repository has no
+  GitHub remote, and no iPhone is attached to this Linux host. The first CI run is the remaining
+  compile confirmation.
+
 ## [0.1.5] — 2026-11-12
 
 Real compiler validation for the SwiftUI layer, plus a prepared macOS CI build. No iOS build was

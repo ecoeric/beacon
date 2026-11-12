@@ -22,6 +22,10 @@ to renew it. If you want it permanently, see [TestFlight](#permanent-option-test
 You do **not** need to modify the server, install a CA profile on the phone, or use a paid account
 for the first install.
 
+> **No usable Mac?** There is now a Linux-only route: GitHub Actions builds an unsigned IPA and
+> `docs/LINUX_IPA_INSTALL.md` signs and installs it with AltServer-Linux-NG. The Mac route below is
+> still the simplest if you can borrow one, but it is no longer the only route.
+
 ---
 
 ## What you need
@@ -172,17 +176,27 @@ cleanest long-term route, but it costs money and is more setup than the free 7-d
 
 ## If you have no Mac at all
 
-Be realistic about the options:
+Use the Linux route first:
+
+1. Push the repository to GitHub.
+2. Run the **iOS build, tests & unsigned IPA** workflow.
+3. Download the `Beacon-unsigned-ipa` artifact.
+4. On this Linux host, run `scripts/install_ipa_linux.sh` as described in
+   [`LINUX_IPA_INSTALL.md`](LINUX_IPA_INSTALL.md).
+
+That path needs no Mac and no Windows. It uses a free Apple ID and still expires after 7 days.
+
+Other options, in case the Linux route is blocked:
 
 - **Cloud Mac** (MacinCloud, MacStadium, AWS EC2 Mac): you can build and run the simulator, but a
   remote Mac usually cannot plug into your physical iPhone. Not a simple install path.
-- **GitHub Actions** (`.github/workflows/ios-build.yml`): builds and tests the app, but **does not
-  install it on a phone**.
-- **Advanced sideloading**: build a signed/unsigned IPA, then use Sideloadly/AltStore with your
-  Apple ID. This can work without owning a Mac, but it needs a second computer, signing setup, and
-  still expires after 7 days on a free account. Not the first thing to try.
+- **GitHub Actions alone**: builds and tests the app and produces the IPA, but **does not install it
+  on a phone**.
+- **Advanced sideloading**: an unsigned IPA plus Sideloadly/AltStore with your Apple ID. This is
+  the same idea as the Linux path, but may require Windows and a different signing tool.
 
-The least painful path for a first install is still a borrowed Mac with a USB cable.
+The least painful path for a first install is still a borrowed Mac with a USB cable; the Linux
+path is the fallback when that is not available.
 
 ---
 

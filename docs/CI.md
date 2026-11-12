@@ -1,53 +1,69 @@
-# iOS build & test CI (no Mac required)
+# iOS build, tests and IPA CI (no Mac required)
 
-Beacon is developed on a Linux host. That host has the real Swift compiler (via Docker) but **no
-Xcode, no iOS SDK and no simulator**, so it cannot produce an iOS build. Two independent checks
-cover the gap; they are deliberately not conflated:
+Beacon is developed on a Linux host with **no Xcode, iOS SDK or simulator**. Three independent
+layers cover the gap; they are deliberately not conflated:
 
-| Check | Where | What it proves |
+| Layer | Where | What it proves |
 |---|---|---|
-| `scripts/typecheck_ios_views.sh` | this host, Docker `swift:6.0` | Every app source and both Xcode test files typecheck with the real Swift compiler against mock SwiftUI/UIKit/Combine/XCTest modules. Catches type, generic, result-builder, property-wrapper and concurrency errors. **Not an iOS build** (mock signatures, no SDK). |
-| `.github/workflows/ios-build.yml` | GitHub-hosted `macos-15` runner | A real Xcode build of the generated project plus `xcodebuild test` on an iPhone simulator. This is the authoritative compile/run confirmation. |
+| Swift typecheck | this host, Docker `swift:6.0` | Every app source and both Xcode test files typecheck with the real Swift compiler against mock SwiftUI/UIKit/Combine/XCTest modules. Catches type, generic, result-builder, property-wrapper and concurrency errors. **Not an iOS build.** |
+| Xcode build + IPA | GitHub Actions `macos-26`, Xcode 26.2 | A real iOS-SDK device build of the generated project, packaged as an **unsigned arm64 IPA**, plus a separate simulator test job. This is the authoritative compile confirmation. |
+| Sign + install | this host, AltServer-Linux-NG | The unsigned IPA is signed with a free Apple ID and installed on the iPhone over USB. See [`LINUX_IPA_INSTALL.md`](LINUX_IPA_INSTALL.md). |
 
-`scripts/validate_ios.sh` runs the first check along with parsing, Foundation tests, call-site
-checks and project validation.
+`scripts/validate_ios.sh` runs the first layer plus parsing, Foundation tests, call-site checks and
+project validation.
 
-## Running the real build
+## The workflow
 
-The workflow runs on every push or pull request that touches `ios/`, and can be started manually.
+`.github/workflows/ios-build.yml` has two independent jobs on `macos-26`:
 
-1. Push this repository to GitHub (a private repository is fine).
-2. Open **Actions → iOS build & tests → Run workflow** (or push a change).
-3. Wait for the job; it takes roughly 5–10 minutes on a hosted runner.
-4. Download the `ios-build-and-test` artifact. It contains:
-   * `build.log` — full `xcodebuild` output;
-   * `test.log` — test output;
-   * `TestResults.xcresult` — open with Xcode's result browser. The four rendered screens are
-     attached to `SnapshotTests` as PNG attachments.
+### `unsigned-ipa` — the artifact you install
 
-No signing certificate, provisioning profile, Apple developer account or Mac is needed: the job
-builds for the simulator with `CODE_SIGNING_ALLOWED=NO`. Device signing and installation remain
-out of scope for this project.
+1. Regenerates `ios/Beacon.xcodeproj` and fails if the committed project differs.
+2. Selects **Xcode 26.2** explicitly (`/Applications/Xcode_26.2.app`) and verifies an iOS 26 SDK.
+3. Builds **Release, `-sdk iphoneos`, arm64** with signing completely disabled.
+4. Packages `Payload/Beacon.app` as `Beacon-unsigned.ipa`.
+5. Verifies the executable is arm64 and the bundled `ca.crt` is present.
+6. Uploads `Beacon-unsigned.ipa`, its SHA-256, `build-info.txt` and `build.log` as artifact
+   **`Beacon-unsigned-ipa`** (30-day retention).
+
+The app is **unsigned on purpose**: no Apple developer account, certificate or provisioning
+profile is needed for CI. Signing happens locally with a free Apple ID before installation.
+
+### `simulator-tests` — compile and test the views
+
+Builds and runs `BeaconTests` on an iPhone simulator with Xcode 26.2 and uploads `test.log` plus
+`TestResults.xcresult`. A test failure does not block the IPA job.
+
+## Running it
+
+1. Push this repository to GitHub (private is fine).
+2. Open **Actions → iOS build, tests & unsigned IPA → Run workflow**.
+3. Wait roughly 5–10 minutes for `unsigned-ipa`.
+4. Download the **`Beacon-unsigned-ipa`** artifact.
+5. Follow [`LINUX_IPA_INSTALL.md`](LINUX_IPA_INSTALL.md) to sign and install it.
+
+You do **not** need a paid Apple Developer account to compile the app or to produce the IPA.
+A free Apple ID is enough for personal installation, but the profile expires after 7 days.
 
 ### Cost
 
-GitHub Actions is free for public repositories. Private repositories consume the account's
-included macOS minutes (macOS runners are billed at a multiplier); a 30-minute timeout caps a run.
+GitHub Actions is free for public repositories. Private repositories consume included macOS
+minutes (macOS runners have a multiplier). The workflow timeout is 45 minutes for the IPA job and
+40 minutes for tests.
 
 ## What CI can and cannot see
 
-* **Can** compile the app against the iOS SDK, run the test target, render the four screens with
-  `ImageRenderer`, and surface real Xcode errors and warnings.
-* **Cannot** reach `192.168.1.83` — a GitHub runner is outside the LAN. `SnapshotTests` therefore
-  runs in **layout mode** with DEBUG fixtures; screenshot tiles show "Unavailable" and no image is
-  fabricated. The live-data screenshots stored on the server are produced on a Mac on the LAN.
-* **Does not** install, sign or distribute the app.
+* **Can** compile against the real iOS SDK, package a device IPA, run the test target, render the
+  four screens with `ImageRenderer`, and surface real Xcode errors.
+* **Cannot** reach `192.168.1.83` — a GitHub runner is outside the LAN. Snapshot tests run in
+  **layout mode** with DEBUG fixtures; screenshot tiles show "Unavailable" and no image is
+  fabricated. Live screenshots must be produced on a machine on the LAN.
+* **Does not** sign or install the IPA. The artifact is intentionally unsigned.
 
 ## Live screenshots on a Mac
 
 Set the variables in the Xcode scheme (**Product → Scheme → Edit Scheme → Test → Arguments →
-Environment Variables**) or pass them to `xcodebuild` with the simulator's `SIMCTL_CHILD_`
-passthrough:
+Environment Variables**) or pass them with the simulator's `SIMCTL_CHILD_` passthrough:
 
 ```bash
 cd ios
@@ -61,11 +77,14 @@ xcodebuild test -project Beacon.xcodeproj -scheme Beacon \
 ```
 
 Without those variables the same test renders fixtures. `scripts/publish_snapshots.py` attaches
-the resulting PNGs to a milestone.
+the PNGs to a milestone.
 
 ## Status
 
-The workflow file is committed and reviewed, but has **not been executed** — this repository has
-no GitHub remote configured on this host. The first run is the remaining confirmation step. The
-Linux-side typecheck *has* been executed and currently passes; it also found a genuine
-compile-blocking bug (a `Section` with more than ten direct children) that was fixed.
+The workflow is implemented and its shell/YAML is locally syntax-checked, but it has **not been
+executed**: this repository has no GitHub remote configured on this host. The Linux-side typecheck
+*has* run and passes; it previously found a real compile blocker (a `Section` with more than ten
+direct children), which was fixed.
+
+The first CI run is the remaining confirmation. If it fails, download `Beacon-unsigned-ipa`
+(which contains `build.log`) and fix the reported compile error before attempting signing.
