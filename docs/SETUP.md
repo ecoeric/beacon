@@ -157,6 +157,9 @@ workflow in `docs/CI.md` or a Mac (§5).
 
 ## 5. Building the iPhone app (macOS)
 
+For a step-by-step first install on a physical phone (free Apple ID, Developer Mode, FAQ), see
+[`docs/INSTALL_IPHONE.md`](INSTALL_IPHONE.md).
+
 ```bash
 git clone <this repo> beacon            # or copy ~/beacon/ios
 cd beacon/ios

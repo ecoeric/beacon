@@ -20,6 +20,8 @@ run on this host (it has no Xcode or iOS SDK).
   executed: no GitHub remote is configured on this host.
 * Snapshot tests now attach each rendered PNG to the `.xcresult`, so a CI runner can retrieve the
   four screens without access to the simulator's filesystem.
+* `docs/INSTALL_IPHONE.md` — beginner guide for the first physical install with a free Apple ID,
+  including Developer Mode, bundle identifiers, signing limits and troubleshooting.
 
 ### Fixed
 * **Compile-blocking SwiftUI bug found by the typecheck:** the Settings "Backend" `Section` had 13
