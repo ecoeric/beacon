@@ -44,9 +44,10 @@ Documentation: `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/OPERATIONS.md`, `d
 
 Requires macOS with Xcode 16+ (`xcodebuild`) or the GitHub Actions macOS runner
 (`.github/workflows/ios-build.yml`, see `docs/CI.md`). For a beginner-friendly install on a
-physical iPhone, including free-Apple-ID signing, see `docs/INSTALL_IPHONE.md`. Nothing in this
-repository installs, signs, or distributes the app automatically — the final Run from Xcode is
-yours.
+physical iPhone, including free-Apple-ID signing, see `docs/INSTALL_IPHONE.md`. To hand the whole
+install brief to another AI assistant, use the self-contained
+`BEACON_IPHONE_INSTALL.md`. Nothing in this repository installs, signs, or distributes the app
+automatically — the final Run from Xcode is yours.
 
 ## Status vocabulary
 
