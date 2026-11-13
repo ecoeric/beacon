@@ -77,7 +77,7 @@ command -v ideviceinfo >/dev/null \
 
 if ! pgrep -x usbmuxd >/dev/null 2>&1 && ! systemctl is-active --quiet usbmuxd 2>/dev/null; then
     echo "warning: usbmuxd does not appear active; trying the device connection anyway." >&2
-    echo "         If detection fails: sudo systemctl enable --now usbmuxd" >&2
+    echo "         If detection fails: sudo systemctl restart usbmuxd" >&2
 fi
 
 # Pick the device. Prefer an explicit UDID, otherwise require exactly one connected iPhone.

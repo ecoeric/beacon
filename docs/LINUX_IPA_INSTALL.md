@@ -23,7 +23,7 @@ On this Linux host:
 ```bash
 sudo apt update
 sudo apt install -y usbmuxd libimobiledevice-utils curl unzip
-sudo systemctl enable --now usbmuxd
+sudo systemctl restart usbmuxd
 ```
 
 Check that the tools exist:
@@ -171,7 +171,7 @@ This is more moving parts. Try USB first; only switch if `idevice_id -l` cannot 
 | Symptom | Cause / fix |
 |---|---|
 | `no iPhone detected` | Unlock, reconnect USB, tap Trust; check `idevice_id -l`; ensure `usbmuxd` is running |
-| `usbmuxd is not running` | `sudo systemctl enable --now usbmuxd` |
+| `usbmuxd is not running` | `sudo systemctl restart usbmuxd` |
 | `idevice_id: command not found` | `sudo apt install libimobiledevice-utils` |
 | `Unable to sign you in` / `-80043`, `-80045`, `-80046` | Use the pinned NG release; use the default `https://new.ani.sidestore.io`; stop after one or two failures to avoid an account lock |
 | `Incorrect Apple ID or password` | Use the Apple ID password, not the device passcode; if AltServer asks for an app-specific password, create one at appleid.apple.com |
