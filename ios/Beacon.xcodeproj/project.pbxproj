@@ -36,31 +36,31 @@
 /* Begin PBXFileReference section */
 		84337AD8D27FCD69AF2C4FC2 /* Beacon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Beacon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDED23FA58339F9273F6C84 /* BeaconTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeaconTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9985D723856527986155BA32 /* BeaconApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/App/BeaconApp.swift; sourceTree = "<group>"; };
-		E0E1277C061E064ABA8BF71D /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/App/RootView.swift; sourceTree = "<group>"; };
-		97D16183873BB8CB8AE60701 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/App/AppModel.swift; sourceTree = "<group>"; };
-		058368450EB574938A303262 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Design/Theme.swift; sourceTree = "<group>"; };
-		54134F6EDFA1868BA4C36D6D /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Design/Components.swift; sourceTree = "<group>"; };
-		392E0F5B9FA706A0B9C38F48 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Models/Models.swift; sourceTree = "<group>"; };
-		7953E92604E7ACED3E945D4B /* Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Models/Formatting.swift; sourceTree = "<group>"; };
-		DB336AC66EB8FB3CAFB5AF0B /* ServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Networking/ServerConfiguration.swift; sourceTree = "<group>"; };
-		C7AA676F6A2E4309BC523E03 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Networking/APIClient.swift; sourceTree = "<group>"; };
-		231C1902E3166B1E65F8FF75 /* PinnedSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Networking/PinnedSession.swift; sourceTree = "<group>"; };
-		68B932EE3C6C6519BC58D7FB /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Networking/Keychain.swift; sourceTree = "<group>"; };
-		AC6D4D1E4795CB7F5D7D034B /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Networking/AppSettings.swift; sourceTree = "<group>"; };
-		579F8C456F73BDF474DB2A19 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Features/Setup/OnboardingView.swift; sourceTree = "<group>"; };
-		1FD8929BAB9EAEBBFB03E021 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Features/Dashboard/DashboardView.swift; sourceTree = "<group>"; };
-		B8B350E3037B206FF0A69064 /* AgentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Features/Agent/AgentView.swift; sourceTree = "<group>"; };
-		D674BB10A72D81D57344E914 /* MilestonesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Features/Milestones/MilestonesView.swift; sourceTree = "<group>"; };
-		67FF913B8E944FC9A1A1E161 /* ScreenshotViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Features/Milestones/ScreenshotViewer.swift; sourceTree = "<group>"; };
-		4BA5FB20E809C3D84D1A85DD /* ServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Features/Server/ServerView.swift; sourceTree = "<group>"; };
-		4A8CA80F904A3CE26826AACA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Features/Settings/SettingsView.swift; sourceTree = "<group>"; };
-		35065513078EF8FEF9613FB0 /* Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon/Fixtures.swift; sourceTree = "<group>"; };
-		A14FADAD0FF03C37DD8DF0C5 /* SnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconTests/SnapshotTests.swift; sourceTree = "<group>"; };
-		D330DBF1169FE712B6F38DC5 /* ModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedTests/ModelDecodingTests.swift; sourceTree = "<group>"; };
-		22E5483E0E3F6DF567952B32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Beacon/Resources/Assets.xcassets; sourceTree = "<group>"; };
-		1955CE2182F20B7C7748F722 /* ca.crt */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beacon/Resources/ca.crt; sourceTree = "<group>"; };
-		6E9E27E4578AD0776A93101F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Beacon/Resources/Info.plist; sourceTree = "<group>"; };
+		9985D723856527986155BA32 /* BeaconApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconApp.swift; sourceTree = "<group>"; };
+		E0E1277C061E064ABA8BF71D /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		97D16183873BB8CB8AE60701 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		058368450EB574938A303262 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		54134F6EDFA1868BA4C36D6D /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		392E0F5B9FA706A0B9C38F48 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		7953E92604E7ACED3E945D4B /* Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatting.swift; sourceTree = "<group>"; };
+		DB336AC66EB8FB3CAFB5AF0B /* ServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerConfiguration.swift; sourceTree = "<group>"; };
+		C7AA676F6A2E4309BC523E03 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		231C1902E3166B1E65F8FF75 /* PinnedSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedSession.swift; sourceTree = "<group>"; };
+		68B932EE3C6C6519BC58D7FB /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
+		AC6D4D1E4795CB7F5D7D034B /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		579F8C456F73BDF474DB2A19 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		1FD8929BAB9EAEBBFB03E021 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		B8B350E3037B206FF0A69064 /* AgentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentView.swift; sourceTree = "<group>"; };
+		D674BB10A72D81D57344E914 /* MilestonesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestonesView.swift; sourceTree = "<group>"; };
+		67FF913B8E944FC9A1A1E161 /* ScreenshotViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotViewer.swift; sourceTree = "<group>"; };
+		4BA5FB20E809C3D84D1A85DD /* ServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerView.swift; sourceTree = "<group>"; };
+		4A8CA80F904A3CE26826AACA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		35065513078EF8FEF9613FB0 /* Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fixtures.swift; sourceTree = "<group>"; };
+		A14FADAD0FF03C37DD8DF0C5 /* SnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTests.swift; sourceTree = "<group>"; };
+		D330DBF1169FE712B6F38DC5 /* ModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecodingTests.swift; sourceTree = "<group>"; };
+		22E5483E0E3F6DF567952B32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1955CE2182F20B7C7748F722 /* ca.crt */ = {isa = PBXFileReference; lastKnownFileType = file; path = ca.crt; sourceTree = "<group>"; };
+		6E9E27E4578AD0776A93101F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,18 +70,18 @@
 
 /* Begin PBXGroup section */
 		518DA81DB9B99529C0C0AEBE = {isa = PBXGroup; children = (82CF2A43A7100F086D7FCFDD /* Beacon */, A0937472EE5878FA82CB0F7E /* BeaconTests */, 9CB302E9C7F6377B351DBEAB /* SharedTests */, 547D009064F7C3F13BEF3460 /* Products */, ); sourceTree = "<group>"; };
-		7ADA0AC3C2F466659FEE24F7 /* App */ = {isa = PBXGroup; children = (9985D723856527986155BA32 /* BeaconApp.swift */, E0E1277C061E064ABA8BF71D /* RootView.swift */, 97D16183873BB8CB8AE60701 /* AppModel.swift */, ); path = Beacon/App; sourceTree = "<group>"; };
-		3DC87765CB39F2AB1CA80AC2 /* Design */ = {isa = PBXGroup; children = (058368450EB574938A303262 /* Theme.swift */, 54134F6EDFA1868BA4C36D6D /* Components.swift */, ); path = Beacon/Design; sourceTree = "<group>"; };
-		352760BE14BEC35CBE470888 /* Agent */ = {isa = PBXGroup; children = (B8B350E3037B206FF0A69064 /* AgentView.swift */, ); path = Beacon/Features/Agent; sourceTree = "<group>"; };
-		B703D606984584A8AE69DBC6 /* Dashboard */ = {isa = PBXGroup; children = (1FD8929BAB9EAEBBFB03E021 /* DashboardView.swift */, ); path = Beacon/Features/Dashboard; sourceTree = "<group>"; };
-		EAF7C0707DA137CA230D7A30 /* Milestones */ = {isa = PBXGroup; children = (D674BB10A72D81D57344E914 /* MilestonesView.swift */, 67FF913B8E944FC9A1A1E161 /* ScreenshotViewer.swift */, ); path = Beacon/Features/Milestones; sourceTree = "<group>"; };
-		906C8C520FCC8A860D023C0C /* Server */ = {isa = PBXGroup; children = (4BA5FB20E809C3D84D1A85DD /* ServerView.swift */, ); path = Beacon/Features/Server; sourceTree = "<group>"; };
-		7A17ED9E0DA8517B520AA47D /* Settings */ = {isa = PBXGroup; children = (4A8CA80F904A3CE26826AACA /* SettingsView.swift */, ); path = Beacon/Features/Settings; sourceTree = "<group>"; };
-		C8A7752BE0650EDDE72BA533 /* Setup */ = {isa = PBXGroup; children = (579F8C456F73BDF474DB2A19 /* OnboardingView.swift */, ); path = Beacon/Features/Setup; sourceTree = "<group>"; };
-		6FDD6487FFEBB38AF111DC45 /* Models */ = {isa = PBXGroup; children = (392E0F5B9FA706A0B9C38F48 /* Models.swift */, 7953E92604E7ACED3E945D4B /* Formatting.swift */, ); path = Beacon/Models; sourceTree = "<group>"; };
-		E63DF06834070F2A3C1E4201 /* Networking */ = {isa = PBXGroup; children = (DB336AC66EB8FB3CAFB5AF0B /* ServerConfiguration.swift */, C7AA676F6A2E4309BC523E03 /* APIClient.swift */, 231C1902E3166B1E65F8FF75 /* PinnedSession.swift */, 68B932EE3C6C6519BC58D7FB /* Keychain.swift */, AC6D4D1E4795CB7F5D7D034B /* AppSettings.swift */, ); path = Beacon/Networking; sourceTree = "<group>"; };
-		8C4E5D29B175BC81C15F2FEC /* Resources */ = {isa = PBXGroup; children = (22E5483E0E3F6DF567952B32 /* Assets.xcassets */, 1955CE2182F20B7C7748F722 /* ca.crt */, 6E9E27E4578AD0776A93101F /* Info.plist */, ); path = Beacon/Resources; sourceTree = "<group>"; };
-		72DF74B0598EE8115CAB814E /* Features */ = {isa = PBXGroup; children = (352760BE14BEC35CBE470888, B703D606984584A8AE69DBC6, EAF7C0707DA137CA230D7A30, 906C8C520FCC8A860D023C0C, 7A17ED9E0DA8517B520AA47D, C8A7752BE0650EDDE72BA533, ); path = Beacon/Features; sourceTree = "<group>"; };
+		7ADA0AC3C2F466659FEE24F7 /* App */ = {isa = PBXGroup; children = (9985D723856527986155BA32 /* BeaconApp.swift */, E0E1277C061E064ABA8BF71D /* RootView.swift */, 97D16183873BB8CB8AE60701 /* AppModel.swift */, ); path = App; sourceTree = "<group>"; };
+		3DC87765CB39F2AB1CA80AC2 /* Design */ = {isa = PBXGroup; children = (058368450EB574938A303262 /* Theme.swift */, 54134F6EDFA1868BA4C36D6D /* Components.swift */, ); path = Design; sourceTree = "<group>"; };
+		352760BE14BEC35CBE470888 /* Agent */ = {isa = PBXGroup; children = (B8B350E3037B206FF0A69064 /* AgentView.swift */, ); path = Agent; sourceTree = "<group>"; };
+		B703D606984584A8AE69DBC6 /* Dashboard */ = {isa = PBXGroup; children = (1FD8929BAB9EAEBBFB03E021 /* DashboardView.swift */, ); path = Dashboard; sourceTree = "<group>"; };
+		EAF7C0707DA137CA230D7A30 /* Milestones */ = {isa = PBXGroup; children = (D674BB10A72D81D57344E914 /* MilestonesView.swift */, 67FF913B8E944FC9A1A1E161 /* ScreenshotViewer.swift */, ); path = Milestones; sourceTree = "<group>"; };
+		906C8C520FCC8A860D023C0C /* Server */ = {isa = PBXGroup; children = (4BA5FB20E809C3D84D1A85DD /* ServerView.swift */, ); path = Server; sourceTree = "<group>"; };
+		7A17ED9E0DA8517B520AA47D /* Settings */ = {isa = PBXGroup; children = (4A8CA80F904A3CE26826AACA /* SettingsView.swift */, ); path = Settings; sourceTree = "<group>"; };
+		C8A7752BE0650EDDE72BA533 /* Setup */ = {isa = PBXGroup; children = (579F8C456F73BDF474DB2A19 /* OnboardingView.swift */, ); path = Setup; sourceTree = "<group>"; };
+		6FDD6487FFEBB38AF111DC45 /* Models */ = {isa = PBXGroup; children = (392E0F5B9FA706A0B9C38F48 /* Models.swift */, 7953E92604E7ACED3E945D4B /* Formatting.swift */, ); path = Models; sourceTree = "<group>"; };
+		E63DF06834070F2A3C1E4201 /* Networking */ = {isa = PBXGroup; children = (DB336AC66EB8FB3CAFB5AF0B /* ServerConfiguration.swift */, C7AA676F6A2E4309BC523E03 /* APIClient.swift */, 231C1902E3166B1E65F8FF75 /* PinnedSession.swift */, 68B932EE3C6C6519BC58D7FB /* Keychain.swift */, AC6D4D1E4795CB7F5D7D034B /* AppSettings.swift */, ); path = Networking; sourceTree = "<group>"; };
+		8C4E5D29B175BC81C15F2FEC /* Resources */ = {isa = PBXGroup; children = (22E5483E0E3F6DF567952B32 /* Assets.xcassets */, 1955CE2182F20B7C7748F722 /* ca.crt */, 6E9E27E4578AD0776A93101F /* Info.plist */, ); path = Resources; sourceTree = "<group>"; };
+		72DF74B0598EE8115CAB814E /* Features */ = {isa = PBXGroup; children = (352760BE14BEC35CBE470888, B703D606984584A8AE69DBC6, EAF7C0707DA137CA230D7A30, 906C8C520FCC8A860D023C0C, 7A17ED9E0DA8517B520AA47D, C8A7752BE0650EDDE72BA533, ); path = Features; sourceTree = "<group>"; };
 		82CF2A43A7100F086D7FCFDD /* Beacon */ = {isa = PBXGroup; children = (7ADA0AC3C2F466659FEE24F7, 3DC87765CB39F2AB1CA80AC2, 6FDD6487FFEBB38AF111DC45, E63DF06834070F2A3C1E4201, 72DF74B0598EE8115CAB814E, 8C4E5D29B175BC81C15F2FEC, 35065513078EF8FEF9613FB0 /* Fixtures.swift */, ); path = Beacon; sourceTree = "<group>"; };
 		A0937472EE5878FA82CB0F7E /* BeaconTests */ = {isa = PBXGroup; children = (A14FADAD0FF03C37DD8DF0C5 /* SnapshotTests.swift */, ); path = BeaconTests; sourceTree = "<group>"; };
 		9CB302E9C7F6377B351DBEAB /* SharedTests */ = {isa = PBXGroup; children = (D330DBF1169FE712B6F38DC5 /* ModelDecodingTests.swift */, ); path = SharedTests; sourceTree = "<group>"; };

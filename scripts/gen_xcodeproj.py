@@ -145,7 +145,7 @@ def build() -> str:
         name = pathlib.Path(path).name
         add(
             f"\t\t{oid('fileref:' + path)} /* {name} */ = {{isa = PBXFileReference; "
-            f"lastKnownFileType = {file_type(path)}; path = {path}; sourceTree = \"<group>\"; }};"
+            f"lastKnownFileType = {file_type(path)}; path = {name}; sourceTree = \"<group>\"; }};"
         )
     add("/* End PBXFileReference section */")
     add("")
@@ -206,13 +206,13 @@ def build() -> str:
         )
         add(
             f"\t\t{group_id} /* {pathlib.Path(directory).name} */ = {{isa = PBXGroup; children = ("
-            f"{child_refs} ); path = {directory}; sourceTree = \"<group>\"; }};"
+            f"{child_refs} ); path = {pathlib.Path(directory).name}; sourceTree = \"<group>\"; }};"
         )
     if feature_children:
         add(
             f"\t\t{oid('group:features')} /* Features */ = {{isa = PBXGroup; children = ("
             + " ".join(f"{child}," for child in feature_children)
-            + " ); path = Beacon/Features; sourceTree = \"<group>\"; };"
+            + " ); path = Features; sourceTree = \"<group>\"; };"
         )
     app_root_refs = " ".join(
         f"{oid('fileref:' + child)} /* {pathlib.Path(child).name} */," for child in app_root_files

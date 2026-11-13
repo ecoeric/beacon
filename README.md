@@ -68,7 +68,7 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 19 app files + 2 test files typecheck, 0 errors |
 | `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | committed; not yet run — no GitHub remote configured |
 | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached to this host) |
-| `scripts/validate_ios_project.py` | 18 checks passed |
+| `scripts/validate_ios_project.py` | 22 checks passed |
 | `scripts/check_openapi_drift.py` | contract up to date |
 | backup restore drill | restored DB, token and image served by the API |
 | crash recovery (`SIGKILL`) | systemd restart, API back in 3.8 s, data intact |

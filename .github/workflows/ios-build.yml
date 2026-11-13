@@ -195,18 +195,31 @@ jobs:
       - name: Pick an available iPhone simulator
         id: sim
         run: |
-          # Prefer the same model as the target phone, then any available iPhone.
-          DEVICE="$(xcrun simctl list devices available | awk -F '[(]' '/iPhone 16e/ {print $1; exit}' | xargs)"
-          if [ -z "$DEVICE" ]; then
-            DEVICE="$(xcrun simctl list devices available | awk -F '[(]' '/iPhone/ {print $1; exit}' | xargs)"
-          fi
-          if [ -z "$DEVICE" ]; then
-            echo "No iPhone simulator available" >&2
-            xcrun simctl list devices available >&2
-            exit 1
-          fi
-          echo "Using simulator: $DEVICE"
-          echo "name=$DEVICE" >> "$GITHUB_OUTPUT"
+          # Use the simulator UDID, not a name plus implicit "latest" OS. The runner has
+          # iPhone 16e only on iOS 26.2; name=iPhone 16e,OS=latest resolves to a newer runtime
+          # where that model does not exist.
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import subprocess
+          import sys
+
+          data = json.loads(
+              subprocess.check_output(["xcrun", "simctl", "list", "devices", "available", "-j"])
+          )
+          candidates = []
+          for runtime, devices in data["devices"].items():
+              for device in devices:
+                  if device.get("isAvailable") and device.get("name", "").startswith("iPhone"):
+                      candidates.append((device["name"], device["udid"], runtime))
+          if not candidates:
+              raise SystemExit("No iPhone simulator available")
+          name, udid, runtime = next(
+              (item for item in candidates if item[0] == "iPhone 16e"), candidates[0]
+          )
+          print(f"name={name}")
+          print(f"udid={udid}")
+          print(f"Using {name} ({runtime}, {udid})", file=sys.stderr)
+          PY
 
       - name: Run unit and layout-snapshot tests
         run: |
@@ -214,7 +227,7 @@ jobs:
           xcodebuild test \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
-            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \

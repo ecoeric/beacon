@@ -248,7 +248,7 @@ systemd
 | iOS syntax | `swiftc -parse` on all 22 Swift files | parsed |
 | iOS SwiftUI typecheck | real Swift 6 compiler against mock SwiftUI/UIKit/Combine modules (`scripts/typecheck_ios_views.sh`) | 19 app files + 2 test files, 0 errors |
 | iOS SDK build | GitHub Actions `macos-15` runner (`docs/CI.md`) | workflow committed, not yet run |
-| Xcode project | `pbxproj` parser + cross-checks | 18 checks passed |
+| Xcode project | `pbxproj` parser + cross-checks | 22 checks passed |
 | Retention | live drill via the systemd unit (aged screenshot) | deleted, 410 confirmed, history kept |
 | Backup / restore | `beacon backup` then serve the API from the restored data directory | milestone, token and image intact |
 | Contract & security | OpenAPI snapshot equality, static no-shell checks, snapshot-timer privilege checks | clean |

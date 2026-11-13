@@ -3,6 +3,31 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.7] — 2026-11-12
+
+First real Xcode 26.2 CI run: fixed the two build blockers it exposed. The IPA itself has not been
+produced yet; the workflow must be rerun after this commit.
+
+### Fixed
+* **Duplicated resource paths (compile blocker):** the generated Xcode project gave both the group
+  and its file reference the full path (`Beacon/Resources/...` + `Beacon/Resources/...`), so Xcode
+  resolved `ca.crt` and `Assets.xcassets` under `ios/Beacon/Beacon/Resources/...` and failed with
+  `lstat(...): No such file or directory`. File references now use basenames and group paths are
+  single components, matching Xcode's group-relative resolution model.
+* **Simulator destination (test blocker):** the workflow selected `iPhone 16e` by name, and
+  `xcodebuild` interpreted the missing OS as “latest” (iOS 26.5), where that model is unavailable.
+  Tests now select an exact simulator UDID from `simctl` and pass `-destination id=...`; iPhone 16e
+  on iOS 26.2 is preferred.
+
+### Added
+* `scripts/validate_ios_project.py` now resolves each `PBXFileReference` through its `PBXGroup`
+  parents and fails if the resulting file is missing, or if a file/group path contains a slash.
+  This would have caught the duplication before CI. Project validation is now **22 checks**.
+
+### Verified
+* Project validation passes; 22 checks. Workflow YAML and shell blocks still pass local linting.
+* The build/test rerun is pending the push of this commit.
+
 ## [0.1.6] — 2026-11-12
 
 iPhone distribution pipeline: a real Xcode 26.2 CI build that produces an unsigned IPA, plus a

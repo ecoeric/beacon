@@ -59,9 +59,44 @@ def main() -> int:
     targets = {target.name: target for target in project.objects.get_targets()}
     check("Beacon" in targets, "app target 'Beacon' present")
     check("BeaconTests" in targets, "test target 'BeaconTests' present")
-
     app = targets.get("Beacon")
     tests = targets.get("BeaconTests")
+
+    groups = project.objects.get_objects_in_section("PBXGroup")
+    file_refs = project.objects.get_objects_in_section("PBXFileReference")
+
+    # Xcode resolves a PBXFileReference.path relative to its enclosing PBXGroup paths.
+    # Build the parent map so validation checks the path Xcode will actually use, not just
+    # the basename. This is what caught the duplicated `Beacon/Resources/...` bug.
+    parent_of: dict[str, str] = {}
+    for group in groups:
+        group_id = str(group.get_id())
+        for child_id in getattr(group, "children", []) or []:
+            parent_of[str(child_id)] = group_id
+
+    def resolve(file_ref_id: str) -> str:
+        file_ref = project.objects[file_ref_id]
+        parts: list[str] = []
+        path = getattr(file_ref, "path", None)
+        if path:
+            parts.append(str(path))
+        parent = parent_of.get(str(file_ref_id))
+        while parent:
+            group = project.objects[parent]
+            group_path = getattr(group, "path", None)
+            if group_path:
+                parts.insert(0, str(group_path))
+            parent = parent_of.get(parent)
+        return "/".join(parts)
+
+    check(
+        all("/" not in str(getattr(ref, "path", "")) for ref in file_refs if getattr(ref, "path", None)),
+        "file references are group-relative (no duplicated path components)",
+    )
+    check(
+        all("/" not in str(getattr(group, "path", "")) for group in groups if getattr(group, "path", None)),
+        "group paths are single path components",
+    )
 
     def source_paths(target) -> set[str]:
         paths: set[str] = set()
@@ -71,8 +106,7 @@ def main() -> int:
                 continue
             for build_file_id in phase.files:
                 build_file = project.objects[build_file_id]
-                file_ref = project.objects[build_file.fileRef]
-                paths.add(str(file_ref.path))
+                paths.add(resolve(str(build_file.fileRef)))
         return paths
 
     def resource_paths(target) -> set[str]:
@@ -83,8 +117,7 @@ def main() -> int:
                 continue
             for build_file_id in phase.files:
                 build_file = project.objects[build_file_id]
-                file_ref = project.objects[build_file.fileRef]
-                paths.add(str(file_ref.path))
+                paths.add(resolve(str(build_file.fileRef)))
         return paths
 
     app_sources = source_paths(app)
@@ -109,6 +142,12 @@ def main() -> int:
     resources = resource_paths(app)
     check(any(path.endswith("Assets.xcassets") for path in resources), "asset catalog is in the resources phase")
     check(any(path.endswith("ca.crt") for path in resources), "private CA certificate is bundled")
+    referenced = app_sources | source_paths(tests) | resources
+    missing_paths = sorted(path for path in referenced if not (IOS / path).exists())
+    check(
+        not missing_paths,
+        "every target file resolves to a real path" + (f" — missing {missing_paths}" if missing_paths else ""),
+    )
 
     info_plist = IOS / "Beacon" / "Resources" / "Info.plist"
     check(info_plist.exists(), "Info.plist exists")
