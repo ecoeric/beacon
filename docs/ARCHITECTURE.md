@@ -247,7 +247,7 @@ systemd
 | iOS logic | Swift 6 on Linux: compile + 13 decoding/formatting tests against live-captured fixtures | 13 passed |
 | iOS syntax | `swiftc -parse` on all 22 Swift files | parsed |
 | iOS SwiftUI typecheck | real Swift 6 compiler against mock SwiftUI/UIKit/Combine modules (`scripts/typecheck_ios_views.sh`) | 19 app files + 2 test files, 0 errors |
-| iOS SDK build | GitHub Actions `macos-15` runner (`docs/CI.md`) | workflow committed, not yet run |
+| iOS SDK build | GitHub Actions `macos-26` runner with Xcode 26.2 (`docs/CI.md`) | first run found two blockers; fixes committed, rerun pending |
 | Xcode project | `pbxproj` parser + cross-checks | 22 checks passed |
 | Retention | live drill via the systemd unit (aged screenshot) | deleted, 410 confirmed, history kept |
 | Backup / restore | `beacon backup` then serve the API from the restored data directory | milestone, token and image intact |

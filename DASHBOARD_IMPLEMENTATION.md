@@ -454,7 +454,9 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 
 * **Test**: `swiftc -parse` for all 22 Swift files plus a full typecheck of 19 app files and both
   Xcode test files against mock SwiftUI/UIKit/Combine/XCTest modules (real Swift compiler). The Xcode build/simulator run is
-  prepared in `.github/workflows/ios-build.yml`; it has not run yet (no GitHub remote).
+  prepared in `.github/workflows/ios-build.yml`. The first run executed and exposed two
+  blockers (duplicated resource paths and an ambiguous simulator destination); both are fixed and
+  a rerun is pending.
 * **Limitations**: no iPad layout (iPhone portrait only), no widgets, no watch app.
 
 ## 2.26 iOS snapshot screenshot test
@@ -479,7 +481,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
 | SwiftUI typecheck (real compiler, mock frameworks) | `scripts/typecheck_ios_views.sh` | 19 app files + 2 test files, 0 errors; found and fixed a 13-child `Section` |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 22 checks passed |
-| Xcode 26.2 unsigned IPA | `.github/workflows/ios-build.yml` (`macos-26`) | prepared; not executed (no GitHub remote) |
+| Xcode 26.2 unsigned IPA | `.github/workflows/ios-build.yml` (`macos-26`) | first run executed; two blockers fixed, rerun pending |
 | Linux sign + install | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached) |
 | SwiftUI memberwise call sites | `python3 scripts/check_view_initialisers.py` (heuristic) | 109 call sites / 11 views, no missing arguments |
 | OpenAPI contract drift | `backend/.venv/bin/python scripts/check_openapi_drift.py` | up to date (36 paths) |
@@ -553,8 +555,9 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
    Swift code is compiled and tested, every Swift file is parsed, every view typechecks against
    mock SwiftUI/UIKit modules, and the Xcode project is structurally validated. The real Xcode
    26.2 build produces an unsigned IPA in `.github/workflows/ios-build.yml` (`docs/CI.md`); the
-   Linux sign/install path is `scripts/install_ipa_linux.sh` (`docs/LINUX_IPA_INSTALL.md`). Neither
-   has been executed: this repository has no GitHub remote and no iPhone is attached.
+   Linux sign/install path is `scripts/install_ipa_linux.sh` (`docs/LINUX_IPA_INSTALL.md`). The
+   first CI run executed and found two blockers (both fixed); the rerun is pending. No iPhone is
+   attached, so signing/install remains unexecuted.
 2. **iPhone installation/signing/distribution**: a Linux-only path is prepared but not executed;
    no signed IPA exists and no app was installed on a phone. App Store distribution remains out
    of scope.

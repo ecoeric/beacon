@@ -66,7 +66,7 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
 | `swiftc -parse` on iOS sources | 22 files parsed |
 | `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 19 app files + 2 test files typecheck, 0 errors |
-| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | committed; not yet run — no GitHub remote configured |
+| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | first run executed and exposed two project/CI blockers; fixes committed, rerun pending |
 | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached to this host) |
 | `scripts/validate_ios_project.py` | 22 checks passed |
 | `scripts/check_openapi_drift.py` | contract up to date |
@@ -85,6 +85,7 @@ The native project (Xcode project, SwiftUI app, pinned-TLS client, tests) is com
 version-controlled here. Every app source typechecks with the real Swift compiler against mock
 SwiftUI/UIKit modules; that is compiler validation, **not** an iOS build. The GitHub Actions
 workflow builds an unsigned arm64 IPA with Xcode 26.2 and runs simulator tests; the Linux install
-script signs and installs that IPA with a free Apple ID. Neither has been executed yet: this
-repository has no GitHub remote, and no iPhone is attached to this host. No installation, signing
+script signs and installs that IPA with a free Apple ID. The first CI run executed on GitHub and
+found two blockers — duplicated Xcode resource paths and an ambiguous simulator destination — both
+fixed in the latest commit; the rerun is pending. No IPA exists yet, and no installation, signing
 or distribution to a phone has been performed.

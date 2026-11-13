@@ -82,10 +82,17 @@ the PNGs to a milestone.
 ## Status
 
 The workflow is implemented and locally linted with `actionlint` 1.7.12; every `run:` block also
-passes `bash -n`. It has **not been executed**: this repository has no GitHub remote configured on
-this host. The Linux-side typecheck
-*has* run and passes; it previously found a real compile blocker (a `Section` with more than ten
-direct children), which was fixed.
+passes `bash -n`. The **first real CI run has executed** on `macos-26` with Xcode 26.2 and found two
+blockers:
 
-The first CI run is the remaining confirmation. If it fails, download `Beacon-unsigned-ipa`
-(which contains `build.log`) and fix the reported compile error before attempting signing.
+- duplicated Xcode resource paths (`ios/Beacon/Beacon/Resources/...`) caused
+  `CpResource … ca.crt` to fail;
+- the simulator destination used `iPhone 16e` with an implicit latest OS, but that model only
+  exists on iOS 26.2.
+
+Both are fixed in the current commit; the IPA rerun is pending. Until it passes, there is no IPA
+and no Xcode compile success claim. The Linux-side typecheck has run and passes; it previously
+found a real compile blocker (a `Section` with more than ten direct children), which was fixed.
+
+If the rerun fails, download `Beacon-unsigned-ipa` (which contains `build.log`) and fix the
+reported error before attempting signing.
