@@ -452,7 +452,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Server | `Features/Server/ServerView.swift` | host tiles + details, disks, containers, Pi-hole card + statistics + blocking toggle, Minecraft card + logs + controls |
 | Settings | `Features/Settings/SettingsView.swift` | connection test, identity/scopes, certificate mode, backend capabilities, disconnect |
 
-* **Test**: `swiftc -parse` for all 22 Swift files plus a full typecheck of 19 app files and both
+* **Test**: `swiftc -parse` for all 23 Swift files plus a full typecheck of 20 app files and both
   Xcode test files against mock SwiftUI/UIKit/Combine/XCTest modules (real Swift compiler). The Xcode build/simulator run is
   prepared in `.github/workflows/ios-build.yml`. The first run executed and exposed two
   blockers (duplicated resource paths and an ambiguous simulator destination); both are fixed and
@@ -478,8 +478,8 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 149 passed |
 | Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
-| Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
-| SwiftUI typecheck (real compiler, mock frameworks) | `scripts/typecheck_ios_views.sh` | 19 app files + 2 test files, 0 errors; found and fixed a 13-child `Section` |
+| Swift syntax (all 23 files) | `scripts/validate_ios.sh` step 1 | parsed |
+| SwiftUI typecheck (real compiler, mock frameworks) | `scripts/typecheck_ios_views.sh` | 20 app files + 2 test files, 0 errors; found and fixed a 13-child `Section` |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 22 checks passed |
 | Xcode 26.2 unsigned IPA | `.github/workflows/ios-build.yml` (`macos-26`) | **succeeded**; unsigned arm64 IPA + bundled CA verified |
 | Linux sign + install | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached) |

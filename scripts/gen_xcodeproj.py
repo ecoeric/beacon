@@ -35,6 +35,7 @@ APP_SOURCES = [
     "Beacon/Features/Setup/OnboardingView.swift",
     "Beacon/Features/Dashboard/DashboardView.swift",
     "Beacon/Features/Agent/AgentView.swift",
+    "Beacon/Features/Agent/SessionsView.swift",
     "Beacon/Features/Milestones/MilestonesView.swift",
     "Beacon/Features/Milestones/ScreenshotViewer.swift",
     "Beacon/Features/Server/ServerView.swift",

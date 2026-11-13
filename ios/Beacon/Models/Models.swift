@@ -164,6 +164,23 @@ struct AgentSessionInfo: Codable, Equatable {
     let transcriptUpdatedAt: Double?
 }
 
+struct AgentSessionSummary: Codable, Equatable, Identifiable {
+    let id: String
+    let name: String
+    let agentId: String?
+    let agentName: String?
+    let lastActivityAt: Double?
+}
+
+struct AgentChatMessage: Codable, Equatable, Identifiable {
+    let id: String
+    let role: String
+    let text: String
+    let status: String
+    let createdAt: Double
+    let model: String?
+}
+
 struct EvidenceItem: Codable, Equatable, Identifiable {
     let source: String
     let detail: String

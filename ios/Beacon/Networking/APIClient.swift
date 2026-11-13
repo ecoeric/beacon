@@ -253,6 +253,22 @@ struct APIClient {
     }
 
     /// Out-of-band interruption. Uses the dedicated endpoint, never the message queue.
+    func agentSessions(limit: Int = 20) async throws -> [AgentSessionSummary] {
+        let data = try await request(
+            "GET", "agent/sessions",
+            query: [URLQueryItem(name: "limit", value: "\(limit)")]
+        )
+        return try decoder.decode([AgentSessionSummary].self, from: data)
+    }
+
+    func agentSessionMessages(sessionId: String, limit: Int = 100) async throws -> [AgentChatMessage] {
+        let data = try await request(
+            "GET", "agent/sessions/\(sessionId)/messages",
+            query: [URLQueryItem(name: "limit", value: "\(limit)")]
+        )
+        return try decoder.decode([AgentChatMessage].self, from: data)
+    }
+
     func requestInterrupt(mode: String, reason: String) async throws -> InterruptInfo {
         let body = InterruptRequest(mode: mode, reason: reason)
         let data = try await request(

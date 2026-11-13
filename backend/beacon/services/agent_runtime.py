@@ -46,6 +46,7 @@ class SessionMessage:
     updated_at: float
     model: str | None = None
     preview: str = ""
+    text: str = ""
 
 
 @dataclass
@@ -158,8 +159,33 @@ def _message_preview(data: str | None, searchable: str | None) -> str:
     return text[:180]
 
 
+def _message_text(data: str | None, searchable: str | None) -> str:
+    """Extract visible chat text, never hidden reasoning parts."""
+    if data:
+        import json
+
+        try:
+            payload = json.loads(data)
+            parts = payload.get("parts") or []
+            texts = [
+                str(part.get("text", ""))
+                for part in parts
+                if isinstance(part, dict)
+                and part.get("type") == "text"
+                and part.get("text")
+            ]
+            if texts:
+                return "\n".join(texts).strip()
+        except (ValueError, AttributeError, TypeError):
+            pass
+    text = (searchable or "").strip()
+    if text.startswith('{"parts"') or text.startswith('{"'):
+        return ""
+    return text
+
+
 def session_messages(
-    settings: Settings, session_id: str, *, limit: int = 12
+    settings: Settings, session_id: str, *, limit: int = 12, oldest_first: bool = False
 ) -> list[SessionMessage]:
     if not settings.cherry_db.exists():
         return []
@@ -171,10 +197,10 @@ def session_messages(
         rows = conn.execute(
             """
             SELECT id, role, status, created_at, updated_at, message_snapshot,
-                   searchable_text
+                   searchable_text, data
             FROM agent_session_message
             WHERE session_id = ?
-            ORDER BY created_at DESC
+            ORDER BY created_at DESC, rowid DESC
             LIMIT ?
             """,
             (session_id, limit),
@@ -183,6 +209,9 @@ def session_messages(
         return []
     finally:
         conn.close()
+
+    if oldest_first:
+        rows = list(reversed(rows))
 
     out: list[SessionMessage] = []
     for row in rows:
@@ -204,6 +233,7 @@ def session_messages(
                 updated_at=_ms_to_seconds(row["updated_at"]) or 0.0,
                 model=model,
                 preview=_message_preview(None, row["searchable_text"]),
+                text=_message_text(row["data"], row["searchable_text"]),
             )
         )
     return out

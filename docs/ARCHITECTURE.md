@@ -245,8 +245,8 @@ systemd
 | Transport/auth | real Uvicorn TLS server + generated CA in tests | verified trust and rejection |
 | Live system | `scripts/smoke_test.py` against real Pi-hole/Minecraft/Docker/agent | 58 checks passed |
 | iOS logic | Swift 6 on Linux: compile + 13 decoding/formatting tests against live-captured fixtures | 13 passed |
-| iOS syntax | `swiftc -parse` on all 22 Swift files | parsed |
-| iOS SwiftUI typecheck | real Swift 6 compiler against mock SwiftUI/UIKit/Combine modules (`scripts/typecheck_ios_views.sh`) | 19 app files + 2 test files, 0 errors |
+| iOS syntax | `swiftc -parse` on all 23 Swift files | parsed |
+| iOS SwiftUI typecheck | real Swift 6 compiler against mock SwiftUI/UIKit/Combine modules (`scripts/typecheck_ios_views.sh`) | 20 app files + 2 test files, 0 errors |
 | iOS SDK build | GitHub Actions `macos-26` runner with Xcode 26.2 (`docs/CI.md`) | first run found two blockers; fixes committed, rerun pending |
 | Xcode project | `pbxproj` parser + cross-checks | 22 checks passed |
 | Retention | live drill via the systemd unit (aged screenshot) | deleted, 410 confirmed, history kept |

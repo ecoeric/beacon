@@ -187,3 +187,26 @@ def test_status_summary_handles_abbreviations_and_filenames():
     summary, _ = status_summary.render_status_summary(status_value)
     terminators = re.findall(r"[.!?](?=\s|$)", summary)
     assert 1 <= len(terminators) <= 3, summary
+
+
+def test_agent_sessions_and_read_only_transcript(client, auth, cherry):
+    cherry.message("user", "success", "hello from the transcript")
+    cherry.message("assistant", "success", "visible answer only")
+
+    response = client.get("/api/v1/agent/sessions", headers=auth())
+    assert response.status_code == 200, response.text
+    sessions = response.json()
+    assert sessions
+    session = next(item for item in sessions if item["id"] == cherry.session_id)
+
+    response = client.get(
+        f"/api/v1/agent/sessions/{session['id']}/messages", headers=auth()
+    )
+    assert response.status_code == 200, response.text
+    messages = response.json()
+    assert [item["role"] for item in messages][-2:] == ["user", "assistant"]
+    assert messages[-2]["text"] == "hello from the transcript"
+    assert messages[-1]["text"] == "visible answer only"
+
+    missing = client.get("/api/v1/agent/sessions/not-a-session/messages", headers=auth())
+    assert missing.status_code == 404

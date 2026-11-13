@@ -68,6 +68,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var lastUpdated: Date?
     @Published private(set) var setupError: String?
     @Published private(set) var statusSummary: StatusSummaryResponse?
+    @Published private(set) var sessions: [AgentSessionSummary] = []
 
     private let settings: AppSettings
     private var client: APIClient?
@@ -177,6 +178,7 @@ final class AppModel: ObservableObject {
         activity = nil
         capabilities = nil
         statusSummary = nil
+        sessions = []
         identityName = nil
         tokenScopes = []
         lastUpdated = nil
@@ -235,6 +237,20 @@ final class AppModel: ObservableObject {
     }
 
     // MARK: - Agent
+
+    func loadSessions() async {
+        guard let client else { return }
+        do {
+            sessions = try await client.agentSessions()
+        } catch {
+            handle(error, prefix: "Chats")
+        }
+    }
+
+    func sessionMessages(sessionId: String) async throws -> [AgentChatMessage] {
+        guard let client else { throw BeaconError.notConfigured }
+        return try await client.agentSessionMessages(sessionId: sessionId)
+    }
 
     func loadStatusSummary() async {
         guard let client else { return }

@@ -3,6 +3,24 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.9] — 2026-11-13
+
+Read-only agent chat browser.
+
+### Added
+* `GET /api/v1/agent/sessions` and `GET /api/v1/agent/sessions/{id}/messages` expose the
+  configured Cherry Studio agent's sessions and visible transcript text. The database is opened
+  read-only; reasoning parts and empty/tool-only messages are not shown.
+* Agent tab toolbar → **Chats**: session list plus transcript viewer. The current session is
+  marked, and the footer states that new chats must be created in Cherry Studio.
+* OpenAPI snapshot is now 39 paths.
+* The Agent tab's status snapshot was refreshed after the successful build; the old macOS blocker
+  was cleared.
+
+### Not implemented
+* **Creating a new chat.** Beacon has no write path into Cherry Studio and no agent-session API to
+  create one. New chats remain a Cherry Studio action.
+
 ## [0.1.8] — 2026-11-13
 
 iPhone app is installed; fixes from the first real use.

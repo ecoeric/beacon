@@ -12,6 +12,7 @@ struct AgentView: View {
     @State private var draft = ""
     @State private var showStatus = false
     @State private var showInterrupt = false
+    @State private var showSessions = false
     @State private var feedback: Feedback?
     @FocusState private var composerFocused: Bool
 
@@ -48,6 +49,15 @@ struct AgentView: View {
             .refreshable { await model.refresh() }
             .navigationTitle("Agent")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showSessions = true
+                    } label: {
+                        Label("Chats", systemImage: "bubble.left.and.bubble.right")
+                            .labelStyle(.iconOnly)
+                    }
+                    .accessibilityLabel("Browse agent chats")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showStatus = true
@@ -67,6 +77,9 @@ struct AgentView: View {
                 InterruptSheet { result in
                     feedback = Feedback(text: result.text, success: result.success)
                 }
+            }
+            .sheet(isPresented: $showSessions) {
+                SessionsView()
             }
         }
     }

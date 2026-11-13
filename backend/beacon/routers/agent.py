@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from typing import Annotated
 
-from fastapi import APIRouter, Header, Query, Request, status
+from fastapi import APIRouter, Header, HTTPException, Query, Request, status
 
 from ..config import get_settings
 from ..deps import (
@@ -20,6 +20,8 @@ from ..deps import (
 )
 from ..schemas import (
     AckRequest,
+    AgentChatMessage,
+    AgentSessionSummary,
     AgentStatusResponse,
     AgentStatusUpdate,
     CheckpointResponse,
@@ -31,6 +33,7 @@ from ..schemas import (
     StatusSummaryResponse,
 )
 from ..security import audit
+from ..services import agent_runtime
 from ..services import agent_status as agent_status_service
 from ..services import interrupts, message_queue, notifications, status_summary
 from ..db import now as time_now
@@ -80,6 +83,58 @@ def get_status_summary(db: DbDep, token: ReadDep) -> StatusSummaryResponse:
         + (["interrupt"] if status_value.latest_interrupt else []),
         deterministic=True,
     )
+
+
+@router.get(
+    "/sessions",
+    response_model=list[AgentSessionSummary],
+    summary="Read-only list of Cherry Studio agent sessions",
+)
+def list_sessions(
+    token: ReadDep,
+    limit: int = Query(20, ge=1, le=50),
+) -> list[AgentSessionSummary]:
+    settings = get_settings()
+    return [
+        AgentSessionSummary(
+            id=item.id,
+            name=item.name,
+            agent_id=item.agent_id,
+            agent_name=item.agent_name,
+            last_activity_at=item.last_activity_at,
+        )
+        for item in agent_runtime.list_sessions(settings, limit=limit)
+    ]
+
+
+@router.get(
+    "/sessions/{session_id}/messages",
+    response_model=list[AgentChatMessage],
+    summary="Read-only transcript for a Cherry Studio agent session",
+)
+def session_messages(
+    session_id: str,
+    token: ReadDep,
+    limit: int = Query(100, ge=1, le=200),
+) -> list[AgentChatMessage]:
+    settings = get_settings()
+    sessions = agent_runtime.list_sessions(settings, limit=50)
+    if session_id not in {item.id for item in sessions}:
+        raise HTTPException(status_code=404, detail="session not found")
+    messages = [
+        AgentChatMessage(
+            id=item.id,
+            role=item.role,
+            text=(item.text or item.preview).strip(),
+            status=item.status,
+            created_at=item.created_at,
+            model=item.model,
+        )
+        for item in agent_runtime.session_messages(
+            settings, session_id, limit=limit, oldest_first=True
+        )
+    ]
+    return [message for message in messages if message.text and not message.text.startswith('{"parts"')]
 
 
 @router.put("/status", response_model=AgentStatusResponse, summary="Agent: publish a status snapshot")

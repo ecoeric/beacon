@@ -63,6 +63,8 @@ Confirmation headers: `agent-interrupt`, `pihole-blocking`, `minecraft-start`,
 |---|---|---|---|
 | GET | `/agent/status` | read | structured state + evidence + queue counts |
 | GET | `/agent/status/summary` | read | deterministic 1–3 sentence status (no LLM) |
+| GET | `/agent/sessions` | read | read-only Cherry Studio session list (`?limit=`) |
+| GET | `/agent/sessions/{session_id}/messages` | read | read-only visible transcript (`?limit=`) |
 | PUT | `/agent/status` | agent | publish snapshot (project/stage/activity/… ) |
 | GET | `/agent/messages` | read | recent messages (`?limit=`) |
 | POST | `/agent/messages` | action | queue a suggestion (`text`, `kind`, `idempotency_key`) |

@@ -366,6 +366,7 @@ public struct Color: View, Hashable {
     public nonisolated static let clear = Color(white: 0)
     public nonisolated static let primary = Color(white: 0)
     public nonisolated static let secondary = Color(white: 0.5)
+    public nonisolated static let tertiary = Color(white: 0.65)
     public var body: Never { fatalError() }
 }
 
@@ -441,8 +442,16 @@ public struct TitleAndIconLabelStyle: LabelStyle {
     public init() {}
 }
 
+public struct IconOnlyLabelStyle: LabelStyle {
+    public init() {}
+}
+
 public extension LabelStyle where Self == TitleAndIconLabelStyle {
     static var titleAndIcon: TitleAndIconLabelStyle { TitleAndIconLabelStyle() }
+}
+
+public extension LabelStyle where Self == IconOnlyLabelStyle {
+    static var iconOnly: IconOnlyLabelStyle { IconOnlyLabelStyle() }
 }
 
 @MainActor

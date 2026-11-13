@@ -52,6 +52,23 @@ class AgentSessionInfo(BaseModel):
     transcript_updated_at: float | None = None
 
 
+class AgentSessionSummary(BaseModel):
+    id: str
+    name: str
+    agent_id: str | None = None
+    agent_name: str | None = None
+    last_activity_at: float | None = None
+
+
+class AgentChatMessage(BaseModel):
+    id: str
+    role: str
+    text: str
+    status: str
+    created_at: float
+    model: str | None = None
+
+
 class EvidenceItem(BaseModel):
     source: str
     detail: str
