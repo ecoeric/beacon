@@ -1,4 +1,5 @@
 name: iOS build, tests & unsigned IPA
+# Indexing trigger: this workflow must be registered on the default branch.
 
 # Beacon is developed on Linux with no Xcode. This workflow does the real iOS-SDK work on a
 # GitHub-hosted macOS 26 runner:
