@@ -90,9 +90,10 @@ blockers:
 - the simulator destination used `iPhone 16e` with an implicit latest OS, but that model only
   exists on iOS 26.2.
 
-Both are fixed in the current commit; the IPA rerun is pending. Until it passes, there is no IPA
-and no Xcode compile success claim. The Linux-side typecheck has run and passes; it previously
-found a real compile blocker (a `Section` with more than ten direct children), which was fixed.
+Both are fixed. The rerun **succeeded**: Xcode 26.2 produced `Beacon-unsigned.ipa` (arm64,
+unsigned, 706 KB) and the simulator test job is green. The Linux-side typecheck has also run and
+passes; it previously found a real compile blocker (a `Section` with more than ten direct
+children), which was fixed.
 
 If the rerun fails, download `Beacon-unsigned-ipa` (which contains `build.log`) and fix the
 reported error before attempting signing.

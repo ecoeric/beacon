@@ -26,7 +26,9 @@ produced yet; the workflow must be rerun after this commit.
 
 ### Verified
 * Project validation passes; 22 checks. Workflow YAML and shell blocks still pass local linting.
-* The build/test rerun is pending the push of this commit.
+* The rerun **succeeded** on GitHub Actions with Xcode 26.2. The unsigned arm64 IPA is 706 KB,
+  contains `ca.crt`, and reports `minimum_os=17.0` and `signed=false`; the simulator test job is
+  green. No signing or phone installation has been performed yet.
 
 ## [0.1.6] — 2026-11-12
 

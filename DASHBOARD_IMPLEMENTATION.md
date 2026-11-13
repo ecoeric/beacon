@@ -481,7 +481,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Swift syntax (all 22 files) | `scripts/validate_ios.sh` step 1 | parsed |
 | SwiftUI typecheck (real compiler, mock frameworks) | `scripts/typecheck_ios_views.sh` | 19 app files + 2 test files, 0 errors; found and fixed a 13-child `Section` |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 22 checks passed |
-| Xcode 26.2 unsigned IPA | `.github/workflows/ios-build.yml` (`macos-26`) | first run executed; two blockers fixed, rerun pending |
+| Xcode 26.2 unsigned IPA | `.github/workflows/ios-build.yml` (`macos-26`) | **succeeded**; unsigned arm64 IPA + bundled CA verified |
 | Linux sign + install | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached) |
 | SwiftUI memberwise call sites | `python3 scripts/check_view_initialisers.py` (heuristic) | 109 call sites / 11 views, no missing arguments |
 | OpenAPI contract drift | `backend/.venv/bin/python scripts/check_openapi_drift.py` | up to date (36 paths) |
