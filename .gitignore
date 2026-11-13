@@ -7,3 +7,6 @@ ios/build/
 ios/.build/
 ios/.swiftpm/
 artifacts/
+
+# AltServer signing certificate / developer disk images (contains a p12)
+AltServerData/

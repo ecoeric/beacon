@@ -298,10 +298,9 @@ struct AsyncScreenshot: View {
             if let displayImage {
                 Image(uiImage: displayImage)
                     .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: height)
-                    .clipped()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Theme.surfaceElevated)
             } else if failed {
                 VStack(spacing: 6) {
                     Image(systemName: "photo.badge.exclamationmark")
@@ -327,6 +326,7 @@ struct AsyncScreenshot: View {
                 .lineLimit(2)
                 .padding(8)
         }
+        .frame(maxWidth: .infinity)
         .frame(height: height)
         .clipShape(RoundedRectangle(cornerRadius: Theme.innerRadius, style: .continuous))
         .overlay(

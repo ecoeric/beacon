@@ -3,6 +3,24 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.8] — 2026-11-13
+
+iPhone app is installed; fixes from the first real use.
+
+### Fixed
+* Minecraft launches through the existing `run.sh` with the configurable argument list
+  `BEACON_MINECRAFT_LAUNCH_ARGS=nogui`; the supervised process is now
+  `run.sh nogui` (verified live: server reached `Done (8.763s)` and `running/online=True`).
+* Milestone screenshots use aspect-fit inside a fixed, clipped tile instead of aspect-fill. Whole
+  images are visible with letterboxing instead of being cropped; the grid remains bounded.
+* AltServer signing data (including its `.p12`) is kept outside the repository in
+  `~/.local/share/beacon/tools/AltServerData/` and is git-ignored.
+
+### Not changed
+* The Agent screen is deliberately not a chat client: it shows status, queues instructions and
+  offers interrupt. There is no transcript browser or “new chat” control in Beacon; those belong
+  to Cherry Studio, not this dashboard.
+
 ## [0.1.7] — 2026-11-12
 
 First real Xcode 26.2 CI run: fixed the two build blockers it exposed. The IPA itself has not been

@@ -211,6 +211,7 @@ def test_supervisor_console_start_and_stop(tmp_path):
     script = server_dir / "run.sh"
     script.write_text(
         "#!/bin/sh\n"
+        "echo \"arg:$1\"\n"
         "echo 'fake server ready'\n"
         "while read line; do\n"
         "  case \"$line\" in\n"
@@ -228,6 +229,7 @@ def test_supervisor_console_start_and_stop(tmp_path):
         assert minecraft.supervisor.stop(timeout=10) is True
         assert not minecraft.supervisor.running()
         log = (settings.logs_dir / "minecraft-console.log").read_text(encoding="utf-8", errors="replace")
+        assert "arg:nogui" in log
         assert "fake server ready" in log
         assert "Stopping server" in log
     finally:

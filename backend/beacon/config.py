@@ -75,6 +75,7 @@ class Settings:
     screenshot_max_total_bytes: int
     max_request_bytes: int
     enable_docs: bool = False
+    minecraft_launch_args: list[str] = field(default_factory=lambda: ["nogui"])
     allowed_origins: list[str] = field(default_factory=list)
 
     @property
@@ -163,6 +164,7 @@ def load_settings() -> Settings:
         ),
         max_request_bytes=_env_int("BEACON_MAX_REQUEST_BYTES", 64 * 1024 * 1024),
         enable_docs=_env_bool("BEACON_ENABLE_DOCS", False),
+        minecraft_launch_args=_env_list("BEACON_MINECRAFT_LAUNCH_ARGS", ["nogui"]),
         allowed_origins=_env_list("BEACON_ALLOWED_ORIGINS", []),
     )
     return settings

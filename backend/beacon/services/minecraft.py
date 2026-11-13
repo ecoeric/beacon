@@ -430,7 +430,7 @@ class Supervisor:
             master, slave = pty.openpty()
             log_file = log_path.open("ab", buffering=0)
             proc = subprocess.Popen(
-                [str(script)],
+                [str(script), *settings.minecraft_launch_args],
                 cwd=str(settings.minecraft_dir),
                 stdin=slave,
                 stdout=slave,

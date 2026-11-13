@@ -64,6 +64,7 @@ done
 
 [ -n "$IPA" ] || IPA="Beacon-unsigned.ipa"
 [ -f "$IPA" ] || die "IPA not found: $IPA"
+IPA="$(readlink -f "$IPA")"
 command -v unzip >/dev/null || die "unzip is required"
 unzip -l "$IPA" | grep -q 'Payload/Beacon.app/Beacon' \
     || die "$IPA does not contain Payload/Beacon.app/Beacon"
@@ -165,6 +166,10 @@ read -r -p "Continue? [y/N] " ANSWER
 case "$ANSWER" in y|Y|yes|YES) ;; *) echo "cancelled"; exit 0 ;; esac
 
 # No password is written to a file or log. AltServer reads the 2FA code from the terminal.
+# Run from the tools directory: AltServer keeps its signing certificate in ./AltServerData,
+# which must not be inside the git checkout.
+mkdir -p "$TOOLS_DIR"
+cd "$TOOLS_DIR"
 ALTSERVER_ANISETTE_SERVER="${ALTSERVER_ANISETTE_SERVER:-https://new.ani.sidestore.io}" \
 ALTSERVER_ANISETTE_PROTOCOL="${ALTSERVER_ANISETTE_PROTOCOL:-v3}" \
 ALTSERVER_2FA="${ALTSERVER_2FA:-auto}" \

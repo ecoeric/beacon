@@ -107,7 +107,8 @@ The script:
 
 It never writes the password to disk or a log. The password is passed to AltServer as a command
 argument, so it is briefly visible to `ps`; run this on a trusted host. Use a dedicated free Apple
-ID, not your primary account.
+ID, not your primary account. AltServer stores its signing certificate under
+`~/.local/share/beacon/tools/AltServerData/`, outside the git checkout.
 
 ### Two-factor codes
 

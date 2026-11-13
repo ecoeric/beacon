@@ -541,7 +541,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | `BEACON_CHERRY_DB`, `BEACON_CHERRY_AGENTS_DIR` | read-only agent evidence |
 | `BEACON_AGENT_ID` | binds the dashboard to the `agent` (DSH) agent only |
 | `BEACON_PIHOLE_URL`, `BEACON_PIHOLE_PASSWORD_FILE` | Pi-hole v6 API |
-| `BEACON_MINECRAFT_*` | existing NeoForge install, host/port, stop timeout |
+| `BEACON_MINECRAFT_*` | existing NeoForge install, host/port, `run.sh nogui` launch args, stop timeout |
 | `BEACON_DOCKER_SNAPSHOT_FILE` | snapshot file written by the root timer |
 | `BEACON_SCREENSHOT_RETENTION_DAYS` | `7` |
 | `BEACON_X11_DISPLAY`, `BEACON_X11_AUTHORITY` | genuine window captures |
