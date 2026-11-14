@@ -506,8 +506,9 @@ struct ServerView: View {
                     )
                     MetricTile(
                         title: "CPU",
-                        value: Format.percent(minecraft.cpuPercent, digits: 1),
-                        fraction: (minecraft.cpuPercent ?? 0) / 100
+                        value: Format.percent(minecraft.cpuPercentOfTotal, digits: 1),
+                        detail: minecraft.cpuPercent.map { "\(String(format: "%.1f", $0))% process · 100% = 1 core" },
+                        fraction: (minecraft.cpuPercentOfTotal ?? 0) / 100
                     )
                     MetricTile(
                         title: "Memory",

@@ -12,7 +12,7 @@ Authorization: Bearer <token>
 | Scope | Grants |
 |---|---|
 | `read` | all status/monitoring GETs, screenshots, activity, capabilities, whoami |
-| `action` | `read` + queue a suggestion / Continue / cancel a pending message |
+| `action` | `read` + send a chat message / queue a suggestion / Continue / cancel a pending message |
 | `admin` | `action` + interrupt, Pi-hole blocking, Minecraft controls, milestone creation, screenshot capture/delete, retention run, audit |
 | `agent` | runtime-only endpoints (status publishing, checkpoint delivery, acknowledgements) |
 
@@ -63,11 +63,12 @@ Confirmation headers: `agent-interrupt`, `pihole-blocking`, `minecraft-start`,
 |---|---|---|---|
 | GET | `/agent/status` | read | structured state + evidence + queue counts |
 | GET | `/agent/status/summary` | read | deterministic 1–3 sentence status (no LLM) |
-| GET | `/agent/sessions` | read | read-only Cherry Studio session list (`?limit=`) |
-| GET | `/agent/sessions/{session_id}/messages` | read | read-only visible transcript (`?limit=`) |
+| GET | `/agent/sessions` | read | Cherry Studio session list (`?limit=`) |
+| GET | `/agent/sessions/{session_id}/messages` | read | visible transcript (`?limit=`) |
+| POST | `/agent/sessions/{session_id}/messages` | action | send a user turn (`text`, optional `client_message_id`); falls back to the durable queue if Cherry writes are unavailable |
 | PUT | `/agent/status` | agent | publish snapshot (project/stage/activity/… ) |
 | GET | `/agent/messages` | read | recent messages (`?limit=`) |
-| POST | `/agent/messages` | action | queue a suggestion (`text`, `kind`, `idempotency_key`) |
+| POST | `/agent/messages` | action | queue a suggestion; when chat writes are enabled it is forwarded to Cherry immediately |
 | POST | `/agent/continue` | action | Continue (optional `note`) |
 | DELETE | `/agent/messages/{id}` | action | cancel while pending |
 | GET | `/agent/queue` | read | queue stats + last checkpoint age |

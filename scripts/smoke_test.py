@@ -108,11 +108,19 @@ def main() -> int:
     unique = uuid.uuid4().hex[:10]
     queued = cli.post(
         "/api/v1/agent/messages",
-        json={"text": "Beacon smoke test — no action required.", "idempotency_key": f"smoke-{unique}"},
+        json={
+            "text": "Beacon smoke test — no action required.",
+            "idempotency_key": f"smoke-{unique}",
+            "forward": False,
+        },
     )
     duplicate = cli.post(
         "/api/v1/agent/messages",
-        json={"text": "Beacon smoke test — no action required.", "idempotency_key": f"smoke-{unique}"},
+        json={
+            "text": "Beacon smoke test — no action required.",
+            "idempotency_key": f"smoke-{unique}",
+            "forward": False,
+        },
     )
     check("message queued", queued.status_code == 201, queued.json().get("id", "")[:8])
     check("idempotency prevents duplicates", duplicate.json()["id"] == queued.json()["id"])
@@ -132,7 +140,9 @@ def main() -> int:
         admin.post("/api/v1/agent/checkpoint").status_code == 403,
     )
 
-    continue_message = cli.post("/api/v1/agent/continue", json={"note": "smoke test"}).json()
+    continue_message = cli.post(
+        "/api/v1/agent/continue", json={"note": "smoke test", "forward": False}
+    ).json()
     cancelled = cli.delete(f"/api/v1/agent/messages/{continue_message['id']}")
     check("Continue works without text and can be cancelled", cancelled.json()["status"] == "cancelled")
 

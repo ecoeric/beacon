@@ -635,6 +635,73 @@
       }
     },
     "/api/v1/agent/sessions/{session_id}/messages": {
+      "post": {
+        "tags": [
+          "agent"
+        ],
+        "summary": "Send a user message to a Cherry Studio agent chat",
+        "description": "Deliver a phone message as a normal user turn.\n\nPreferred path: Cherry Studio's own durable delivery queue (a user row with\n``delivery_status='accepted'``). If writes are disabled or unavailable, the message is\nqueued in Beacon instead so it is never silently lost.",
+        "operationId": "send_session_message_api_v1_agent_sessions__session_id__messages_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatSendRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatSendResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "get": {
         "tags": [
           "agent"
@@ -3189,6 +3256,76 @@
         ],
         "title": "CaptureResult"
       },
+      "ChatSendRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "client_message_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Message Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "ChatSendRequest"
+      },
+      "ChatSendResponse": {
+        "properties": {
+          "delivered": {
+            "type": "boolean",
+            "title": "Delivered"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "cherry",
+              "queue"
+            ],
+            "title": "Mode"
+          },
+          "message_id": {
+            "type": "string",
+            "title": "Message Id"
+          },
+          "queued_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queued Id"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "delivered",
+          "mode",
+          "message_id"
+        ],
+        "title": "ChatSendResponse"
+      },
       "CheckpointResponse": {
         "properties": {
           "server_time": {
@@ -3250,6 +3387,11 @@
               }
             ],
             "title": "Note"
+          },
+          "forward": {
+            "type": "boolean",
+            "title": "Forward",
+            "default": true
           }
         },
         "type": "object",
@@ -3909,6 +4051,12 @@
               }
             ],
             "title": "Idempotency Key"
+          },
+          "forward": {
+            "type": "boolean",
+            "title": "Forward",
+            "description": "Forward to the Cherry chat immediately when BEACON_CHAT_WRITE is enabled",
+            "default": true
           }
         },
         "type": "object",
@@ -4338,6 +4486,17 @@
               }
             ],
             "title": "Cpu Percent"
+          },
+          "cpu_percent_of_total": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpu Percent Of Total"
           },
           "memory_bytes": {
             "anyOf": [

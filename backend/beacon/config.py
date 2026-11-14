@@ -51,6 +51,7 @@ class Settings:
 
     cherry_db: Path
     cherry_agents_dir: Path
+    chat_write_enabled: bool
     agent_id: str
     session_id: str
     stale_working_seconds: int
@@ -135,6 +136,7 @@ def load_settings() -> Settings:
         cherry_agents_dir=Path(
             _env("BEACON_CHERRY_AGENTS_DIR", str(Path.home() / ".config/CherryStudio/Data/Agents"))
         ).expanduser(),
+        chat_write_enabled=_env_bool("BEACON_CHAT_WRITE", False),
         agent_id=_env("BEACON_AGENT_ID", ""),
         session_id=_env("BEACON_SESSION_ID", ""),
         stale_working_seconds=_env_int("BEACON_STALE_WORKING_SECONDS", 90),

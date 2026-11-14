@@ -50,6 +50,7 @@ def enqueue(
     idempotency_key: str | None = None,
     client: str | None = None,
     session_id: str | None = None,
+    forward: bool = True,
 ) -> tuple[MessageModel, bool]:
     """Add a message. Returns ``(message, created)``; an existing idempotency key wins."""
     if kind not in KINDS:
@@ -78,11 +79,22 @@ def enqueue(
             cursor = conn.execute(
                 """
                 INSERT INTO agent_message(
-                    id, seq, kind, body, status, created_at, idempotency_key, client, session_id
-                ) VALUES (?,?,?,?,?,?,?,?,?)
+                    id, seq, kind, body, status, created_at, idempotency_key, client, session_id, forward
+                ) VALUES (?,?,?,?,?,?,?,?,?,?)
                 ON CONFLICT(idempotency_key) DO NOTHING
                 """,
-                (message_id, seq, kind, body, "pending", now(), effective_key, client, session_id),
+                (
+                    message_id,
+                    seq,
+                    kind,
+                    body,
+                    "pending",
+                    now(),
+                    effective_key,
+                    client,
+                    session_id,
+                    1 if forward else 0,
+                ),
             )
             if cursor.rowcount == 0:
                 created = False
@@ -91,10 +103,21 @@ def enqueue(
             conn.execute(
                 """
                 INSERT INTO agent_message(
-                    id, seq, kind, body, status, created_at, idempotency_key, client, session_id
-                ) VALUES (?,?,?,?,?,?,?,?,?)
+                    id, seq, kind, body, status, created_at, idempotency_key, client, session_id, forward
+                ) VALUES (?,?,?,?,?,?,?,?,?,?)
                 """,
-                (message_id, seq, kind, body, "pending", now(), None, client, session_id),
+                (
+                    message_id,
+                    seq,
+                    kind,
+                    body,
+                    "pending",
+                    now(),
+                    None,
+                    client,
+                    session_id,
+                    1 if forward else 0,
+                ),
             )
     if not created:
         row = db.query_one(
@@ -120,6 +143,51 @@ def list_messages(
 
 def pending_count(db: Database) -> int:
     return int(db.scalar("SELECT COUNT(*) FROM agent_message WHERE status='pending'") or 0)
+
+
+def pending_for_forwarding(db: Database, *, limit: int = 10) -> list[dict]:
+    """Pending queue rows that a writeable-chat writer may forward immediately.
+
+    The raw ``session_id`` is intentionally included: it is routing metadata, not part of the
+    public ``MessageModel``.
+    """
+    rows = db.query(
+        "SELECT id, seq, body, session_id FROM agent_message "
+        "WHERE status='pending' AND forward=1 ORDER BY seq LIMIT ?",
+        (limit,),
+    )
+    return [dict(row) for row in rows]
+
+
+def mark_forwarded(db: Database, message_id: str, *, note: str) -> MessageModel:
+    """Mark a queue row as handed to Cherry Studio's durable delivery queue.
+
+    This is not an agent checkpoint: Cherry owns the turn from here. Recording the terminal
+    state keeps the row from being forwarded twice (the deterministic Cherry message id is the
+    second line of defence).
+    """
+    with db.transaction() as conn:
+        row = conn.execute("SELECT * FROM agent_message WHERE id=?", (message_id,)).fetchone()
+        if row is None:
+            raise QueueError("not_found", "message not found", status_code=404)
+        if row["status"] not in ("pending", "delivered", "acknowledged", "processed"):
+            raise QueueError(
+                "invalid_transition",
+                f"cannot forward a message in state '{row['status']}'",
+            )
+        if row["status"] != "processed":
+            stamp = now()
+            conn.execute(
+                """
+                UPDATE agent_message
+                   SET status='processed', delivered_at=COALESCE(delivered_at, ?),
+                       acknowledged_at=COALESCE(acknowledged_at, ?), processed_at=?,
+                       ack_note=COALESCE(ack_note, ?), processed_note=?
+                 WHERE id=?
+                """,
+                (stamp, stamp, stamp, note, note, message_id),
+            )
+    return get(db, message_id)  # type: ignore[return-value]
 
 
 def checkpoint(

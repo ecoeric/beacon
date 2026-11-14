@@ -269,6 +269,16 @@ struct APIClient {
         return try decoder.decode([AgentChatMessage].self, from: data)
     }
 
+    func sendChatMessage(sessionId: String, text: String, clientMessageId: String) async throws -> ChatSendResult {
+        struct Body: Encodable {
+            let text: String
+            let clientMessageId: String
+        }
+        let body = Body(text: text, clientMessageId: clientMessageId)
+        let data = try await request("POST", "agent/sessions/\(sessionId)/messages", body: body)
+        return try decode(ChatSendResult.self, from: data)
+    }
+
     func requestInterrupt(mode: String, reason: String) async throws -> InterruptInfo {
         let body = InterruptRequest(mode: mode, reason: reason)
         let data = try await request(

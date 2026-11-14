@@ -3,6 +3,52 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.11] — 2026-11-14
+
+Writeable Chats, real queue delivery, and bug-fix pass from phone use.
+
+### Added
+* **Writeable Chats.** `POST /agent/sessions/{id}/messages` writes one accepted user-delivery row
+  into Cherry Studio's own durable delivery queue; Cherry runs the turn normally and the reply
+  appears in the transcript. `BEACON_CHAT_WRITE=1` enables it; `=0` keeps Cherry strictly
+  read-only and falls back to the Beacon queue. `BEACON_CHAT_WRITE` is off by default in code and
+  on in `deploy/beacon.env`. The write is transactionally one row, validates the session/agent,
+  uses UUIDv7 ids (or a deterministic UUIDv5 for retries), and never writes model output.
+* **Legacy queue messages now actually send.** New `/agent/messages` and `/agent/continue` rows
+  are forwarded to Cherry immediately; a 20-second API sweep forwards pre-existing pending rows.
+  Forwarding is idempotent (`client_message_id=queue:<id>`) and leaves the row pending if Cherry is
+  closed, busy or changed its schema.
+* `chat_write` capability flag in `/capabilities`; Chats composer now uses the writeable endpoint
+  and refreshes the transcript after sending.
+* `BEACON_CHAT_WRITE`, `services/chat_write.py`, `services/chat_delivery.py`, and
+  `tests/test_chat_write.py` (10 tests).
+
+### Fixed
+* Minecraft CPU tile now shows **percent of total host CPU** (`cpu_percent_of_total`) with the
+  one-core process percentage as detail, instead of comparing a 100%+ process figure with a 7%
+  host figure. Live example: 104% of one core = 8.7% of the host.
+* Swift decoding: `cpuPercentOfTotal` and `luna` were declared with `= nil`, so `Decodable`
+  silently ignored both backend fields. Removed the defaults and added the missing Minecraft
+  `CodingKeys` entry.
+* Chat transcript now filters raw `{"parts":...}` payloads and reasoning/tool-only parts at both
+  the backend and UI layers.
+* Chats list refreshes every 10 s and the transcript every 5 s; sending refreshes after the write.
+* Chats layout no longer uses `safeAreaInset`/`overlay(alignment:)` (both were unsupported by the
+  mock SwiftUI harness), fixing the last typecheck failure; composer sits below the scroll view.
+* Luna / KSP card is live again: server name, Career mode, players, vessels, UDP 8800, uptime,
+  memory, password and mod-control flags.
+
+### Verified
+* 164 backend tests, 20 app + 2 test Swift files typecheck, 21 app sources in the Xcode project,
+  39 OpenAPI paths, `beacon doctor` green.
+* Live endpoint returned `mode=cherry` for a real message row; Luna summary reports
+  `state=running`, `game_mode=Career`, `udp_listening=true`.
+
+### Not implemented
+* **Creating a brand-new chat** from the phone. Sending into existing chats is now writeable;
+  creating the session still belongs to Cherry Studio.
+* True real-time push: the app polls (10 s chats / 5 s transcript / 15 s dashboard).
+
 ## [0.1.10] — 2026-11-13
 
 Read-only KSP / Luna Multiplayer monitoring.

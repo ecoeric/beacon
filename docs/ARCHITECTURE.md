@@ -31,7 +31,8 @@ iPhone ──HTTPS/token──►│ auth ─► routers ─► services        
 ```
 
 * **Status service** (`services/agent_status.py`) only reads: the agent-pushed snapshot row,
-  the Cherry Studio SQLite database (opened read-only), `/proc` for the runtime process, and
+  the Cherry Studio SQLite database (read-only for evidence; one narrow delivery-row write for
+  the Chats composer when `BEACON_CHAT_WRITE=1`), `/proc` for the runtime process, and
   queue counts. It never writes to Cherry Studio, never calls an LLM, never spawns the agent.
   The one-to-three-sentence Status text is composed deterministically in
   `services/status_summary.py` (`render_status_summary`), a pure function over the snapshot.
@@ -107,7 +108,8 @@ All state is in `data/` (mode 0700): `beacon.sqlite` (WAL), `secrets/*.token` (0
   The app performs SHA-256 **SPKI pinning**; there is no "ignore certificate errors" switch.
 * Process containment: the API runs with `NoNewPrivileges=yes` (so a compromised process cannot
   exec setuid `sudo` even though the interactive account has a NOPASSWD rule), `ProtectSystem=strict`,
-  `ProtectHome=read-only` plus `ReadWritePaths` for `data/` and the Minecraft folder,
+  `ProtectHome=read-only` plus `ReadWritePaths` for `data/`, the Minecraft folder and Cherry's
+  data directory (the delivery-row write path),
   `ProtectProc=invisible`, `SystemCallArchitectures=native`, and `InaccessiblePaths` masking
   `~/.ssh`, `~/.gnupg`, `~/.mozilla` and Cherry Studio's `Credentials` directory. Residual risk:
   the process still runs as `eric` and can read the Cherry Studio database (needed for agent
@@ -169,6 +171,8 @@ system frameworks, zero packages.
 | `deps.py` | FastAPI dependencies, confirmation header, throttling |
 | `tls.py` | private CA + leaf generation, SPKI pin, certificate inspection |
 | `services/agent_runtime.py` | read-only Cherry Studio evidence + `/proc` runtime resolution |
+| `services/chat_write.py` | one-row Cherry delivery writer for writeable Chats |
+| `services/chat_delivery.py` | forwards legacy queue rows into Cherry's delivery table |
 | `services/agent_status.py` | state machine, snapshot loading, status payload |
 | `services/status_summary.py` | deterministic 1–3 sentence status text (pure) |
 | `services/message_queue.py` | queue lifecycle, checkpoint delivery, inbox mirror |
@@ -241,7 +245,7 @@ systemd
 
 | Layer | Method | Result (last run) |
 |---|---|---|
-| API/service logic | 149 pytest tests with synthetic Cherry Studio DB, fake Minecraft/RCON servers, mocked Pi-hole transport and controlled processes | 149 passed |
+| API/service logic | 164 pytest tests with synthetic Cherry Studio DB, fake Minecraft/RCON servers, mocked Pi-hole transport and controlled processes | 164 passed |
 | Transport/auth | real Uvicorn TLS server + generated CA in tests | verified trust and rejection |
 | Live system | `scripts/smoke_test.py` against real Pi-hole/Minecraft/Docker/agent | 58 checks passed |
 | iOS logic | Swift 6 on Linux: compile + 13 decoding/formatting tests against live-captured fixtures | 13 passed |

@@ -22,6 +22,8 @@ from ..schemas import (
     AckRequest,
     AgentChatMessage,
     AgentSessionSummary,
+    ChatSendRequest,
+    ChatSendResponse,
     AgentStatusResponse,
     AgentStatusUpdate,
     CheckpointResponse,
@@ -35,7 +37,7 @@ from ..schemas import (
 from ..security import audit
 from ..services import agent_runtime
 from ..services import agent_status as agent_status_service
-from ..services import interrupts, message_queue, notifications, status_summary
+from ..services import chat_delivery, chat_write, interrupts, message_queue, notifications, status_summary
 from ..db import now as time_now
 
 router = APIRouter(prefix="/agent", tags=["agent"])
@@ -105,6 +107,92 @@ def list_sessions(
         )
         for item in agent_runtime.list_sessions(settings, limit=limit)
     ]
+
+
+@router.post(
+    "/sessions/{session_id}/messages",
+    response_model=ChatSendResponse,
+    summary="Send a user message to a Cherry Studio agent chat",
+)
+def send_session_message(
+    session_id: str,
+    payload: ChatSendRequest,
+    request: Request,
+    db: DbDep,
+    token: ActionDep,
+) -> ChatSendResponse:
+    """Deliver a phone message as a normal user turn.
+
+    Preferred path: Cherry Studio's own durable delivery queue (a user row with
+    ``delivery_status='accepted'``). If writes are disabled or unavailable, the message is
+    queued in Beacon instead so it is never silently lost.
+    """
+    throttle(f"{token.id}:chat-send", limit=30, window_seconds=60)
+    settings = get_settings()
+    sessions = agent_runtime.list_sessions(settings, limit=50)
+    if session_id not in {item.id for item in sessions}:
+        raise HTTPException(status_code=404, detail="session not found")
+
+    text = payload.text.strip()
+    if not text:
+        raise HTTPException(status_code=422, detail="message is empty")
+
+    failure: chat_write.ChatWriteError | None = None
+    if settings.chat_write_enabled:
+        try:
+            result = chat_write.enqueue_user_message(
+                settings,
+                session_id=session_id,
+                text=text,
+                client_message_id=payload.client_message_id,
+            )
+        except chat_write.ChatWriteError as exc:
+            if exc.code in {"session_not_found", "message_too_long", "empty_message", "invalid_message"}:
+                raise HTTPException(status_code=422, detail=exc.message) from exc
+            failure = exc
+        else:
+            audit(
+                db,
+                actor=token.name,
+                action="agent.chat.send",
+                target=result.message_id,
+                detail={"session_id": session_id, "chars": len(text), "mode": "cherry"},
+                ip=client_ip(request),
+            )
+            return ChatSendResponse(
+                delivered=True,
+                mode="cherry",
+                message_id=result.message_id,
+                note="Sent to the agent chat.",
+            )
+
+    message, created = message_queue.enqueue(
+        db,
+        text=text,
+        kind="suggestion",
+        idempotency_key=payload.client_message_id,
+        client=token.name,
+        session_id=session_id,
+    )
+    if created:
+        audit(
+            db,
+            actor=token.name,
+            action="agent.chat.queue",
+            target=message.id,
+            detail={"session_id": session_id, "chars": len(text), "mode": "queue"},
+            ip=client_ip(request),
+        )
+    note = "Queued; Beacon will forward it to the agent chat automatically."
+    if failure is not None:
+        note = f"Cherry delivery unavailable ({failure.message}); queued for automatic retry."
+    return ChatSendResponse(
+        delivered=False,
+        mode="queue",
+        message_id=message.id,
+        queued_id=message.id,
+        note=note,
+    )
 
 
 @router.get(
@@ -260,6 +348,7 @@ def create_message(
         idempotency_key=payload.idempotency_key,
         client=token.name,
         session_id=session,
+        forward=payload.forward,
     )
     if created:
         audit(
@@ -270,6 +359,8 @@ def create_message(
             detail={"kind": message.kind, "chars": len(message.body)},
             ip=client_ip(request),
         )
+        if payload.forward and chat_delivery.forward_one(settings, db, message.id):
+            message = message_queue.get(db, message.id) or message
     return message
 
 
@@ -285,6 +376,7 @@ def continue_agent(payload: ContinueRequest, request: Request, db: DbDep, token:
         kind="continue",
         client=token.name,
         session_id=interrupts.resolve_session(settings, db),
+        forward=payload.forward,
     )
     if created:
         audit(
@@ -295,6 +387,8 @@ def continue_agent(payload: ContinueRequest, request: Request, db: DbDep, token:
             detail={"with_note": bool(note)},
             ip=client_ip(request),
         )
+        if payload.forward and chat_delivery.forward_one(settings, db, message.id):
+            message = message_queue.get(db, message.id) or message
     return message
 
 

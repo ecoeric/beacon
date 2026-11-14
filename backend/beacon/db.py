@@ -15,7 +15,7 @@ import uuid
 from collections.abc import Iterator
 from pathlib import Path
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS meta (
@@ -67,7 +67,8 @@ CREATE TABLE IF NOT EXISTS agent_message (
     processed_note TEXT,
     idempotency_key TEXT UNIQUE,
     client TEXT,
-    session_id TEXT
+    session_id TEXT,
+    forward INTEGER NOT NULL DEFAULT 1
 );
 
 CREATE INDEX IF NOT EXISTS idx_agent_message_status ON agent_message(status, seq);
@@ -218,10 +219,25 @@ class Database:
                         "INSERT INTO meta(key, value, updated_at) VALUES (?,?,?)",
                         ("schema_version", str(SCHEMA_VERSION), now()),
                     )
-                elif int(row["value"]) != SCHEMA_VERSION:
-                    raise RuntimeError(
-                        f"unexpected schema version {row['value']} (expected {SCHEMA_VERSION})"
-                    )
+                else:
+                    version = int(row["value"])
+                    if version == 1:
+                        columns = {
+                            item[1]
+                            for item in conn.execute("PRAGMA table_info(agent_message)").fetchall()
+                        }
+                        if "forward" not in columns:
+                            conn.execute(
+                                "ALTER TABLE agent_message ADD COLUMN forward INTEGER NOT NULL DEFAULT 1"
+                            )
+                        conn.execute(
+                            "UPDATE meta SET value=?, updated_at=? WHERE key='schema_version'",
+                            (str(SCHEMA_VERSION), now()),
+                        )
+                    elif version != SCHEMA_VERSION:
+                        raise RuntimeError(
+                            f"unexpected schema version {row['value']} (expected {SCHEMA_VERSION})"
+                        )
             finally:
                 conn.close()
 

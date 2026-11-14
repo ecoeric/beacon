@@ -220,7 +220,8 @@ Deliberate trade-offs:
   setuid binaries.
 * `PrivateTmp=off` — `ffmpeg -f x11grab` needs `/tmp/.X11-unix` for real window captures.
 * `PrivateDevices=off` — `nvidia-smi` needs `/dev/nvidia*`.
-* `ProtectHome=read-only` with `ReadWritePaths` for `data/` and the Minecraft folder.
+* `ProtectHome=read-only` with `ReadWritePaths` for `data/`, the Minecraft folder and Cherry
+  Studio's data directory (one narrow chat-delivery row; disable with `BEACON_CHAT_WRITE=0`).
 * An `IPAddressDeny=any` egress allow-list was trialled and **reverted**: with it in place the
   service could not reach Pi-hole on the same host. The unit documents this. Exposure is instead
   limited by binding to `192.168.1.83` only (no port forward, no public listener).

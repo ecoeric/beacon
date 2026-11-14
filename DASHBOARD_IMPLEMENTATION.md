@@ -65,6 +65,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | 2.18 | Pi-hole monitoring and blocking control | Implemented |
 | 2.19 | Minecraft monitoring | Implemented (TPS/MSPT unavailable, stated) |
 | 2.19a | KSP / Luna Multiplayer monitoring | Implemented read-only (status JSON, process, UDP 8800; no privileged controls) |
+| 2.19b | Agent chat browser and writeable composer | Implemented (read-only transcript; sends one Cherry delivery row; legacy queue auto-forwarded) |
 | 2.20 | Minecraft controls with safeguards | Implemented (all channels tested against controlled instances; the live manually-started instance is intentionally not restarted) |
 | 2.21 | Activity feed / in-app notifications | Implemented (push: Planned) |
 | 2.22 | Audit trail | Implemented |
@@ -476,7 +477,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 
 | Harness | Command | Last result |
 |---|---|---|
-| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 152 passed |
+| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 164 passed |
 | Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
 | Swift syntax (all 23 files) | `scripts/validate_ios.sh` step 1 | parsed |
@@ -504,7 +505,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 * **Files**: `backend/tests/test_contract_and_security.py`,
   `backend/tests/test_integration_edges.py`, `scripts/check_openapi_drift.py`,
   `scripts/check_view_initialisers.py`.
-* **Test**: 149 pytest tests total (149 passing), contract checker exit 0.
+* **Test**: 164 pytest tests total (164 passing), contract checker exit 0.
 * **Limitations**: the secret scan is best-effort (binary files are skipped); static checks are
   guardrails, not a proof of absence. A configurable request-body ceiling
   (`BEACON_MAX_REQUEST_BYTES`, default 64 MiB) is enforced by an ASGI middleware that also covers
@@ -539,7 +540,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Variable | Purpose |
 |---|---|
 | `BEACON_BIND` / `BEACON_PORT` | `192.168.1.83` / `8091` |
-| `BEACON_CHERRY_DB`, `BEACON_CHERRY_AGENTS_DIR` | read-only agent evidence |
+| `BEACON_CHERRY_DB`, `BEACON_CHERRY_AGENTS_DIR` | agent evidence; `BEACON_CHAT_WRITE=1` adds the one-row delivery write |
 | `BEACON_AGENT_ID` | binds the dashboard to the `agent` (DSH) agent only |
 | `BEACON_PIHOLE_URL`, `BEACON_PIHOLE_PASSWORD_FILE` | Pi-hole v6 API |
 | `BEACON_MINECRAFT_*` | existing NeoForge install, host/port, `run.sh nogui` launch args, stop timeout |

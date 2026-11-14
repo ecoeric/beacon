@@ -309,7 +309,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
 
     check("data directory writable", os.access(settings.data_dir, os.W_OK), str(settings.data_dir))
     db = get_db(settings)
-    check("database schema", db.get_meta("schema_version") == "1", f"schema {db.get_meta('schema_version')}")
+    check("database schema", db.get_meta("schema_version") == "2", f"schema {db.get_meta('schema_version')}")
     def readable(path) -> bool:
         try:
             return path.exists() and os.access(path, os.R_OK)

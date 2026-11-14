@@ -275,7 +275,28 @@ final class AppModel: ObservableObject {
         do {
             let message = try await client.sendSuggestion(text)
             await refresh(showSpinner: false)
-            return .init(success: true, text: "Queued as #\(message.seq) — the agent picks it up at its next checkpoint.")
+            let note = message.status == .processed
+                ? "Sent to the active chat."
+                : "Queued as #\(message.seq) — waiting for Cherry Studio to accept it."
+            return .init(success: true, text: note)
+        } catch {
+            handle(error, prefix: "Sending")
+            return .init(success: false, text: message(for: error))
+        }
+    }
+
+    func sendChatMessage(sessionId: String, text: String) async -> MessageFeedback {
+        guard let client else { return .init(success: false, text: "Not connected") }
+        isPerformingAction = true
+        defer { isPerformingAction = false }
+        do {
+            let result = try await client.sendChatMessage(
+                sessionId: sessionId,
+                text: text,
+                clientMessageId: UUID().uuidString.lowercased()
+            )
+            await loadSessions()
+            return .init(success: true, text: result.note)
         } catch {
             handle(error, prefix: "Sending")
             return .init(success: false, text: message(for: error))
@@ -289,7 +310,10 @@ final class AppModel: ObservableObject {
         do {
             let message = try await client.sendContinue(note: note)
             await refresh(showSpinner: false)
-            return .init(success: true, text: "Continue queued as #\(message.seq).")
+            let note = message.status == .processed
+                ? "Continue message sent to the active chat."
+                : "Continue queued as #\(message.seq)."
+            return .init(success: true, text: note)
         } catch {
             handle(error, prefix: "Continue")
             return .init(success: false, text: message(for: error))

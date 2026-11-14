@@ -133,6 +133,7 @@ def env(tmp_path, monkeypatch, cherry):
     monkeypatch.setenv("BEACON_LUNA_PROCESS_MARKER", "__no_such_luna_process__")
     monkeypatch.setenv("BEACON_DOCKER_SNAPSHOT_FILE", str(tmp_path / "docker-snapshot.json"))
     monkeypatch.setenv("BEACON_AGENT_ID", "agent-test")
+    monkeypatch.setenv("BEACON_CHAT_WRITE", "0")
     monkeypatch.setenv("BEACON_SESSION_ID", "")
     monkeypatch.setenv("BEACON_TLS_CERT", str(data / "tls" / "server.crt"))
     monkeypatch.setenv("BEACON_TLS_KEY", str(data / "tls" / "server.key"))

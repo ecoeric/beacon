@@ -55,9 +55,15 @@ struct SessionsView: View {
                     Button("Done") { dismiss() }
                 }
             }
+            .refreshable { await model.loadSessions() }
             .task {
                 await model.loadSessions()
                 loading = false
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: .seconds(10))
+                    if Task.isCancelled { return }
+                    await model.loadSessions()
+                }
             }
             .sheet(item: $selected) { session in
                 SessionTranscriptView(session: session)
@@ -101,32 +107,48 @@ struct SessionTranscriptView: View {
     @State private var messages: [AgentChatMessage] = []
     @State private var loading = true
     @State private var error: String?
+    @State private var draft = ""
+    @State private var feedback: String?
+    @State private var sending = false
+
+    private var isCurrentSession: Bool {
+        if let current = model.agent?.session.id {
+            return session.id == current
+        }
+        return model.sessions.first?.id == session.id
+    }
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
-                    if loading {
-                        LoadingCard(lines: 5)
-                    } else if let error {
-                        ErrorBanner(message: error) {
-                            Task { await load() }
-                        }
-                    } else if messages.isEmpty {
-                        EmptyState(
-                            symbol: "text.bubble",
-                            title: "No visible messages",
-                            message: "This session has no user or assistant text yet."
-                        )
-                        .beaconCard()
-                    } else {
-                        ForEach(messages) { message in
-                            messageRow(message)
+            VStack(spacing: 0) {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 10) {
+                        if loading {
+                            LoadingCard(lines: 5)
+                        } else if let error {
+                            ErrorBanner(message: error) {
+                                Task { await load() }
+                            }
+                        } else if messages.isEmpty {
+                            EmptyState(
+                                symbol: "text.bubble",
+                                title: "No visible messages",
+                                message: "This session has no user or assistant text yet."
+                            )
+                            .beaconCard()
+                        } else {
+                            ForEach(messages) { message in
+                                messageRow(message)
+                            }
                         }
                     }
+                    .padding(Theme.screenPadding)
+                    .padding(.bottom, 20)
                 }
-                .padding(Theme.screenPadding)
-                .padding(.bottom, 20)
+                .refreshable { await load() }
+
+                DividerLine()
+                composer
             }
             .beaconScreen()
             .navigationTitle(session.name.isEmpty ? "Chat" : session.name)
@@ -136,12 +158,19 @@ struct SessionTranscriptView: View {
                     Button("Done") { dismiss() }
                 }
             }
-            .task { await load() }
+            .task {
+                await load()
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: .seconds(5))
+                    if Task.isCancelled { return }
+                    await load(showLoading: false)
+                }
+            }
         }
     }
 
-    private func load() async {
-        loading = true
+    private func load(showLoading: Bool = true) async {
+        if showLoading { loading = true }
         error = nil
         do {
             messages = try await model.sessionMessages(sessionId: session.id)
@@ -149,6 +178,61 @@ struct SessionTranscriptView: View {
             self.error = error.localizedDescription
         }
         loading = false
+    }
+
+    @ViewBuilder
+    private var composer: some View {
+        if isCurrentSession {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    TextField("Message the active agent…", text: $draft, axis: .vertical)
+                        .font(.beaconBody)
+                        .lineLimit(1...4)
+                        .padding(9)
+                        .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    Button {
+                        send()
+                    } label: {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.system(size: 28))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Theme.accent)
+                    .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || sending)
+                    .opacity(sending ? 0.45 : 1)
+                }
+                Text(feedback ?? "Sends as a normal user message to the active agent.")
+                    .font(.beaconTiny)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, Theme.screenPadding)
+            .padding(.vertical, 8)
+            .background(Theme.surface)
+        } else {
+            Text("Read-only session. Open the current chat to send a message.")
+                .font(.beaconTiny)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(10)
+                .background(Theme.surface)
+        }
+    }
+
+    private func send() {
+        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty, !sending else { return }
+        sending = true
+        feedback = "Sending…"
+        Task {
+            let result = await model.sendChatMessage(sessionId: session.id, text: text)
+            if result.success {
+                draft = ""
+                try? await Task.sleep(for: .milliseconds(700))
+                await load(showLoading: false)
+            }
+            feedback = result.text
+            sending = false
+        }
     }
 
     private func messageRow(_ message: AgentChatMessage) -> some View {

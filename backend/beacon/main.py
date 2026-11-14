@@ -26,7 +26,16 @@ from . import __version__
 from .config import get_settings
 from .db import get_db
 from .routers import agent, milestones, monitoring, system
-from .services import capture, interrupts, message_queue, minecraft, pihole, retention, screenshots
+from .services import (
+    capture,
+    chat_delivery,
+    interrupts,
+    message_queue,
+    minecraft,
+    pihole,
+    retention,
+    screenshots,
+)
 from .services import system_metrics
 
 logger = logging.getLogger("beacon")
@@ -138,6 +147,21 @@ def _error_handler(exc: Exception) -> JSONResponse:
     return JSONResponse(status_code=status_code, content=body)
 
 
+async def _chat_delivery_loop(settings) -> None:
+    """Continuously hand legacy queue rows to Cherry's durable delivery queue."""
+    while True:
+        await asyncio.sleep(20)
+        try:
+            db = get_db(settings)
+            forwarded = await asyncio.to_thread(
+                chat_delivery.forward_pending, settings, db, limit=10
+            )
+            if forwarded:
+                logger.info("forwarded %s queued message(s) to Cherry chat", forwarded)
+        except Exception:  # pragma: no cover - loop must survive
+            logger.exception("chat delivery sweep failed")
+
+
 async def _retention_loop(settings) -> None:
     while True:
         await asyncio.sleep(3600)
@@ -164,6 +188,11 @@ async def lifespan(app: FastAPI):
     db = get_db(settings)
     system_metrics.get_sampler().start()
     task = asyncio.create_task(_retention_loop(settings), name="beacon-retention")
+    delivery_task = asyncio.create_task(_chat_delivery_loop(settings), name="beacon-chat-delivery")
+    try:
+        await asyncio.to_thread(chat_delivery.forward_pending, settings, db, limit=10)
+    except Exception:
+        logger.exception("startup chat delivery sweep failed (continuing)")
     try:
         await asyncio.to_thread(retention.run, settings, db, actor="startup")
     except Exception:
@@ -174,9 +203,10 @@ async def lifespan(app: FastAPI):
     try:
         yield
     finally:
-        task.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await task
+        for background in (task, delivery_task):
+            background.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await background
         system_metrics.get_sampler().stop()
         await pihole.close_client()
 

@@ -130,4 +130,4 @@ def test_spki_pin_changes_when_the_key_rotates(env):
 
 def test_db_schema_version_is_recorded(env):
     db = get_db(env)
-    assert db.get_meta("schema_version") == "1"
+    assert db.get_meta("schema_version") == "2"

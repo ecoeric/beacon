@@ -55,7 +55,7 @@ systemctl status beacon-docker.service
 sudo cat /run/beacon/docker.json
 
 # static and behavioural checks
-cd backend && .venv/bin/python -m pytest tests -q          # 149 tests
+cd backend && .venv/bin/python -m pytest tests -q          # 164 tests
 python3 scripts/check_openapi_drift.py
 backend/.venv/bin/python scripts/smoke_test.py             # live, 58 checks
 beacon doctor
@@ -64,9 +64,13 @@ beacon doctor
 ## 4. Residual risks (accepted, documented)
 
 * The API process runs as `eric`. It can read the Cherry Studio database (required for agent
-  evidence) and other non-masked files owned by that account. It cannot gain root, cannot execute
-  arbitrary shell commands through the API, and can write only under `data/` and the Minecraft
-  folder (systemd `ReadWritePaths`).
+  evidence) and, because `BEACON_CHAT_WRITE=1`, write one narrowly-shaped user message row into
+  Cherry's durable delivery table so Chats is writeable from the phone. That requires
+  `ReadWritePaths` for `~/.config/CherryStudio/Data` and is the main new privilege of this feature.
+  The API still cannot gain root, cannot execute arbitrary shell commands, and can write only to
+  `data/`, the Minecraft folder, and that Cherry data directory. The write path is transactionally
+  one row, validates the session/agent, and falls back to the Beacon queue on any schema or lock
+  error. Set `BEACON_CHAT_WRITE=0` to return to a strictly read-only Cherry integration.
 * The Docker snapshot timer is root and runs a fixed Python script; compromises of that script
   would grant Docker-socket-level access. It is short, dependency-free and only shells out with a
   fixed argv.

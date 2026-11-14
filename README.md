@@ -1,8 +1,8 @@
 # Beacon — native iOS dashboard for this server
 
 Beacon is a genuinely native SwiftUI iPhone app plus a small, hardened FastAPI service that
-runs on `ericserver`. It shows what the active AI agent is doing, lets you send it queued
-instructions (and interrupt it safely), tracks development milestones with short-lived
+runs on `ericserver`. It shows what the active AI agent is doing, lets you read and send chat
+messages (and interrupt it safely), tracks development milestones with short-lived
 screenshots, and monitors the host, Pi-hole, Minecraft and the KSP Luna Multiplayer server.
 
 ```
@@ -10,7 +10,7 @@ iPhone (SwiftUI, no web views)
         │  HTTPS + bearer token + certificate pinning
         ▼
 beacon-api  (FastAPI, 192.168.1.83:8091, systemd, SQLite WAL)
-        ├── agent status / message queue / interrupt  ──► Cherry Studio DSH runtime + SQLite (read-only)
+        ├── agent status / chat / interrupt          ──► Cherry Studio DSH runtime + SQLite (read-mostly)
         ├── milestones + screenshots + 7-day retention ──► data/screenshots
         ├── system metrics                              ──► /proc, sensors, nvidia-smi, root-written Docker snapshot
         ├── Pi-hole                                     ──► http://192.168.1.83:8080/api (v6)
@@ -62,12 +62,12 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 
 | Check | Result |
 |---|---|
-| `pytest backend/tests` | 149 passed |
+| `pytest backend/tests` | 164 passed |
 | `scripts/smoke_test.py` (live Pi-hole / Minecraft / Docker / agent) | 58 checks passed |
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
 | `swiftc -parse` on iOS sources | 23 files parsed |
 | `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 20 app files + 2 test files typecheck, 0 errors |
-| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | **succeeded**; unsigned arm64 IPA produced (706 KB), both jobs green |
+| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | **succeeded**; unsigned arm64 IPA produced (771 KB), both jobs green |
 | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached to this host) |
 | `scripts/validate_ios_project.py` | 22 checks passed |
 | `scripts/check_openapi_drift.py` | contract up to date (39 paths) |

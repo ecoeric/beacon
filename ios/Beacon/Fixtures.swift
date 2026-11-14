@@ -88,6 +88,7 @@ enum Fixtures {
         status: "Up 5 days (healthy)",
         health: "healthy",
         cpuPercent: 0.42,
+        cpuPercentOfTotal: 0.05,
         memoryBytes: 39_000_000,
         memoryLimitBytes: 16_000_000_000,
         startedAt: now - 5 * 86_400,
@@ -184,6 +185,7 @@ enum Fixtures {
         uptimeSeconds: 3.4 * 86_400,
         pid: 34_408,
         cpuPercent: 12.4,
+        cpuPercentOfTotal: 1.55,
         memoryBytes: 9_780_000_000,
         tps: nil,
         mspt: nil,
@@ -272,6 +274,7 @@ enum Fixtures {
         server: server,
         pihole: pihole,
         minecraft: minecraft,
+        luna: nil,
         latestMilestone: milestones.first,
         activity: activity,
         dataAgeSeconds: 20
@@ -283,7 +286,7 @@ enum Fixtures {
             configuredAgentId: "cc33efa9-6b9f-41f0-bf75-86dbc6e27096",
             statusSource: "agent snapshot + Cherry Studio SQLite (read-only) + /proc"
         ),
-        messageDelivery: .init(mode: "checkpoint", maxMessageChars: 4000),
+        messageDelivery: .init(mode: "checkpoint", maxMessageChars: 4000, chatWrite: true),
         interrupt: .init(modes: ["signal", "checkpoint"], signal: "SIGINT"),
         screenshots: .init(retentionDays: 7, sources: ["text", "api", "window", "file"], maxPerMilestone: 4),
         monitoring: .init(

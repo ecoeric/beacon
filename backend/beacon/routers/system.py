@@ -84,7 +84,11 @@ async def capabilities(db: DbDep, token: ReadDep) -> dict:
             ),
             "status_source": "agent snapshot + Cherry Studio SQLite (read-only) + /proc",
         },
-        "message_delivery": {"mode": "checkpoint", "max_message_chars": 4000},
+        "message_delivery": {
+            "mode": "checkpoint",
+            "max_message_chars": 4000,
+            "chat_write": settings.chat_write_enabled,
+        },
         "interrupt": {"modes": ["signal", "checkpoint"], "signal": "SIGINT"},
         "screenshots": {
             "retention_days": settings.screenshot_retention_days,

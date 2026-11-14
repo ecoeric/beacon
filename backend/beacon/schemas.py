@@ -69,6 +69,19 @@ class AgentChatMessage(BaseModel):
     model: str | None = None
 
 
+class ChatSendRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=4000)
+    client_message_id: str | None = Field(default=None, max_length=120)
+
+
+class ChatSendResponse(BaseModel):
+    delivered: bool
+    mode: Literal["cherry", "queue"]
+    message_id: str
+    queued_id: str | None = None
+    note: str = ""
+
+
 class EvidenceItem(BaseModel):
     source: str
     detail: str
@@ -151,6 +164,7 @@ class MessageModel(BaseModel):
         data.pop("idempotency_key", None)
         data.pop("client", None)
         data.pop("session_id", None)
+        data.pop("forward", None)
         return cls(**data)
 
 
@@ -158,10 +172,15 @@ class MessageCreate(BaseModel):
     text: str = Field(min_length=1, max_length=4000)
     kind: Literal["suggestion", "continue"] = "suggestion"
     idempotency_key: str | None = Field(default=None, max_length=120)
+    forward: bool = Field(
+        default=True,
+        description="Forward to the Cherry chat immediately when BEACON_CHAT_WRITE is enabled",
+    )
 
 
 class ContinueRequest(BaseModel):
     note: str | None = Field(default=None, max_length=4000)
+    forward: bool = True
 
 
 class InterruptRequest(BaseModel):
@@ -385,6 +404,7 @@ class MinecraftStatus(BaseModel):
     uptime_seconds: float | None = None
     pid: int | None = None
     cpu_percent: float | None = None
+    cpu_percent_of_total: float | None = None
     memory_bytes: int | None = None
     tps: float | None = None
     mspt: float | None = None

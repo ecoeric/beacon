@@ -181,6 +181,14 @@ struct AgentChatMessage: Codable, Equatable, Identifiable {
     let model: String?
 }
 
+struct ChatSendResult: Codable, Equatable {
+    let delivered: Bool
+    let mode: String
+    let messageId: String
+    let queuedId: String?
+    let note: String
+}
+
 struct EvidenceItem: Codable, Equatable, Identifiable {
     let source: String
     let detail: String
@@ -443,6 +451,7 @@ struct DockerContainerInfo: Codable, Equatable, Identifiable {
     let status: String
     let health: String?
     let cpuPercent: Double?
+    let cpuPercentOfTotal: Double?
     let memoryBytes: Int?
     let memoryLimitBytes: Int?
     let startedAt: Double?
@@ -528,6 +537,7 @@ struct MinecraftStatus: Codable, Equatable {
     let uptimeSeconds: Double?
     let pid: Int?
     let cpuPercent: Double?
+    let cpuPercentOfTotal: Double?
     let memoryBytes: Int?
     let tps: Double?
     let mspt: Double?
@@ -546,7 +556,7 @@ struct MinecraftStatus: Codable, Equatable {
     enum CodingKeys: String, CodingKey {
         case available, online, state, version, loader, modsCount, motd, players, uptimeSeconds, pid
         case protocolNumber = "protocol"
-        case cpuPercent, memoryBytes, tps, mspt, tickMetricsNote
+        case cpuPercent, cpuPercentOfTotal, memoryBytes, tps, mspt, tickMetricsNote
         case playersOnline, playersMax, recentErrors, recentEvents, logUpdatedAt
         case lastBackupAt, backupNote, controls, generatedAt, error
     }
@@ -623,7 +633,7 @@ struct DashboardSummary: Codable, Equatable {
     let server: ServerOverview
     let pihole: PiholeStatus
     let minecraft: MinecraftStatus
-    let luna: LunaStatus? = nil
+    let luna: LunaStatus?
     let latestMilestone: Milestone?
     let activity: ActivityFeed
     let dataAgeSeconds: Double?
@@ -638,6 +648,7 @@ struct Capabilities: Decodable, Equatable {
     struct DeliverySection: Decodable, Equatable {
         let mode: String
         let maxMessageChars: Int
+        let chatWrite: Bool?
     }
     struct InterruptSection: Decodable, Equatable {
         let modes: [String]

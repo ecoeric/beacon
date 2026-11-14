@@ -650,6 +650,11 @@ async def status(settings: Settings) -> MinecraftStatus:
         uptime_seconds=uptime,
         pid=pid,
         cpu_percent=stats.get("cpu_percent"),
+        cpu_percent_of_total=(
+            round(stats["cpu_percent"] / max(1, os.cpu_count() or 1), 1)
+            if stats.get("cpu_percent") is not None
+            else None
+        ),
         memory_bytes=stats.get("memory_bytes"),
         tps=None,
         mspt=None,
