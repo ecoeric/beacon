@@ -14,8 +14,8 @@ SideStore OTA release pipeline.
   `apps.json` and `Beacon-AppIcon.png`.
 * `scripts/ota_source.py`: dependency-free SideStore/AltStore source generator. It inspects the
   real IPA (bundle id, version/build, CA, executable, unsigned), merges up to 25 previous versions
-  newest-first, writes modern `versions` plus legacy flat fields, and fails closed on invalid
-  URLs/versions.
+  newest-first, writes modern `versions` (including `buildVersion` and IPA `sha256`) plus legacy flat
+  fields, and fails closed on invalid URLs/versions.
 * `scripts/test_ota_source.py` (8 tests) and `scripts/validate_ota.sh`.
 * `scripts/make_app_icon.py` and a reproducible 1024×1024 `AppIcon.png` asset, used both by Xcode
   and the SideStore source.
