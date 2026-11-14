@@ -54,6 +54,9 @@ struct ServerView: View {
                     if let pihole = model.pihole {
                         piholeCard(pihole)
                     }
+                    if let luna = model.luna {
+                        lunaCard(luna)
+                    }
                     if let minecraft = model.minecraft {
                         minecraftCard(minecraft)
                     }
@@ -396,6 +399,83 @@ struct ServerView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Luna Multiplayer
+
+    private func lunaCard(_ luna: LunaStatus) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                SectionHeader(title: "KSP · Luna", subtitle: luna.serverName ?? "Luna Multiplayer")
+                Spacer()
+                StatusPill(
+                    text: luna.state,
+                    tone: luna.online ? .success : (luna.udpListening ? .warning : .danger),
+                    symbol: "airplane"
+                )
+            }
+
+            if !luna.available && !luna.online {
+                InlineNote(
+                    text: luna.error ?? "Luna status endpoint is not reachable.",
+                    symbol: "exclamationmark.triangle"
+                )
+            } else {
+                LazyVGrid(columns: columns, spacing: 10) {
+                    MetricTile(
+                        title: "Players",
+                        value: "\(luna.playersOnline ?? 0)/\(luna.playersMax ?? 0)",
+                        detail: luna.players.isEmpty ? "nobody online" : luna.players.joined(separator: ", ")
+                    )
+                    MetricTile(
+                        title: "Vessels",
+                        value: luna.vessels.map(String.init) ?? "—",
+                        detail: luna.warpMode ?? "Subspace"
+                    )
+                }
+
+                HStack(spacing: 14) {
+                    MetaText(
+                        text: "UDP 8800 \(luna.udpListening ? "listening" : "closed")",
+                        symbol: luna.udpListening ? "network" : "network.slash"
+                    )
+                    MetaText(text: "up \(Format.duration(luna.uptimeSeconds))", symbol: "clock.arrow.circlepath")
+                    Spacer()
+                }
+
+                if let description = luna.description, !description.isEmpty {
+                    Text(description)
+                        .font(.beaconTiny)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                DisclosureGroup {
+                    VStack(alignment: .leading, spacing: 4) {
+                        KeyValueRow(label: "Game mode", value: luna.gameMode ?? "—")
+                        KeyValueRow(label: "Password", value: luna.hasPassword == true ? "required" : "none")
+                        KeyValueRow(label: "Mod control", value: luna.modControl == true ? "enabled" : "off")
+                        KeyValueRow(label: "Warp", value: luna.warpMode ?? "—")
+                        if let pid = luna.pid {
+                            KeyValueRow(label: "PID", value: "\(pid)", mono: true)
+                        }
+                        KeyValueRow(label: "Process memory", value: Format.bytes(luna.memoryBytes))
+                        KeyValueRow(label: "Server memory", value: Format.bytes(luna.serverMemoryBytes))
+                    }
+                    .padding(.top, 6)
+                } label: {
+                    Text("Details")
+                        .font(.beaconCaption)
+                        .foregroundStyle(Theme.accent)
+                }
+
+                InlineNote(
+                    text: "Read-only. Start or stop the LMP service from the server; Beacon does not run a privileged systemctl path.",
+                    symbol: "lock.shield"
+                )
+            }
+        }
+        .beaconCard()
     }
 
     // MARK: - Minecraft

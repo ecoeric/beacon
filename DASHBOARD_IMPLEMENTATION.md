@@ -64,6 +64,7 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | 2.17 | Read-only Docker monitoring | Implemented |
 | 2.18 | Pi-hole monitoring and blocking control | Implemented |
 | 2.19 | Minecraft monitoring | Implemented (TPS/MSPT unavailable, stated) |
+| 2.19a | KSP / Luna Multiplayer monitoring | Implemented read-only (status JSON, process, UDP 8800; no privileged controls) |
 | 2.20 | Minecraft controls with safeguards | Implemented (all channels tested against controlled instances; the live manually-started instance is intentionally not restarted) |
 | 2.21 | Activity feed / in-app notifications | Implemented (push: Planned) |
 | 2.22 | Audit trail | Implemented |
@@ -475,16 +476,16 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 
 | Harness | Command | Last result |
 |---|---|---|
-| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 149 passed |
+| Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 152 passed |
 | Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
 | Swift syntax (all 23 files) | `scripts/validate_ios.sh` step 1 | parsed |
 | SwiftUI typecheck (real compiler, mock frameworks) | `scripts/typecheck_ios_views.sh` | 20 app files + 2 test files, 0 errors; found and fixed a 13-child `Section` |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 22 checks passed |
 | Xcode 26.2 unsigned IPA | `.github/workflows/ios-build.yml` (`macos-26`) | **succeeded**; unsigned arm64 IPA + bundled CA verified |
-| Linux sign + install | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached) |
+| Linux sign + install | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | succeeded on iPhone 16e / iOS 26.2 |
 | SwiftUI memberwise call sites | `python3 scripts/check_view_initialisers.py` (heuristic) | 109 call sites / 11 views, no missing arguments |
-| OpenAPI contract drift | `backend/.venv/bin/python scripts/check_openapi_drift.py` | up to date (36 paths) |
+| OpenAPI contract drift | `backend/.venv/bin/python scripts/check_openapi_drift.py` | up to date (39 paths) |
 | Security guardrails | `tests/test_contract_and_security.py` | no shell execution, helper allow-list, units not root |
 | Backup restore drill | `test_backup_can_be_restored_and_served` | restored DB + token + image served |
 | Deployment health | `beacon doctor` | all checks passed |

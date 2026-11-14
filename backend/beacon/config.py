@@ -68,6 +68,8 @@ class Settings:
     minecraft_launch_script: str
     minecraft_rcon_password_file: Path
     minecraft_stop_timeout_seconds: int
+    luna_status_url: str
+    luna_process_marker: str
 
     docker_snapshot_file: Path
     screenshot_retention_days: int
@@ -154,6 +156,8 @@ def load_settings() -> Settings:
             _env("BEACON_MINECRAFT_RCON_PASSWORD_FILE", str(data_dir / "secrets" / "minecraft.rcon"))
         ).expanduser(),
         minecraft_stop_timeout_seconds=_env_int("BEACON_MINECRAFT_STOP_TIMEOUT_SECONDS", 120),
+        luna_status_url=_env("BEACON_LUNA_STATUS_URL", "http://127.0.0.1:8900"),
+        luna_process_marker=_env("BEACON_LUNA_PROCESS_MARKER", "/luna-server/Server"),
         docker_snapshot_file=Path(
             _env("BEACON_DOCKER_SNAPSHOT_FILE", "/run/beacon/docker.json")
         ),

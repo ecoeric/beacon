@@ -560,6 +560,31 @@ struct MinecraftLogs: Codable, Equatable {
     let updatedAt: Double?
 }
 
+// MARK: - Luna Multiplayer (KSP)
+
+struct LunaStatus: Codable, Equatable {
+    let available: Bool
+    let online: Bool
+    let state: String
+    let serverName: String?
+    let description: String?
+    let gameMode: String?
+    let playersOnline: Int?
+    let playersMax: Int?
+    let players: [String]
+    let vessels: Int?
+    let hasPassword: Bool?
+    let modControl: Bool?
+    let warpMode: String?
+    let udpListening: Bool
+    let pid: Int?
+    let uptimeSeconds: Double?
+    let memoryBytes: Int?
+    let serverMemoryBytes: Int?
+    let generatedAt: Double
+    let error: String?
+}
+
 // MARK: - Activity
 
 struct ActivityItem: Codable, Equatable, Identifiable {
@@ -598,6 +623,7 @@ struct DashboardSummary: Codable, Equatable {
     let server: ServerOverview
     let pihole: PiholeStatus
     let minecraft: MinecraftStatus
+    let luna: LunaStatus? = nil
     let latestMilestone: Milestone?
     let activity: ActivityFeed
     let dataAgeSeconds: Double?

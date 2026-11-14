@@ -3280,6 +3280,9 @@
           "minecraft": {
             "$ref": "#/components/schemas/MinecraftStatus"
           },
+          "luna": {
+            "$ref": "#/components/schemas/LunaStatus"
+          },
           "latest_milestone": {
             "anyOf": [
               {
@@ -3312,6 +3315,7 @@
           "server",
           "pihole",
           "minecraft",
+          "luna",
           "activity"
         ],
         "title": "DashboardSummary"
@@ -3684,6 +3688,198 @@
         },
         "type": "object",
         "title": "InterruptRequest"
+      },
+      "LunaStatus": {
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "title": "Available",
+            "default": false
+          },
+          "online": {
+            "type": "boolean",
+            "title": "Online",
+            "default": false
+          },
+          "state": {
+            "type": "string",
+            "title": "State",
+            "default": "stopped"
+          },
+          "server_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Server Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "game_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Game Mode"
+          },
+          "players_online": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Players Online"
+          },
+          "players_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Players Max"
+          },
+          "players": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Players"
+          },
+          "vessels": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vessels"
+          },
+          "has_password": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Password"
+          },
+          "mod_control": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mod Control"
+          },
+          "warp_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warp Mode"
+          },
+          "udp_listening": {
+            "type": "boolean",
+            "title": "Udp Listening",
+            "default": false
+          },
+          "pid": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pid"
+          },
+          "uptime_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uptime Seconds"
+          },
+          "memory_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Memory Bytes"
+          },
+          "server_memory_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Server Memory Bytes"
+          },
+          "generated_at": {
+            "type": "number",
+            "title": "Generated At",
+            "default": 0.0
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "title": "LunaStatus"
       },
       "MessageCreate": {
         "properties": {

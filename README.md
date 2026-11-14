@@ -3,7 +3,7 @@
 Beacon is a genuinely native SwiftUI iPhone app plus a small, hardened FastAPI service that
 runs on `ericserver`. It shows what the active AI agent is doing, lets you send it queued
 instructions (and interrupt it safely), tracks development milestones with short-lived
-screenshots, and monitors the host, Pi-hole and the Minecraft server.
+screenshots, and monitors the host, Pi-hole, Minecraft and the KSP Luna Multiplayer server.
 
 ```
 iPhone (SwiftUI, no web views)
@@ -14,7 +14,8 @@ beacon-api  (FastAPI, 192.168.1.83:8091, systemd, SQLite WAL)
         ├── milestones + screenshots + 7-day retention ──► data/screenshots
         ├── system metrics                              ──► /proc, sensors, nvidia-smi, root-written Docker snapshot
         ├── Pi-hole                                     ──► http://192.168.1.83:8080/api (v6)
-        └── Minecraft                                   ──► server-list ping :25565, logs, /proc, (rcon/systemd if enabled)
+        ├── Minecraft                                   ──► server-list ping :25565, logs, /proc, (rcon/systemd if enabled)
+        └── KSP / Luna Multiplayer                      ──► read-only status JSON http://127.0.0.1:8900
 ```
 
 ## Repository layout
@@ -69,7 +70,7 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | **succeeded**; unsigned arm64 IPA produced (706 KB), both jobs green |
 | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached to this host) |
 | `scripts/validate_ios_project.py` | 22 checks passed |
-| `scripts/check_openapi_drift.py` | contract up to date |
+| `scripts/check_openapi_drift.py` | contract up to date (39 paths) |
 | backup restore drill | restored DB, token and image served by the API |
 | crash recovery (`SIGKILL`) | systemd restart, API back in 3.8 s, data intact |
 | privilege boundary | API runs with `NoNewPrivileges=yes`; Docker reads via a fixed root timer |

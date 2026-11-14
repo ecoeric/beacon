@@ -129,6 +129,8 @@ def env(tmp_path, monkeypatch, cherry):
     monkeypatch.setenv("BEACON_MINECRAFT_DIR", str(tmp_path / "minecraft"))
     monkeypatch.setenv("BEACON_MINECRAFT_HOST", "127.0.0.1")
     monkeypatch.setenv("BEACON_MINECRAFT_PORT", "1")
+    monkeypatch.setenv("BEACON_LUNA_STATUS_URL", "http://127.0.0.1:9")
+    monkeypatch.setenv("BEACON_LUNA_PROCESS_MARKER", "__no_such_luna_process__")
     monkeypatch.setenv("BEACON_DOCKER_SNAPSHOT_FILE", str(tmp_path / "docker-snapshot.json"))
     monkeypatch.setenv("BEACON_AGENT_ID", "agent-test")
     monkeypatch.setenv("BEACON_SESSION_ID", "")

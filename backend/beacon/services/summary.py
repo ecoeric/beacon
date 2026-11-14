@@ -14,6 +14,7 @@ from ..config import Settings
 from ..db import Database, now
 from ..schemas import (
     DashboardSummary,
+    LunaStatus,
     MinecraftStatus,
     PiholeStatus,
     ServiceStatus,
@@ -22,6 +23,7 @@ from ..schemas import (
 from . import (
     agent_status,
     docker_monitor,
+    luna,
     milestones,
     minecraft,
     notifications,
@@ -117,6 +119,36 @@ def _minecraft_service(status: MinecraftStatus) -> ServiceStatus:
     )
 
 
+def _luna_service(status: LunaStatus) -> ServiceStatus:
+    if status.state == "running":
+        players = f"{status.players_online or 0}/{status.players_max}" if status.players_max else "online"
+        return ServiceStatus(
+            key="luna",
+            label="KSP · Luna",
+            state="up",
+            summary=f"Online · {players} players",
+            detail=status.server_name,
+            checked_at=status.generated_at,
+        )
+    if status.state == "process-only":
+        return ServiceStatus(
+            key="luna",
+            label="KSP · Luna",
+            state="degraded",
+            summary="Process running · status endpoint unavailable",
+            detail=status.error,
+            checked_at=status.generated_at,
+        )
+    return ServiceStatus(
+        key="luna",
+        label="KSP · Luna",
+        state="down",
+        summary="Stopped",
+        detail=status.error,
+        checked_at=status.generated_at,
+    )
+
+
 def _server_service(server: ServerOverview) -> ServiceStatus:
     detail = None
     state = "up"
@@ -137,7 +169,7 @@ def _server_service(server: ServerOverview) -> ServiceStatus:
     )
 
 
-def _track(db: Database, pihole_status: PiholeStatus, minecraft_status: MinecraftStatus, server: ServerOverview, agent) -> None:
+def _track(db: Database, pihole_status: PiholeStatus, minecraft_status: MinecraftStatus, luna_status: LunaStatus, server: ServerOverview, agent) -> None:
     pihole_online = pihole_status.available and pihole_status.online
     notifications.transition(
         db,
@@ -166,6 +198,23 @@ def _track(db: Database, pihole_status: PiholeStatus, minecraft_status: Minecraf
             "minecraft_online",
             "Minecraft server is online",
             f"{minecraft_status.version or 'Server'} · {minecraft_status.players_online or 0} players",
+        ),
+    )
+    luna_online = luna_status.state == "running"
+    notifications.transition(
+        db,
+        key="luna",
+        online=luna_online,
+        detail={"state": luna_status.state},
+        offline_notification=(
+            "luna_offline",
+            "KSP Luna server went offline",
+            "The Luna Multiplayer server is not answering.",
+        ),
+        online_notification=(
+            "luna_online",
+            "KSP Luna server is online",
+            f"{luna_status.server_name or 'Luna'} · {luna_status.players_online or 0} players",
         ),
     )
     for disk in server.disks:
@@ -212,16 +261,17 @@ async def build_summary(settings: Settings, db: Database) -> DashboardSummary:
     agent = agent_status.build_agent_status(settings, db)
     docker = await asyncio.to_thread(docker_monitor.snapshot, settings)
     pihole_container = docker_monitor.find_container(docker, "pihole") if docker.available else None
-    pihole_status, minecraft_status, server = await asyncio.gather(
+    pihole_status, minecraft_status, luna_status, server = await asyncio.gather(
         pihole.get_client(settings).status(pihole_container),
         minecraft.status(settings),
+        asyncio.to_thread(luna.status, settings),
         asyncio.to_thread(system_metrics.overview, settings),
     )
     server.docker = docker.containers
     server.docker_available = docker.available
     server.docker_error = docker.error
 
-    _track(db, pihole_status, minecraft_status, server, agent)
+    _track(db, pihole_status, minecraft_status, luna_status, server, agent)
 
     services = [
         ServiceStatus(
@@ -234,6 +284,7 @@ async def build_summary(settings: Settings, db: Database) -> DashboardSummary:
         _agent_service(agent),
         _pihole_service(pihole_status),
         _minecraft_service(minecraft_status),
+        _luna_service(luna_status),
         _server_service(server),
         ServiceStatus(
             key="docker",
@@ -251,6 +302,7 @@ async def build_summary(settings: Settings, db: Database) -> DashboardSummary:
         server=server,
         pihole=pihole_status,
         minecraft=minecraft_status,
+        luna=luna_status,
         latest_milestone=milestones.latest(db),
         activity=notifications.feed(db, limit=20),
         data_age_seconds=agent.data_age_seconds,

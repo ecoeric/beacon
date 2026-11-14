@@ -404,6 +404,7 @@ final class AppModel: ObservableObject {
     var agent: AgentStatus? { summary?.agent }
     var pihole: PiholeStatus? { summary?.pihole }
     var minecraft: MinecraftStatus? { summary?.minecraft }
+    var luna: LunaStatus? { summary?.luna }
     var server: ServerOverview? { summary?.server }
     var latestMilestone: Milestone? { summary?.latestMilestone ?? milestones.first }
     var unreadActivity: Int { activity?.unread ?? summary?.activity.unread ?? 0 }

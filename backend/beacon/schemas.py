@@ -415,6 +415,29 @@ class ActivityFeed(BaseModel):
     items: list[NotificationModel] = Field(default_factory=list)
 
 
+class LunaStatus(BaseModel):
+    available: bool = False
+    online: bool = False
+    state: str = "stopped"
+    server_name: str | None = None
+    description: str | None = None
+    game_mode: str | None = None
+    players_online: int | None = None
+    players_max: int | None = None
+    players: list[str] = Field(default_factory=list)
+    vessels: int | None = None
+    has_password: bool | None = None
+    mod_control: bool | None = None
+    warp_mode: str | None = None
+    udp_listening: bool = False
+    pid: int | None = None
+    uptime_seconds: float | None = None
+    memory_bytes: int | None = None
+    server_memory_bytes: int | None = None
+    generated_at: float = 0.0
+    error: str | None = None
+
+
 class DashboardSummary(BaseModel):
     generated_at: float
     agent: AgentStatusResponse
@@ -422,6 +445,7 @@ class DashboardSummary(BaseModel):
     server: ServerOverview
     pihole: PiholeStatus
     minecraft: MinecraftStatus
+    luna: LunaStatus
     latest_milestone: MilestoneModel | None = None
     activity: ActivityFeed
     data_age_seconds: float | None = None

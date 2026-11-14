@@ -3,6 +3,29 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.10] — 2026-11-13
+
+Read-only KSP / Luna Multiplayer monitoring.
+
+### Added
+* `LunaStatus` in the dashboard summary, populated from the LMP status JSON on
+  `http://127.0.0.1:8900` plus `/proc` process/UDP checks.
+* Server tab card: running/stopped, server name, online/max players, current player names,
+  vessel count, game mode, password/mod-control flags, warp mode, UDP 8800 listening, PID,
+  uptime and process memory.
+* Activity notifications for Luna online/offline edges.
+* `BEACON_LUNA_STATUS_URL` and `BEACON_LUNA_PROCESS_MARKER` configuration; read-only by design.
+
+### Not implemented
+* Start/stop/restart of `luna-server.service`: it is a root-owned system service, and Beacon
+  deliberately has no sudo path. Manage the service from the server.
+* `new chat` creation in the iOS app; Cherry Studio's database remains read-only.
+
+### Verified
+* Live summary returned `state=running`, `players 0/10`, `udp_listening=true` for
+  “Eric's Kerbin Station”.
+* 152 backend tests, 39 OpenAPI paths.
+
 ## [0.1.9] — 2026-11-13
 
 Read-only agent chat browser.

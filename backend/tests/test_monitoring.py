@@ -118,11 +118,13 @@ def test_dashboard_summary_composes_everything(client, auth):
         "unknown",
     }
     keys = {service["key"] for service in payload["services"]}
-    assert {"api", "agent", "pihole", "minecraft", "server", "docker"} <= keys
+    assert {"api", "agent", "pihole", "minecraft", "luna", "server", "docker"} <= keys
     pihole_service = next(service for service in payload["services"] if service["key"] == "pihole")
     assert pihole_service["state"] == "down"
     minecraft_service = next(service for service in payload["services"] if service["key"] == "minecraft")
     assert minecraft_service["state"] == "down"
+    luna_service = next(service for service in payload["services"] if service["key"] == "luna")
+    assert luna_service["state"] == "down"
     assert payload["activity"]["unread"] == 0
 
 
