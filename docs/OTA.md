@@ -238,7 +238,8 @@ background refresh/VPN; OTA updates do not remove that requirement.
 * The bundle identifier remains `dev.ericserver.beacon`; updates preserve app data.
 * Backend credentials stay in the app's Keychain and are entered by the user; they are not built
   into the IPA.
-* The source feed exposes only the IPA, icon and release notes.
+* The source feed exposes only the IPA, icon and release notes. Release notes are generated from
+  commit subjects, so do not put credentials or private data in commit messages.
 
 ## 9. Local validation
 
