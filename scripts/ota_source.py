@@ -224,6 +224,12 @@ def _validate_version_entry(entry: Any, *, label: str) -> None:
         raise SourceError(f"{label}.size must be a positive integer")
     if "buildVersion" in entry and not isinstance(entry["buildVersion"], str):
         raise SourceError(f"{label}.buildVersion must be a string")
+    if "sha256" in entry and (
+        not isinstance(entry["sha256"], str)
+        or len(entry["sha256"]) != 64
+        or any(ch not in "0123456789abcdef" for ch in entry["sha256"].lower())
+    ):
+        raise SourceError(f"{label}.sha256 must be a 64-character hex digest")
 
 
 def validate_source(data: dict[str, Any], *, bundle_id: str = BUNDLE_ID) -> None:
@@ -354,6 +360,7 @@ def build_source(
         "buildVersion": build,
         "date": date,
         "localizedDescription": notes,
+        "sha256": info.sha256,
         "downloadURL": download_url,
         "size": info.size,
     }

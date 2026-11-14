@@ -82,6 +82,7 @@ class OtaSourceTests(unittest.TestCase):
         self.assertEqual(app["bundleIdentifier"], "dev.ericserver.beacon")
         self.assertEqual(app["versions"][0]["version"], "1.0.42")
         self.assertEqual(app["versions"][0]["buildVersion"], "42")
+        self.assertEqual(len(app["versions"][0]["sha256"]), 64)
         self.assertEqual(app["versions"][0]["size"], app["size"])
         self.assertEqual(app["versions"][0]["minOSVersion"], "17.0")
         self.assertEqual(app["version"], "1.0.42")
