@@ -67,7 +67,7 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
 | `swiftc -parse` on iOS sources | 23 files parsed |
 | `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 20 app files + 2 test files typecheck, 0 errors |
-| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | **succeeded**; unsigned arm64 IPA produced (771 KB), both jobs green |
+| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | **succeeded** for `a7a8021`; unsigned arm64 IPA (771 KB), both jobs green. `11f9b30` is committed locally but not pushed/built — this host has no GitHub credentials |
 | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached to this host) |
 | `scripts/validate_ios_project.py` | 22 checks passed |
 | `scripts/check_openapi_drift.py` | contract up to date (39 paths) |
