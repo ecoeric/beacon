@@ -253,7 +253,9 @@ This runs the source-generator unit tests, checks the committed icon is reproduc
 Info.plist version placeholders and checks the workflow structure. If `actionlint` is installed it
 also lints expressions and shell blocks. The generator was additionally run against the existing
 real `artifacts/Beacon-unsigned.ipa` (version 1.0, build 1) and accepted its unsigned arm64 layout,
-bundle id, CA and Info.plist.
+bundle id, CA and Info.plist. The publish shell sequence was also exercised with a fake
+`gh`/`curl`: release creation, source-feed upload, feed fetch-back and published-IPA SHA-256
+verification all reached their assertions. That validates the commands, not GitHub or SideStore.
 
 ## 10. Limits and unverified parts
 
