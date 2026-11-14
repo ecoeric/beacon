@@ -492,6 +492,25 @@ jobs:
           print(f"published feed verified: {source_url} -> {version}")
           PY
 
+      - name: Fetch the published IPA back and verify its checksum
+        run: |
+          set -euo pipefail
+          source ota/urls.env
+          EXPECTED="$(cut -d ' ' -f 1 dist/Beacon-unsigned.ipa.sha256)"
+          for attempt in 1 2 3 4 5; do
+            if curl -fsSL "${DOWNLOAD_URL}?verify=${GITHUB_RUN_ID}-${attempt}" -o downloaded-ipa; then
+              break
+            fi
+            sleep 5
+          done
+          ACTUAL="$(sha256sum downloaded-ipa | cut -d ' ' -f 1)"
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "::error::published IPA checksum mismatch: expected $EXPECTED, got $ACTUAL"
+            exit 1
+          fi
+          test "$(wc -c < downloaded-ipa)" -gt 0
+          echo "published IPA verified: $(wc -c < downloaded-ipa) bytes, sha256 $ACTUAL"
+
       - name: Publish summary
         if: always()
         run: |

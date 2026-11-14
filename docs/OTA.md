@@ -219,7 +219,9 @@ background refresh/VPN; OTA updates do not remove that requirement.
   simulator test means no release and no feed change.
 * Versioned releases are never overwritten or deleted. Re-running the same run number only
   replaces assets in that same release; a new commit gets a new run number and a new version.
-* The source feed is updated only after the IPA release is created and the IPA is verified.
+* The source feed is updated only after the IPA release is created and the IPA is verified. The
+  publish job then downloads the published IPA again and compares its SHA-256 with the build
+  artifact, so a broken/truncated release fails the run.
 * If the source-feed upload fails after the IPA release exists, the old feed still points to the
   last working IPA. The orphaned release can be cleaned up manually; it is harmless.
 * The publish job refuses private targets, because SideStore could not download them.
