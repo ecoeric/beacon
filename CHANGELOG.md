@@ -21,7 +21,9 @@ Writeable Chats, real queue delivery, and bug-fix pass from phone use.
 * `chat_write` capability flag in `/capabilities`; Chats composer now uses the writeable endpoint
   and refreshes the transcript after sending.
 * `BEACON_CHAT_WRITE`, `services/chat_write.py`, `services/chat_delivery.py`, and
-  `tests/test_chat_write.py` (10 tests).
+  `tests/test_chat_write.py` (12 tests).
+* Queue schema v2 adds `agent_message.forward` (default 1) so smoke tests and checkpoint-only
+  callers can opt out of automatic chat forwarding; existing databases migrate on startup.
 
 ### Fixed
 * Minecraft CPU tile now shows **percent of total host CPU** (`cpu_percent_of_total`) with the
