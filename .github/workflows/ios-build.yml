@@ -1,28 +1,37 @@
-name: iOS build, tests & unsigned IPA
+name: iOS build, tests & SideStore release
 # Indexing trigger: this workflow must be registered on the default branch.
 
 # Beacon is developed on Linux with no Xcode. This workflow does the real iOS-SDK work on a
 # GitHub-hosted macOS 26 runner:
 #
-#   * simulator tests (separate job; a test failure does not block the IPA)
+#   * simulator tests
 #   * an unsigned arm64 device build packaged as Payload/Beacon.app in a .ipa
+#   * a gated publish job that creates a immutable GitHub Release and updates the stable
+#     SideStore source feed (apps.json + icon) after BOTH jobs above succeed
 #
 # The IPA is intentionally UNSIGNED. It contains the app and its bundled private CA, but no
-# Apple provisioning profile. Sign it with a free Apple ID on the Linux host before installing;
-# see docs/LINUX_IPA_INSTALL.md.
+# Apple provisioning profile. SideStore signs it on-device with the user's Apple ID; see
+# docs/OTA.md. The old USB/AltServer path remains as a fallback (docs/LINUX_IPA_INSTALL.md).
 
 on:
   push:
+    branches:
+      - master
+      - main
     paths:
       - "ios/**"
       - "scripts/gen_xcodeproj.py"
       - "scripts/validate_ios_project.py"
+      - "scripts/ota_source.py"
+      - "scripts/make_app_icon.py"
       - ".github/workflows/ios-build.yml"
   pull_request:
     paths:
       - "ios/**"
       - "scripts/gen_xcodeproj.py"
       - "scripts/validate_ios_project.py"
+      - "scripts/ota_source.py"
+      - "scripts/make_app_icon.py"
       - ".github/workflows/ios-build.yml"
   workflow_dispatch:
 
@@ -31,13 +40,18 @@ permissions:
 
 concurrency:
   group: ios-${{ github.ref }}
-  cancel-in-progress: true
+  # Never cancel an in-flight release publish. Pull-request builds may be superseded.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   PROJECT: ios/Beacon.xcodeproj
   SCHEME: Beacon
   XCODE_APP: /Applications/Xcode_26.2.app
   XCODE_VERSION: "26.2"
+  # Every successful run gets a monotonically increasing marketing version. SideStore compares
+  # CFBundleShortVersionString, so a hardcoded 1.0 would never produce an update prompt.
+  APP_VERSION: 1.0.${{ github.run_number }}
+  APP_BUILD: ${{ github.run_number }}
 
 jobs:
   unsigned-ipa:
@@ -87,6 +101,8 @@ jobs:
             CODE_SIGN_ENTITLEMENTS="" \
             ONLY_ACTIVE_ARCH=NO \
             ARCHS=arm64 \
+            MARKETING_VERSION="$APP_VERSION" \
+            CURRENT_PROJECT_VERSION="$APP_BUILD" \
             VALIDATE_PRODUCT=NO \
             clean build 2>&1 | tee build.log
 
@@ -140,6 +156,14 @@ jobs:
             echo "minimum_os=$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$APP_PATH/Info.plist" 2>/dev/null || echo unknown)"
             echo "signed=false"
           } | tee -a build-info.txt
+
+          ACTUAL_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Info.plist")"
+          ACTUAL_BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP_PATH/Info.plist")"
+          if [ "$ACTUAL_VERSION" != "$APP_VERSION" ] || [ "$ACTUAL_BUILD" != "$APP_BUILD" ]; then
+            echo "Version substitution failed: expected $APP_VERSION ($APP_BUILD), got $ACTUAL_VERSION ($ACTUAL_BUILD)" >&2
+            echo "Is Info.plist still using \$(MARKETING_VERSION) / \$(CURRENT_PROJECT_VERSION)?" >&2
+            exit 1
+          fi
 
           shasum -a 256 Beacon-unsigned.ipa | tee Beacon-unsigned.ipa.sha256
           ls -lh Beacon-unsigned.ipa
@@ -252,4 +276,242 @@ jobs:
             echo ""
             echo "- Simulator: ${{ steps.sim.outputs.name }}"
             echo "- Result: ${{ job.status }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------------------------
+  # SideStore / AltStore OTA publish
+  #
+  # This job only runs after BOTH the device build and simulator tests succeed, and only on the
+  # repository's default branch. It never deletes an older release. If any step here fails, the
+  # previously published source feed still points at the last working IPA.
+  # ---------------------------------------------------------------------------------------------
+  publish:
+    name: Publish SideStore release
+    if: ${{ github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+    needs: [unsigned-ipa, simulator-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      APP_VERSION: 1.0.${{ github.run_number }}
+      APP_BUILD: ${{ github.run_number }}
+      TAG: v1.0.${{ github.run_number }}
+      TARGET_REPO: ${{ vars.BEACON_RELEASE_REPO || github.repository }}
+      SOURCE_RELEASE_TAG: beacon-source
+      # A fine-grained PAT with contents:write on the public release mirror. When unset, the
+      # workflow uses GITHUB_TOKEN and the target repository must be public.
+      GH_TOKEN: ${{ secrets.BEACON_RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+      HAS_RELEASE_TOKEN: ${{ secrets.BEACON_RELEASE_TOKEN != '' }}
+    steps:
+      - name: Check out source history for release notes
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Download the tested IPA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Beacon-unsigned-ipa
+          path: dist
+
+      - name: Verify target repository is public and writable
+        run: |
+          set -euo pipefail
+          if [ "$TARGET_REPO" != "$GITHUB_REPOSITORY" ] && [ "$HAS_RELEASE_TOKEN" != "true" ]; then
+            echo "::error::BEACON_RELEASE_REPO is set to $TARGET_REPO but BEACON_RELEASE_TOKEN is missing."
+            echo "Add a fine-grained PAT with contents:write on that public repository as a secret."
+            exit 1
+          fi
+          VISIBILITY="$(gh repo view "$TARGET_REPO" --json visibility -q .visibility)"
+          if [ "$VISIBILITY" != "PUBLIC" ]; then
+            echo "::error::Release target $TARGET_REPO is $VISIBILITY. SideStore cannot fetch private GitHub assets."
+            echo "Make the repository public, or create a public release-only mirror and set the"
+            echo "BEACON_RELEASE_REPO Actions variable plus the BEACON_RELEASE_TOKEN secret."
+            exit 1
+          fi
+
+      - name: Verify IPA and prepare release metadata
+        run: |
+          set -euo pipefail
+          mkdir -p ota
+          (cd dist && sha256sum -c Beacon-unsigned.ipa.sha256)
+          test -f dist/Beacon-unsigned.ipa
+          test -f dist/build-info.txt
+          grep -q 'arm64' dist/build-info.txt
+          grep -q 'signed=false' dist/build-info.txt
+
+          SOURCE_URL="https://github.com/${TARGET_REPO}/releases/download/${SOURCE_RELEASE_TAG}/apps.json"
+          DOWNLOAD_URL="https://github.com/${TARGET_REPO}/releases/download/${TAG}/Beacon-unsigned.ipa"
+          ICON_URL="https://github.com/${TARGET_REPO}/releases/download/${SOURCE_RELEASE_TAG}/Beacon-AppIcon.png"
+          printf 'SOURCE_URL=%s\nDOWNLOAD_URL=%s\nICON_URL=%s\n' "$SOURCE_URL" "$DOWNLOAD_URL" "$ICON_URL" > ota/urls.env
+
+          PREV_TAG="$(git tag --list 'v1.0.*' --sort=-version:refname | grep -v -F -x "$TAG" | head -n 1 || true)"
+          if [ -n "$PREV_TAG" ]; then
+            RANGE="${PREV_TAG}..${GITHUB_SHA}"
+          else
+            RANGE="-20"
+          fi
+          {
+            echo "## Beacon ${APP_VERSION}"
+            echo
+            echo "Built from \`${GITHUB_SHA}\` on $(date -u +'%Y-%m-%d %H:%M UTC')."
+            echo
+            echo "### Changes"
+            echo
+            git log --no-merges --pretty='- %s (%h)' "$RANGE" | head -n 40 || true
+            echo
+            echo "### Install / update"
+            echo
+            echo "Open SideStore → Sources → refresh, then update Beacon. This is an unsigned IPA;"
+            echo "SideStore signs it with your existing Apple ID certificate."
+            echo
+            echo "Source: ${SOURCE_URL}"
+          } > release-notes.md
+
+          if gh release view "$SOURCE_RELEASE_TAG" --repo "$TARGET_REPO" >/dev/null 2>&1; then
+            if gh release view "$SOURCE_RELEASE_TAG" --repo "$TARGET_REPO" \
+                --json assets -q '.assets[].name' | grep -qx 'apps.json'; then
+              # If the old feed exists but cannot be downloaded, fail instead of silently
+              # discarding version history.
+              gh release download "$SOURCE_RELEASE_TAG" --repo "$TARGET_REPO" \
+                --pattern apps.json --dir ota --clobber
+            fi
+          fi
+          cp ios/Beacon/Resources/AppIcon.png ota/Beacon-AppIcon.png
+
+          python3 scripts/ota_source.py \
+            --ipa dist/Beacon-unsigned.ipa \
+            --version "$APP_VERSION" \
+            --build "$APP_BUILD" \
+            --source-url "$SOURCE_URL" \
+            --download-url "$DOWNLOAD_URL" \
+            --icon-url "$ICON_URL" \
+            --notes-file release-notes.md \
+            --existing ota/apps.json \
+            --output ota/apps.json
+
+          # Fail closed if the feed somehow does not point at this exact build.
+          python3 - "$APP_VERSION" "$DOWNLOAD_URL" <<'PY'
+          import json
+          import sys
+
+          version, download = sys.argv[1], sys.argv[2]
+          with open("ota/apps.json", encoding="utf-8") as handle:
+              feed = json.load(handle)
+          app = feed["apps"][0]
+          latest = app["versions"][0]
+          assert latest["version"] == version, (latest["version"], version)
+          assert latest["downloadURL"] == download, (latest["downloadURL"], download)
+          assert app["bundleIdentifier"] == "dev.ericserver.beacon"
+          assert latest["size"] > 0
+          print(f"feed verified: {version}, {latest['size']} bytes, {len(app['versions'])} version(s)")
+          PY
+
+      - name: Create immutable versioned GitHub Release
+        run: |
+          set -euo pipefail
+          source ota/urls.env
+          if gh release view "$TAG" --repo "$TARGET_REPO" >/dev/null 2>&1; then
+            gh release upload "$TAG" \
+              dist/Beacon-unsigned.ipa \
+              dist/Beacon-unsigned.ipa.sha256 \
+              dist/build-info.txt \
+              release-notes.md \
+              --clobber --repo "$TARGET_REPO"
+            gh release edit "$TAG" --repo "$TARGET_REPO" \
+              --title "Beacon ${APP_VERSION}" \
+              --notes-file release-notes.md \
+              --latest
+          else
+            TARGET_ARGS=()
+            if [ "$TARGET_REPO" = "$GITHUB_REPOSITORY" ]; then
+              TARGET_ARGS=(--target "$GITHUB_SHA")
+            fi
+            gh release create "$TAG" \
+              dist/Beacon-unsigned.ipa \
+              dist/Beacon-unsigned.ipa.sha256 \
+              dist/build-info.txt \
+              release-notes.md \
+              --repo "$TARGET_REPO" \
+              --title "Beacon ${APP_VERSION}" \
+              --notes-file release-notes.md \
+              --latest \
+              "${TARGET_ARGS[@]}"
+          fi
+
+      - name: Publish/update the stable SideStore source feed
+        run: |
+          set -euo pipefail
+          source ota/urls.env
+          NOTES="Stable SideStore/AltStore source for Beacon. Do not delete this release; its assets keep fixed URLs used by SideStore."
+          if gh release view "$SOURCE_RELEASE_TAG" --repo "$TARGET_REPO" >/dev/null 2>&1; then
+            gh release upload "$SOURCE_RELEASE_TAG" \
+              ota/apps.json ota/Beacon-AppIcon.png \
+              --clobber --repo "$TARGET_REPO"
+            gh release edit "$SOURCE_RELEASE_TAG" --repo "$TARGET_REPO" \
+              --title "Beacon SideStore source" \
+              --notes "$NOTES" \
+              --prerelease
+          else
+            gh release create "$SOURCE_RELEASE_TAG" \
+              ota/apps.json ota/Beacon-AppIcon.png \
+              --repo "$TARGET_REPO" \
+              --title "Beacon SideStore source" \
+              --notes "$NOTES" \
+              --prerelease
+          fi
+
+      - name: Fetch the published feed back and verify it
+        run: |
+          set -euo pipefail
+          source ota/urls.env
+          # The cache-busting query is only for this verification request; SideStore keeps using
+          # the canonical source URL stored in apps.json.
+          for attempt in 1 2 3 4 5; do
+            if curl -fsSL "${SOURCE_URL}?verify=${GITHUB_RUN_ID}-${attempt}" -o downloaded-apps.json; then
+              break
+            fi
+            sleep 5
+          done
+          python3 - "$APP_VERSION" "$SOURCE_URL" "$DOWNLOAD_URL" <<'PY'
+          import json
+          import sys
+
+          version, source_url, download_url = sys.argv[1:4]
+          with open("downloaded-apps.json", encoding="utf-8") as handle:
+              feed = json.load(handle)
+          app = feed["apps"][0]
+          latest = app["versions"][0]
+          assert feed["sourceURL"] == source_url, (feed["sourceURL"], source_url)
+          assert app["versions"][0]["version"] == version
+          assert latest["downloadURL"] == download_url
+          assert latest["size"] > 0
+          assert app["bundleIdentifier"] == "dev.ericserver.beacon"
+          print(f"published feed verified: {source_url} -> {version}")
+          PY
+
+      - name: Publish summary
+        if: always()
+        run: |
+          {
+            echo "### SideStore OTA release"
+            echo ""
+            echo "- Version: \`${APP_VERSION}\` (build \`${APP_BUILD}\`)"
+            echo "- Target repository: \`${TARGET_REPO}\`"
+            echo "- Version release: \`${TAG}\`"
+            echo "- Status: ${{ job.status }}"
+            echo ""
+            if [ -f ota/urls.env ]; then
+              source ota/urls.env
+              echo "SideStore source URL:"
+              echo ""
+              echo "\`${SOURCE_URL}\`"
+              echo ""
+              echo "Add it in SideStore → Sources (or open \`sidestore://source?url=${SOURCE_URL}\`)."
+              echo "Future updates: open SideStore, refresh Sources, tap Update."
+            fi
+            echo ""
+            echo "The IPA is unsigned and is signed on-device by SideStore. No Apple credentials are stored in this repository."
           } >> "$GITHUB_STEP_SUMMARY"

@@ -7,8 +7,10 @@ Beacon has two parts, and only one of them is not deployed yet:
 | `beacon-api` on `ericserver` | **Already running** at `https://192.168.1.83:8091` |
 | Native iPhone app | **Never installed** — there is no App Store link; you build it once with your own Apple ID |
 
-This guide is for a **personal install**, not App Store distribution. Nothing here signs or
-installs the app automatically; you do the final Run from Xcode.
+This guide is for a **personal install**, not App Store distribution. It remains the
+Xcode/Mac route; for routine updates, use the SideStore OTA pipeline in [`OTA.md`](OTA.md) instead
+of rebuilding from a Mac. Nothing here signs or installs the app automatically; you do the final
+Run from Xcode.
 
 ---
 

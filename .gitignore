@@ -10,3 +10,8 @@ artifacts/
 
 # AltServer signing certificate / developer disk images (contains a p12)
 AltServerData/
+
+# Local SideStore release staging (the workflow uses a fresh runner).
+ota/
+release-notes.md
+downloaded-apps.json

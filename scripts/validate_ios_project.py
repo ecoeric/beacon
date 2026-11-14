@@ -6,7 +6,9 @@ Checks performed:
   * the app target compiles every source file that exists under ``ios/Beacon``;
   * the test target includes the snapshot test and the shared decoding test;
   * resources (asset catalog, private CA) are in the resources phase;
-  * Info.plist is wired through ``INFOPLIST_FILE`` and exists;
+  * Info.plist is wired through ``INFOPLIST_FILE``, exists, and uses build-setting version
+    placeholders so CI can assign a unique version;
+  * the app icon asset exists and is a 1024x1024 PNG;
   * the shared scheme references real target ids;
   * every ``.swift`` file on disk is referenced by exactly one target;
   * all Swift files parse (requires ``swiftc``; run ``scripts/validate_ios.sh`` for that step).
@@ -18,6 +20,8 @@ Requires:  pbxproj (pip/pipx), e.g. `uv run --with pbxproj python scripts/valida
 from __future__ import annotations
 
 import pathlib
+import plistlib
+import struct
 import sys
 import xml.etree.ElementTree as ET
 
@@ -159,6 +163,27 @@ def main() -> int:
         all(setting(config, "INFOPLIST_FILE") == "Beacon/Resources/Info.plist" for config in app_configs),
         "INFOPLIST_FILE points at Beacon/Resources/Info.plist",
     )
+    try:
+        info = plistlib.loads(info_plist.read_bytes())
+    except Exception as exc:  # noqa: BLE001 - validation reports, does not crash
+        info = {}
+        check(False, f"Info.plist parses ({exc})")
+    check(
+        info.get("CFBundleShortVersionString") == "$(MARKETING_VERSION)",
+        "CFBundleShortVersionString uses $(MARKETING_VERSION)",
+    )
+    check(
+        info.get("CFBundleVersion") == "$(CURRENT_PROJECT_VERSION)",
+        "CFBundleVersion uses $(CURRENT_PROJECT_VERSION)",
+    )
+    icon = IOS / "Beacon" / "Resources" / "AppIcon.png"
+    check(icon.is_file(), "app icon AppIcon.png exists")
+    if icon.is_file():
+        raw = icon.read_bytes()
+        check(raw[:8] == b"\x89PNG\r\n\x1a\n", "app icon is a PNG")
+        if raw[:8] == b"\x89PNG\r\n\x1a\n" and len(raw) >= 24:
+            width, height = struct.unpack(">II", raw[16:24])
+            check((width, height) == (1024, 1024), f"app icon is 1024x1024 (got {width}x{height})")
     bundle_ids = {setting(config, "PRODUCT_BUNDLE_IDENTIFIER") for config in app_configs}
     check(bundle_ids == {"dev.ericserver.beacon"}, "app bundle identifier is dev.ericserver.beacon")
     pbx_text = PROJECT.read_text(encoding="utf-8")

@@ -1,8 +1,12 @@
 # Sign and install Beacon on iPhone from Linux
 
-This is the Linux-only path: **GitHub Actions builds an unsigned IPA**, and this host signs and
-installs it with a free Apple ID using **AltServer-Linux-NG**. No Windows and no Mac are required
-for this step.
+This is the Linux-only **USB fallback** path: **GitHub Actions builds an unsigned IPA**, and this
+host signs and installs it with a free Apple ID using **AltServer-Linux-NG**. No Windows and no Mac
+are required for this step.
+
+> **Prefer SideStore for routine updates.** The OTA pipeline in [`OTA.md`](OTA.md) publishes the
+> IPA and a source feed; SideStore installs updates without USB. Use this document only for the
+> first install or when SideStore is unavailable.
 
 > The IPA from CI is **unsigned**. It cannot be installed directly. `scripts/install_ipa_linux.sh`
 > signs it with a development profile and installs it over USB.

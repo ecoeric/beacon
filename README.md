@@ -39,16 +39,20 @@ systemctl status beacon-api
 beacon doctor
 ```
 
-Documentation: `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/OPERATIONS.md`, `docs/SECURITY_REVIEW.md`, `docs/CI.md`, `DASHBOARD_IMPLEMENTATION.md`.
+Documentation: `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/OPERATIONS.md`,
+`docs/SECURITY_REVIEW.md`, `docs/CI.md`, `docs/OTA.md`, `DASHBOARD_IMPLEMENTATION.md`.
 
 ## Building the iPhone app
 
-Two routes:
+Three routes, in order of convenience:
 
+- **SideStore OTA (routine updates):** GitHub Actions builds and publishes an unsigned IPA plus a
+  stable SideStore source feed. Add the source once, then tap **Update** in SideStore. No USB
+  after the one-time SideStore setup — see `docs/OTA.md`.
 - **Borrowed Mac:** open `ios/Beacon.xcodeproj` and Run (see `docs/INSTALL_IPHONE.md`).
-- **Linux-only:** GitHub Actions builds an unsigned IPA (`.github/workflows/ios-build.yml`), and
-  `scripts/install_ipa_linux.sh` signs and installs it with a free Apple ID
-  (see `docs/LINUX_IPA_INSTALL.md`).
+- **Linux-only USB fallback:** GitHub Actions builds an unsigned IPA
+  (`.github/workflows/ios-build.yml`), and `scripts/install_ipa_linux.sh` signs and installs it
+  with a free Apple ID (see `docs/LINUX_IPA_INSTALL.md`).
 
 `docs/CI.md` covers the workflow and its artifacts. Nothing in this repository pushes, signs or
 distributes the app automatically; the final signing/install is an explicit user action.
@@ -67,9 +71,11 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
 | `swiftc -parse` on iOS sources | 23 files parsed |
 | `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 20 app files + 2 test files typecheck, 0 errors |
-| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | **succeeded** for `a7a8021`; unsigned arm64 IPA (771 KB), both jobs green. `11f9b30` is committed locally but not pushed/built — this host has no GitHub credentials |
+| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | **succeeded** for `a7a8021`; unsigned arm64 IPA (771 KB), both jobs green. The 0.1.12 release/publish path is not run yet — this host has no GitHub credentials, so no new IPA/release/feed exists |
 | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached to this host) |
-| `scripts/validate_ios_project.py` | 22 checks passed |
+| `scripts/validate_ios_project.py` | project structure + version placeholders + 1024px app icon checks pass |
+| `scripts/validate_ota.sh` | 8 source-generator tests pass; icon reproducible; workflow structure valid |
+| `actionlint` + `shellcheck` | workflow expressions and embedded shell pass |
 | `scripts/check_openapi_drift.py` | contract up to date (39 paths) |
 | backup restore drill | restored DB, token and image served by the API |
 | crash recovery (`SIGKILL`) | systemd restart, API back in 3.8 s, data intact |

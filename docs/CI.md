@@ -7,14 +7,14 @@ layers cover the gap; they are deliberately not conflated:
 |---|---|---|
 | Swift typecheck | this host, Docker `swift:6.0` | Every app source and both Xcode test files typecheck with the real Swift compiler against mock SwiftUI/UIKit/Combine/XCTest modules. Catches type, generic, result-builder, property-wrapper and concurrency errors. **Not an iOS build.** |
 | Xcode build + IPA | GitHub Actions `macos-26`, Xcode 26.2 | A real iOS-SDK device build of the generated project, packaged as an **unsigned arm64 IPA**, plus a separate simulator test job. This is the authoritative compile confirmation. |
-| Sign + install | this host, AltServer-Linux-NG | The unsigned IPA is signed with a free Apple ID and installed on the iPhone over USB. See [`LINUX_IPA_INSTALL.md`](LINUX_IPA_INSTALL.md). |
+| Sign + install | SideStore on the iPhone (preferred) or AltServer-Linux-NG over USB (fallback) | The unsigned IPA is signed with a free Apple ID. SideStore installs it without USB; see [`OTA.md`](OTA.md). The fallback is [`LINUX_IPA_INSTALL.md`](LINUX_IPA_INSTALL.md). |
 
 `scripts/validate_ios.sh` runs the first layer plus parsing, Foundation tests, call-site checks and
 project validation.
 
 ## The workflow
 
-`.github/workflows/ios-build.yml` has two independent jobs on `macos-26`:
+`.github/workflows/ios-build.yml` has two `macos-26` build/test jobs plus a gated publish job:
 
 ### `unsigned-ipa` — the artifact you install
 
@@ -32,15 +32,25 @@ profile is needed for CI. Signing happens locally with a free Apple ID before in
 ### `simulator-tests` — compile and test the views
 
 Builds and runs `BeaconTests` on an iPhone simulator with Xcode 26.2 and uploads `test.log` plus
-`TestResults.xcresult`. A test failure does not block the IPA job.
+`TestResults.xcresult`. A test failure does not block the build artifact, but it **does** block the
+`publish` job.
+
+### `publish` — immutable release and SideStore feed
+
+Runs on `ubuntu-latest` only for a push to the default branch, and only when both jobs above pass.
+It verifies the IPA, creates a versioned GitHub Release, merges the SideStore `apps.json` into the
+fixed `beacon-source` prerelease, and fetches the published feed back to verify it. See
+[`OTA.md`](OTA.md) for the source URL, one-time setup and failure model.
 
 ## Running it
 
-1. Push this repository to GitHub (private is fine).
-2. Open **Actions → iOS build, tests & unsigned IPA → Run workflow**.
-3. Wait roughly 5–10 minutes for `unsigned-ipa`.
-4. Download the **`Beacon-unsigned-ipa`** artifact.
-5. Follow [`LINUX_IPA_INSTALL.md`](LINUX_IPA_INSTALL.md) to sign and install it.
+1. Push this repository to GitHub.
+2. For SideStore, the target release repository must be public (or use a public mirror — see
+   [`OTA.md`](OTA.md)); private GitHub assets cannot be fetched by SideStore.
+3. Open **Actions → iOS build, tests & SideStore release → Run workflow**.
+4. Wait roughly 5–10 minutes for the build and tests, then the publish job.
+5. Add the source URL printed in the run summary in SideStore, install Beacon, and use
+   **Updates → Update** for later builds.
 
 You do **not** need a paid Apple Developer account to compile the app or to produce the IPA.
 A free Apple ID is enough for personal installation, but the profile expires after 7 days.
@@ -58,7 +68,10 @@ minutes (macOS runners have a multiplier). The workflow timeout is 45 minutes fo
 * **Cannot** reach `192.168.1.83` — a GitHub runner is outside the LAN. Snapshot tests run in
   **layout mode** with DEBUG fixtures; screenshot tiles show "Unavailable" and no image is
   fabricated. Live screenshots must be produced on a machine on the LAN.
-* **Does not** sign or install the IPA. The artifact is intentionally unsigned.
+* **Does not** sign or install the IPA. The artifact is intentionally unsigned; SideStore signs
+  it on-device, or the fallback AltServer script signs it over USB.
+* **Cannot publish to a private repository.** The publish job checks visibility and fails closed
+  with instructions to make the repo public or configure a public mirror.
 
 ## Live screenshots on a Mac
 
@@ -81,9 +94,9 @@ the PNGs to a milestone.
 
 ## Status
 
-The workflow is implemented and locally linted with `actionlint` 1.7.12; every `run:` block also
-passes `bash -n`. The **first real CI run has executed** on `macos-26` with Xcode 26.2 and found two
-blockers:
+The original build workflow was implemented and locally linted with `actionlint` 1.7.12; its
+embedded shell also passes ShellCheck 0.11.0. The **first real CI run executed** on `macos-26` with Xcode 26.2
+and found two blockers:
 
 - duplicated Xcode resource paths (`ios/Beacon/Beacon/Resources/...`) caused
   `CpResource … ca.crt` to fail;
@@ -95,5 +108,10 @@ unsigned, 706 KB) and the simulator test job is green. The Linux-side typecheck 
 passes; it previously found a real compile blocker (a `Section` with more than ten direct
 children), which was fixed.
 
-If the rerun fails, download `Beacon-unsigned-ipa` (which contains `build.log`) and fix the
-reported error before attempting signing.
+The OTA release job and SideStore source feed are newer than that first build. They have been
+locally validated with `scripts/validate_ota.sh`, `actionlint` and the existing real IPA, but the
+new publish path has **not** executed on GitHub yet; this host has no GitHub credentials. See
+[`OTA.md`](OTA.md#limits-and-unverified-parts).
+
+If a build fails, download `Beacon-unsigned-ipa` (which contains `build.log`) and fix the reported
+error. No release or source-feed update occurs for a failed build.

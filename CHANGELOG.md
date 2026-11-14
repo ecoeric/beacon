@@ -3,6 +3,48 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.12] — 2026-11-14
+
+SideStore OTA release pipeline.
+
+### Added
+* `.github/workflows/ios-build.yml` now has a gated `publish` job. It runs only on the default
+  branch after both the unsigned device build and simulator tests pass, creates an immutable
+  `v1.0.<run_number>` GitHub Release, and updates a fixed `beacon-source` prerelease containing
+  `apps.json` and `Beacon-AppIcon.png`.
+* `scripts/ota_source.py`: dependency-free SideStore/AltStore source generator. It inspects the
+  real IPA (bundle id, version/build, CA, executable, unsigned), merges up to 25 previous versions
+  newest-first, writes modern `versions` plus legacy flat fields, and fails closed on invalid
+  URLs/versions.
+* `scripts/test_ota_source.py` (8 tests) and `scripts/validate_ota.sh`.
+* `scripts/make_app_icon.py` and a reproducible 1024×1024 `AppIcon.png` asset, used both by Xcode
+  and the SideStore source.
+* Automatic versioning: `CFBundleShortVersionString = 1.0.<run_number>` and
+  `CFBundleVersion = <run_number>`, wired through `$(MARKETING_VERSION)` /
+  `$(CURRENT_PROJECT_VERSION)` and verified after the Xcode build.
+* `docs/OTA.md`: audit, architecture, public-repo and private-source/public-mirror setup,
+  SideStore instructions, routine commands, failure handling, security and unverified limits.
+
+### Changed
+* Release builds are no longer cancelled by a newer push; PR builds still use cancellation to
+  save runners.
+* `docs/CI.md` and `README.md` describe the SideStore path; USB/AltServer remains a fallback.
+
+### Security
+* No Apple ID, certificate, provisioning profile or backend token is stored in GitHub. The IPA
+  remains unsigned and SideStore signs it on-device.
+* The optional public release mirror uses a fine-grained PAT in `BEACON_RELEASE_TOKEN`; the
+  publish job refuses a private target repository.
+* Bundle identifier remains `dev.ericserver.beacon`, so SideStore updates preserve app data.
+
+### Verified locally
+* 8 source-generator tests, icon reproducibility, version placeholders and workflow structure.
+* `actionlint` 1.7.12 and `shellcheck` 0.11.0 pass on the workflow.
+* The generator accepts the existing real `artifacts/Beacon-unsigned.ipa` (arm64, unsigned,
+  bundle id, CA) and emits a valid feed.
+* **Not verified:** no GitHub push/dispatch (no credentials on this host), no macOS/Xcode run, no
+  published release/feed, and no SideStore install/update on an iPhone.
+
 ## [0.1.11] — 2026-11-14
 
 Writeable Chats, real queue delivery, and bug-fix pass from phone use.
