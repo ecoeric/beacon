@@ -24,6 +24,8 @@ SideStore OTA release pipeline.
   `$(CURRENT_PROJECT_VERSION)` and verified after the Xcode build.
 * `docs/OTA.md`: audit, architecture, public-repo and private-source/public-mirror setup,
   SideStore instructions, routine commands, failure handling, security and unverified limits.
+* `scripts/install_sidestore_linux.sh`: one-time Linux/USB SideStore bootstrap using the pinned,
+  checksum-verified official `0.7.0-alpha` IPA and the existing AltServer-Linux-NG cache.
 
 ### Changed
 * Release builds are no longer cancelled by a newer push; PR builds still use cancellation to

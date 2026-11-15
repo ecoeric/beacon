@@ -66,10 +66,15 @@ done
 [ -f "$IPA" ] || die "IPA not found: $IPA"
 IPA="$(readlink -f "$IPA")"
 command -v unzip >/dev/null || die "unzip is required"
-unzip -l "$IPA" | grep -q 'Payload/Beacon.app/Beacon' \
+IPA_LIST="$(mktemp)"
+trap 'rm -f "$IPA_LIST"' EXIT
+unzip -Z1 "$IPA" > "$IPA_LIST"
+grep -qx 'Payload/Beacon.app/Beacon' "$IPA_LIST" \
     || die "$IPA does not contain Payload/Beacon.app/Beacon"
-unzip -l "$IPA" | grep -q 'Payload/Beacon.app/ca.crt' \
+grep -qx 'Payload/Beacon.app/ca.crt' "$IPA_LIST" \
     || die "$IPA is missing the bundled CA (Payload/Beacon.app/ca.crt)"
+rm -f "$IPA_LIST"
+trap - EXIT
 
 command -v idevice_id >/dev/null \
     || die "idevice_id is missing. Install: sudo apt install usbmuxd libimobiledevice-utils"
