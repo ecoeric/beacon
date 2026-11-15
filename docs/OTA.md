@@ -143,6 +143,21 @@ Recommended if the repository contains private infrastructure details.
 No Apple ID, certificate, provisioning profile or backend token belongs in GitHub. SideStore signs
 the unsigned IPA on the phone.
 
+### Install SideStore itself (only needed once)
+
+SideStore is not on the App Store. If it is not already installed, use the Linux/USB bootstrap:
+
+```bash
+cd ~/beacon
+./scripts/install_sidestore_linux.sh --check  # preflight, no password prompt
+./scripts/install_sidestore_linux.sh          # prompts for Apple ID/password/2FA
+```
+
+It downloads the pinned official SideStore `0.7.0-alpha` IPA, verifies its SHA-256, checks the
+paired iPhone and cached AltServer, then prompts for the free Apple ID/password/2FA in a real
+terminal. After it finishes, on the phone trust the developer app, enable Developer Mode, connect
+LocalDevVPN, open SideStore, sign in and refresh the `7 DAYS` counter. This is the only USB step.
+
 ## 5. Normal future updates
 
 ```bash
