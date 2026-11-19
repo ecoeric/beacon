@@ -1,14 +1,18 @@
 // SessionsView.swift
 // Beacon
 //
-// Read-only browser for Cherry Studio agent sessions and their visible transcript text.
-// Beacon never writes to the Cherry Studio database and cannot create a new chat; that stays
-// in Cherry Studio. This screen exists so the current and previous agent conversations can be
-// inspected from the phone.
+// Session picker and quick chat browser. The actual conversation UI lives in ChatView.swift;
+// this list is used both as the full-screen Chat tab's switcher and as the Agent tab's quick
+// browser sheet. Sending is supported for any existing session; creating a new chat still
+// belongs to Cherry Studio.
 
 import SwiftUI
 
 struct SessionsView: View {
+    /// When supplied, the list acts as a picker and dismisses after a selection. Otherwise the
+    /// selected transcript is shown in a sheet (the Agent tab's quick browser).
+    var onSelect: ((AgentSessionSummary) -> Void)? = nil
+
     @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss
     @State private var selected: AgentSessionSummary?
@@ -30,7 +34,12 @@ struct SessionsView: View {
                     } else {
                         ForEach(model.sessions) { session in
                             Button {
-                                selected = session
+                                if let onSelect {
+                                    onSelect(session)
+                                    dismiss()
+                                } else {
+                                    selected = session
+                                }
                             } label: {
                                 row(session)
                             }
@@ -38,7 +47,9 @@ struct SessionsView: View {
                         }
                     }
 
-                    Text("Read-only browser. Create new chats in Cherry Studio; Beacon does not write to its database.")
+                    Text(onSelect == nil
+                         ? "Tap a chat to open it. New chats are still created in Cherry Studio."
+                         : "Choose a chat to open it.")
                         .font(.beaconTiny)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -66,7 +77,7 @@ struct SessionsView: View {
                 }
             }
             .sheet(item: $selected) { session in
-                SessionTranscriptView(session: session)
+                ChatConversationView(session: session)
             }
         }
     }
@@ -96,171 +107,5 @@ struct SessionsView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .beaconCard()
-    }
-}
-
-struct SessionTranscriptView: View {
-    let session: AgentSessionSummary
-
-    @EnvironmentObject private var model: AppModel
-    @Environment(\.dismiss) private var dismiss
-    @State private var messages: [AgentChatMessage] = []
-    @State private var loading = true
-    @State private var error: String?
-    @State private var draft = ""
-    @State private var feedback: String?
-    @State private var sending = false
-
-    private var isCurrentSession: Bool {
-        if let current = model.agent?.session.id {
-            return session.id == current
-        }
-        return model.sessions.first?.id == session.id
-    }
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 10) {
-                        if loading {
-                            LoadingCard(lines: 5)
-                        } else if let error {
-                            ErrorBanner(message: error) {
-                                Task { await load() }
-                            }
-                        } else if messages.isEmpty {
-                            EmptyState(
-                                symbol: "text.bubble",
-                                title: "No visible messages",
-                                message: "This session has no user or assistant text yet."
-                            )
-                            .beaconCard()
-                        } else {
-                            ForEach(messages) { message in
-                                messageRow(message)
-                            }
-                        }
-                    }
-                    .padding(Theme.screenPadding)
-                    .padding(.bottom, 20)
-                }
-                .refreshable { await load() }
-
-                DividerLine()
-                composer
-            }
-            .beaconScreen()
-            .navigationTitle(session.name.isEmpty ? "Chat" : session.name)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
-            .task {
-                await load()
-                while !Task.isCancelled {
-                    try? await Task.sleep(for: .seconds(5))
-                    if Task.isCancelled { return }
-                    await load(showLoading: false)
-                }
-            }
-        }
-    }
-
-    private func load(showLoading: Bool = true) async {
-        if showLoading { loading = true }
-        error = nil
-        do {
-            messages = try await model.sessionMessages(sessionId: session.id)
-        } catch {
-            self.error = error.localizedDescription
-        }
-        loading = false
-    }
-
-    @ViewBuilder
-    private var composer: some View {
-        if isCurrentSession {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
-                    TextField("Message the active agent…", text: $draft, axis: .vertical)
-                        .font(.beaconBody)
-                        .lineLimit(1...4)
-                        .padding(9)
-                        .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    Button {
-                        send()
-                    } label: {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 28))
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(Theme.accent)
-                    .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || sending)
-                    .opacity(sending ? 0.45 : 1)
-                }
-                Text(feedback ?? "Sends as a normal user message to the active agent.")
-                    .font(.beaconTiny)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.horizontal, Theme.screenPadding)
-            .padding(.vertical, 8)
-            .background(Theme.surface)
-        } else {
-            Text("Read-only session. Open the current chat to send a message.")
-                .font(.beaconTiny)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity)
-                .padding(10)
-                .background(Theme.surface)
-        }
-    }
-
-    private func send() {
-        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty, !sending else { return }
-        sending = true
-        feedback = "Sending…"
-        Task {
-            let result = await model.sendChatMessage(sessionId: session.id, text: text)
-            if result.success {
-                draft = ""
-                try? await Task.sleep(for: .milliseconds(700))
-                await load(showLoading: false)
-            }
-            feedback = result.text
-            sending = false
-        }
-    }
-
-    private func messageRow(_ message: AgentChatMessage) -> some View {
-        let isUser = message.role == "user"
-        return HStack {
-            if isUser { Spacer(minLength: 28) }
-            VStack(alignment: isUser ? .trailing : .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    Text(isUser ? "You" : (message.model ?? "Agent"))
-                        .font(.beaconTiny)
-                        .foregroundStyle(.secondary)
-                    Text(Format.age(message.createdAt))
-                        .font(.beaconTiny)
-                        .foregroundStyle(.tertiary)
-                }
-                Text(message.text.isEmpty ? "—" : message.text)
-                    .font(.beaconBody)
-                    .foregroundStyle(.primary)
-                    .multilineTextAlignment(isUser ? .trailing : .leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(10)
-                    .background(
-                        isUser ? Theme.accent.opacity(0.16) : Theme.surfaceElevated,
-                        in: RoundedRectangle(cornerRadius: Theme.innerRadius, style: .continuous)
-                    )
-            }
-            if !isUser { Spacer(minLength: 28) }
-        }
-        .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
     }
 }

@@ -3,6 +3,29 @@
 All meaningful implementation changes, bug fixes, architectural changes and decisions.
 Newest first. Dates are UTC.
 
+## [0.1.13] — 2026-11-15
+
+Full agent chat tab.
+
+### Added
+* New **Chat** tab with a full conversation UI, session switcher, day separators, auto-scroll,
+  multiline composer and 4-second transcript polling.
+* Chat can send to any existing session, not just the current one; a note warns when a message
+  will resume an older chat.
+* The Agent tab's Chats sheet now uses the same conversation UI instead of a separate read-only
+  transcript view.
+* `Format.chatDay` and the small SwiftUI mock surface needed by `ScrollViewReader` / `withAnimation`.
+
+### Fixed
+* `install_ipa_linux.sh` and `install_sidestore_linux.sh` no longer fail the `unzip | grep` check
+  under `set -o pipefail` (use a temporary file list).
+* Added `ChatView.swift` to the generated Xcode project and its source validation.
+
+### Verified locally
+* 21 app files + 2 test files typecheck against the mock frameworks.
+* iOS project validation passes with 22 app sources; 24 Swift files parse.
+* Not built or installed yet: the new IPA must come from CI or a local Xcode build.
+
 ## [0.1.12] — 2026-11-14
 
 SideStore OTA release pipeline.

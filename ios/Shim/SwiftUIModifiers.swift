@@ -67,6 +67,7 @@ public extension View {
     func onChange<V: Equatable>(of value: V, _ action: @escaping (V, V) -> Void) -> Self { self }
     func task(_ action: @escaping () async -> Void) -> Self { self }
     func task<ID: Equatable>(id: ID, _ action: @escaping () async -> Void) -> Self { self }
+    func id<ID: Hashable>(_ id: ID) -> Self { self }
     func refreshable(_ action: @escaping () async -> Void) -> Self { self }
     func focused(_ binding: FocusState<Bool>) -> Self { self }
     func focused<Value: Equatable>(_ binding: FocusState<Value>, equals value: Value) -> Self { self }

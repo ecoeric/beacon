@@ -619,3 +619,26 @@ public final class ImageRenderer<Content: View> {
     public var isOpaque: Bool = false
     public var uiImage: UIImage? { nil }
 }
+
+// MARK: - Scroll coordination
+
+public struct ScrollViewReader<Content: View>: View {
+    public init(@ViewBuilder content: @escaping (ScrollViewProxy) -> Content) {}
+    public var body: Never { fatalError() }
+}
+
+public struct ScrollViewProxy {
+    public nonisolated init() {}
+    public func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {}
+}
+
+
+public struct Animation: Equatable {
+    public nonisolated static let `default` = Animation()
+    public nonisolated static func easeOut(duration: Double) -> Animation { Animation() }
+}
+
+@MainActor
+public func withAnimation<Result>(_ animation: Animation? = nil, _ body: () throws -> Result) rethrows -> Result {
+    try body()
+}

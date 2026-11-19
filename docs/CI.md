@@ -108,10 +108,11 @@ unsigned, 706 KB) and the simulator test job is green. The Linux-side typecheck 
 passes; it previously found a real compile blocker (a `Section` with more than ten direct
 children), which was fixed.
 
-The OTA release job and SideStore source feed are newer than that first build. They have been
-locally validated with `scripts/validate_ota.sh`, `actionlint` and the existing real IPA, but the
-new publish path has **not** executed on GitHub yet; this host has no GitHub credentials. See
-[`OTA.md`](OTA.md#limits-and-unverified-parts).
+The OTA release job and SideStore source feed are newer than that first build. Run 6 executed the
+whole path: it published `v1.0.6`, updated the fixed `beacon-source` release, and the public
+`apps.json` plus IPA were fetched and checksum-verified afterwards. The remaining unverified step
+is SideStore's on-device install/update, which is blocked on this phone by AltServer-suffixed
+bundle identifiers. See [`OTA.md`](OTA.md#limits-and-unverified-parts).
 
 If a build fails, download `Beacon-unsigned-ipa` (which contains `build.log`) and fix the reported
 error. No release or source-feed update occurs for a failed build.

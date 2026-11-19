@@ -46,16 +46,17 @@ Documentation: `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/OPERATIONS.md`,
 
 Three routes, in order of convenience:
 
-- **SideStore OTA (routine updates):** GitHub Actions builds and publishes an unsigned IPA plus a
-  stable SideStore source feed. Add the source once, then tap **Update** in SideStore. No USB
-  after the one-time SideStore setup — see `docs/OTA.md`.
-- **Borrowed Mac:** open `ios/Beacon.xcodeproj` and Run (see `docs/INSTALL_IPHONE.md`).
-- **Linux-only USB fallback:** GitHub Actions builds an unsigned IPA
+- **Linux-only USB (current routine on this phone):** GitHub Actions builds an unsigned IPA
   (`.github/workflows/ios-build.yml`), and `scripts/install_ipa_linux.sh` signs and installs it
   with a free Apple ID (see `docs/LINUX_IPA_INSTALL.md`).
+- **SideStore OTA (works at the feed level; blocked on this phone):** GitHub Actions publishes the
+  unsigned IPA and a stable SideStore source feed. Once both apps have unsuffixed bundle IDs,
+  add the source and tap **Update** in SideStore. The current AltServer-installed copies carry a
+  team-ID suffix that SideStore cannot match; see `docs/OTA.md`.
+- **Borrowed Mac:** open `ios/Beacon.xcodeproj` and Run (see `docs/INSTALL_IPHONE.md`).
 
-`docs/CI.md` covers the workflow and its artifacts. Nothing in this repository pushes, signs or
-distributes the app automatically; the final signing/install is an explicit user action.
+`docs/CI.md` covers the workflow and its artifacts. CI publishes the unsigned IPA and SideStore
+feed automatically; signing and installation on the phone remain explicit user actions.
 
 ## Status vocabulary
 
@@ -69,10 +70,10 @@ in `DASHBOARD_IMPLEMENTATION.md` refers to code that exists and tests that were 
 | `pytest backend/tests` | 164 passed |
 | `scripts/smoke_test.py` (live Pi-hole / Minecraft / Docker / agent) | 58 checks passed |
 | `cd ios && swift test` (Linux Swift 6, live-captured fixtures) | 13 passed |
-| `swiftc -parse` on iOS sources | 23 files parsed |
-| `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 20 app files + 2 test files typecheck, 0 errors |
-| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests) | **succeeded** for `a7a8021`; unsigned arm64 IPA (771 KB), both jobs green. The 0.1.12 release/publish path is not run yet — this host has no GitHub credentials, so no new IPA/release/feed exists |
-| `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | prepared; not executed (no iPhone attached to this host) |
+| `swiftc -parse` on iOS sources | 24 files parsed |
+| `scripts/typecheck_ios_views.sh` (real Swift 6 compiler, mock SwiftUI/UIKit/Combine/XCTest) | 21 app files + 2 test files typecheck, 0 errors |
+| `.github/workflows/ios-build.yml` (Xcode 26.2 unsigned IPA + simulator tests + publish) | **succeeded** through run 6 (`aa9a794`); unsigned arm64 IPA (815 KB) published as release `v1.0.6`, SideStore feed public and verified |
+| `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | executed: Beacon 1.0 installed on the iPhone over USB. AltServer appended its team ID to the installed bundle identifier; no iPhone is attached to this host right now |
 | `scripts/validate_ios_project.py` | project structure + version placeholders + 1024px app icon checks pass |
 | `scripts/validate_ota.sh` | 8 source-generator tests pass; icon reproducible; workflow structure valid |
 | `actionlint` + `shellcheck` | workflow expressions and embedded shell pass |
@@ -91,8 +92,17 @@ screenshots expire automatically after seven days while milestone summaries rema
 The native project (Xcode project, SwiftUI app, pinned-TLS client, tests) is complete and
 version-controlled here. Every app source typechecks with the real Swift compiler against mock
 SwiftUI/UIKit modules; that is compiler validation, **not** an iOS build. The GitHub Actions
-workflow builds an unsigned arm64 IPA with Xcode 26.2 and runs simulator tests; the Linux install
-script signs and installs that IPA with a free Apple ID. The first CI run found two blockers
-(duplicated resource paths and an ambiguous simulator destination); after fixing them, the rerun
-**succeeded** and produced `Beacon-unsigned.ipa` (arm64, unsigned, bundled CA present). No
-installation, signing or distribution to a phone has been performed yet.
+workflow builds an unsigned arm64 IPA with Xcode 26.2, runs simulator tests, and publishes the
+versioned GitHub Release plus the SideStore feed. Run 6 built and published `v1.0.6`; the feed at
+`https://github.com/ecoeric/beacon/releases/download/beacon-source/apps.json` returns a valid
+source with a checksum-verified IPA.
+
+The Linux USB script has also been exercised: Beacon 1.0 is installed on the iPhone, signed with a
+free Apple ID through AltServer-Linux-NG. That path remains the working routine update method on
+this phone. The SideStore feed is public and valid, but SideStore cannot update or resign the
+installed apps because their bundle identifiers carry an AltServer-appended team suffix
+(`dev.ericserver.beacon.CS7ALNH4T4`, `com.SideStore.SideStore.CS7ALNH4T4`) while SideStore looks
+for the unsuffixed identifiers. Fixing that needs a one-time clean reinstall of both apps with
+unsuffixed IDs; retrying SideStore's resign action cannot fix it.
+
+The full Chat tab is newer than the installed 1.0 build and will arrive in the next CI build.

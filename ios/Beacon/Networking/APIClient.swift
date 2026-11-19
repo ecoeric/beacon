@@ -261,7 +261,7 @@ struct APIClient {
         return try decoder.decode([AgentSessionSummary].self, from: data)
     }
 
-    func agentSessionMessages(sessionId: String, limit: Int = 100) async throws -> [AgentChatMessage] {
+    func agentSessionMessages(sessionId: String, limit: Int = 200) async throws -> [AgentChatMessage] {
         let data = try await request(
             "GET", "agent/sessions/\(sessionId)/messages",
             query: [URLQueryItem(name: "limit", value: "\(limit)")]

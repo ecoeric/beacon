@@ -13,10 +13,12 @@ are required for this step.
 
 Target device: **iPhone 16e, iOS 26.2**. The app deployment target is iOS 17.0.
 
-**Compatibility note:** the maintained NG fork documents iOS 26.4+/27 signing fixes and was tested
-by its maintainer on iOS 27.0, not specifically 26.2. iOS 26.2 is expected to work, but this exact
-combination has not been verified on this host (no iPhone is attached). If it fails, capture the
-AltServer error and stop after one or two attempts rather than retrying repeatedly.
+**Compatibility note:** this path has been exercised on this host: AltServer-Linux-NG signed and
+installed Beacon 1.0 on the iPhone 16e running iOS 26.2. AltServer appends its Apple team ID to the
+installed bundle identifier (`dev.ericserver.beacon.CS7ALNH4T4`). That is fine for USB updates — the
+next run targets the same identifier — but it is why SideStore's in-place update cannot find the
+app; see [`OTA.md`](OTA.md). If a future install fails, capture the AltServer error and stop after
+one or two attempts rather than retrying repeatedly.
 
 ---
 

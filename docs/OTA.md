@@ -2,13 +2,17 @@
 
 This document covers the one-tap iPhone update path: GitHub Actions builds Beacon, publishes an
 unsigned IPA and a SideStore/AltStore source feed, and SideStore signs/installs the update on the
-phone. It replaces the USB/AltServer step for routine updates.
+phone. Once the phone has a clean SideStore installation, it replaces the USB/AltServer step for
+routine updates.
 
-> **Current blocker on this host:** the GitHub repository is not publicly readable from here
-> (`https://api.github.com/repos/ecoeric/beacon` returns `404` without credentials), and this
-> machine has no GitHub credentials or SSH key. The workflow and feed generator are implemented
-> and locally validated, but the real macOS build, GitHub Release publication and a SideStore
-> install have **not** been run. See [Limits](#limits-and-unverified-parts).
+> **Current status:** the pipeline is live through `v1.0.6`. GitHub Actions built the IPA,
+> published the versioned release, and the public feed is served at
+> `https://github.com/ecoeric/beacon/releases/download/beacon-source/apps.json`. The remaining
+> blocker is specific to this iPhone: SideStore and Beacon were installed with an AltServer-
+> appended team suffix in their bundle identifiers, so SideStore's in-place update/resign step
+> looks for an app that does not exist. The USB installer is the working update path until both
+> apps are reinstalled once with unsuffixed identifiers. See
+> [Limits](#limits-and-unverified-parts).
 
 ## 1. Audit: the old process
 
@@ -205,16 +209,25 @@ Add it once:
 
 ### One-time migration from the AltServer/USB install
 
-SideStore and AltServer are different signers. If the copy currently on the phone was installed by
-`scripts/install_ipa_linux.sh`, iOS may refuse an in-place update from SideStore because the signing
-certificate/profile does not match. That is a one-time migration, not a per-update problem:
+SideStore and AltServer are different signers, so an in-place switch may require deleting the old
+copy once. On this phone there is a second problem: the installed identifiers are
+`dev.ericserver.beacon.CS7ALNH4T4` and `com.SideStore.SideStore.CS7ALNH4T4`. The suffix is the
+Apple team ID that AltServer appended when installing. SideStore's update and self-resign code
+looks for the base identifiers, so it reports “could not be found” and cannot repair the install.
 
-1. Add the source and install Beacon **from SideStore** once.
-2. If iOS reports a signing/provisioning error over the old copy, delete the old Beacon app and
-   install the SideStore copy. Re-enter the server URL/token in Beacon if the data is not preserved
-   (the Keychain item often survives, but do not rely on it).
-3. Every later version is signed by the same SideStore certificate, so **Updates → Update**
+Do **not** keep retrying “Resign SideStore” — it cannot match either installed identifier. A
+working OTA setup needs a one-time clean reinstall:
+
+1. Remove the suffixed Beacon and SideStore apps.
+2. Reinstall SideStore with a signer that keeps `com.SideStore.SideStore`, not an AltServer
+   append-team-ID install.
+3. Add the source and install Beacon from SideStore. If the source installs a suffixed Beacon,
+   SideStore is still appending its team ID and the same mismatch will return.
+4. Every later version is signed by the same SideStore certificate, so **Updates → Update**
    preserves app data and needs no USB.
+
+This cleanup is optional if USB updates are acceptable: `scripts/install_ipa_linux.sh` updates the
+existing suffixed Beacon in place with the same AltServer signing identity.
 
 A direct add link is:
 
@@ -276,14 +289,13 @@ verification all reached their assertions. That validates the commands, not GitH
 
 These are real limitations, not assumptions:
 
-* **No end-to-end run on this host.** There is no GitHub authentication and no macOS/Xcode here.
-  The workflow cannot be pushed, dispatched or observed; no GitHub Release or public feed exists
-  yet.
-* **No iPhone is attached**, so SideStore installation/update was not exercised. The feed and IPA
-  are structurally valid and the existing IPA passed the generator's checks, but only a real
-  SideStore update proves the final step.
-* The repository is currently private/404 without credentials. Choose Option A or B before
-  expecting SideStore to fetch anything.
+* **The on-device signing step is not verified end to end.** The GitHub build, release and public
+  feed have run; the feed and IPA have been fetched and checksum-verified. SideStore has not
+  installed or updated Beacon on this phone because of the bundle-ID mismatch described above.
+* **No iPhone is attached to this host right now.** Re-running the USB installer requires the
+  phone to be unlocked, trusted and visible to `idevice_id -l`.
+* The AltServer-installed bundle identifiers carry a team suffix. SideStore expects unsuffixed
+  identifiers, so OTA update/resign cannot work until both apps are cleanly reinstalled once.
 * The app icon is new and was generated and validated as a 1024x1024 PNG, but its appearance in a
   real Xcode build has not been visually verified.
 * SideStore still requires its one-time setup, LocalDevVPN and periodic 7-day refresh. "One tap"

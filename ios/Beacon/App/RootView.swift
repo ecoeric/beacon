@@ -13,6 +13,7 @@ struct RootView: View {
 
     enum Tab: Hashable {
         case dashboard
+        case chat
         case agent
         case progress
         case server
@@ -25,6 +26,10 @@ struct RootView: View {
                     DashboardView(onOpenAgent: { selection = .agent })
                         .tabItem { Label("Home", systemImage: "house") }
                         .tag(Tab.dashboard)
+
+                    ChatView()
+                        .tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }
+                        .tag(Tab.chat)
 
                     AgentView()
                         .tabItem { Label("Agent", systemImage: "sparkles") }

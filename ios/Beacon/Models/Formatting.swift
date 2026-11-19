@@ -83,6 +83,19 @@ enum Format {
         return formatter.string(from: Date(timeIntervalSince1970: timestamp))
     }
 
+    /// Day separator used by the full chat transcript.
+    static func chatDay(_ timestamp: Double, now: Date = Date()) -> String {
+        let date = Date(timeIntervalSince1970: timestamp)
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) { return "Today" }
+        if calendar.isDateInYesterday(date) { return "Yesterday" }
+        let formatter = DateFormatter()
+        formatter.dateFormat = calendar.isDate(date, equalTo: now, toGranularity: .year)
+            ? "EEEE, d MMM"
+            : "d MMM yyyy"
+        return formatter.string(from: date)
+    }
+
     static func dayAndTime(_ timestamp: Double?) -> String {
         guard let timestamp else { return "—" }
         let formatter = DateFormatter()

@@ -206,9 +206,10 @@ Documentation endpoints are disabled in production (`BEACON_ENABLE_DOCS=0`).
 * `ios/Beacon/Models` — Codable mirrors of the API, Foundation only.
 * `ios/Beacon/Networking` — `APIClient`, `PinnedSession` (CA anchor + SPKI pin, DER parser),
   `Keychain`, `AppSettings`, `ServerConfiguration`.
-* `ios/Beacon/App` — `BeaconApp`, `RootView` (four tabs + onboarding gate), `AppModel`.
+* `ios/Beacon/App` — `BeaconApp`, `RootView` (five tabs + onboarding gate), `AppModel`.
 * `ios/Beacon/Design` — `Theme`, reusable components.
-* `ios/Beacon/Features` — Setup, Dashboard, Agent, Milestones (+ viewer), Server, Settings.
+* `ios/Beacon/Features` — Setup, Dashboard, Agent (status + full Chat), Milestones (+ viewer),
+  Server, Settings.
 * `ios/SharedTests` — decoding/formatting tests shared with the Linux SwiftPM package.
 * `ios/BeaconTests/SnapshotTests` — renders four screens to PNG on macOS (live or fixture mode)
   and attaches them to the `.xcresult`.
@@ -249,8 +250,8 @@ systemd
 | Transport/auth | real Uvicorn TLS server + generated CA in tests | verified trust and rejection |
 | Live system | `scripts/smoke_test.py` against real Pi-hole/Minecraft/Docker/agent | 58 checks passed |
 | iOS logic | Swift 6 on Linux: compile + 13 decoding/formatting tests against live-captured fixtures | 13 passed |
-| iOS syntax | `swiftc -parse` on all 23 Swift files | parsed |
-| iOS SwiftUI typecheck | real Swift 6 compiler against mock SwiftUI/UIKit/Combine modules (`scripts/typecheck_ios_views.sh`) | 20 app files + 2 test files, 0 errors |
+| iOS syntax | `swiftc -parse` on all 24 Swift files | parsed |
+| iOS SwiftUI typecheck | real Swift 6 compiler against mock SwiftUI/UIKit/Combine modules (`scripts/typecheck_ios_views.sh`) | 21 app files + 2 test files, 0 errors |
 | iOS SDK build | GitHub Actions `macos-26` runner with Xcode 26.2 (`docs/CI.md`) | first run found two blockers; fixes committed, rerun pending |
 | Xcode project | `pbxproj` parser + cross-checks | 22 checks passed |
 | Retention | live drill via the systemd unit (aged screenshot) | deleted, 410 confirmed, history kept |

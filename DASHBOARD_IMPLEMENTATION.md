@@ -65,13 +65,13 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | 2.18 | Pi-hole monitoring and blocking control | Implemented |
 | 2.19 | Minecraft monitoring | Implemented (TPS/MSPT unavailable, stated) |
 | 2.19a | KSP / Luna Multiplayer monitoring | Implemented read-only (status JSON, process, UDP 8800; no privileged controls) |
-| 2.19b | Agent chat browser and writeable composer | Implemented (read-only transcript; sends one Cherry delivery row; legacy queue auto-forwarded) |
+| 2.19b | Agent Chat tab, session switcher and writeable composer | Implemented (full transcript UI; sends to any visible session as one Cherry delivery row; legacy queue auto-forwarded) |
 | 2.20 | Minecraft controls with safeguards | Implemented (all channels tested against controlled instances; the live manually-started instance is intentionally not restarted) |
 | 2.21 | Activity feed / in-app notifications | Implemented (push: Planned) |
 | 2.22 | Audit trail | Implemented |
 | 2.23 | iOS design system | Implemented |
 | 2.24 | iOS networking, pinning, Keychain | Implemented (typechecked + tested on Linux) |
-| 2.25 | iOS screens (Home, Agent, Progress, Server, Settings, Setup) | Implemented (source complete; CI Xcode 26.2 build prepared) |
+| 2.25 | iOS screens (Home, Chat, Agent, Progress, Server, Settings, Setup) | Implemented (source complete; last published CI build is v1.0.6, Chat awaits the next build) |
 | 2.26 | iOS snapshot screenshot test | Implemented (requires macOS/Xcode to run) |
 | 2.27 | Validation harnesses | Implemented |
 | 2.28 | Contract, security and backup guardrails | Implemented |
@@ -449,16 +449,16 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 |---|---|---|
 | Setup | `Features/Setup/OnboardingView.swift` | server address, token, optional pin, validated before saving |
 | Home | `Features/Dashboard/DashboardView.swift` | agent hero card, service rows, host tiles, latest milestone 2×2 gallery, activity |
-| Agent | `Features/Agent/AgentView.swift` | status card + Details disclosure, Status sheet, composer (Send/Continue), recent messages + cancel, separate interrupt card/sheet |
+| Chat | `Features/Agent/ChatView.swift` | full conversation, session switcher, day separators, auto-scroll, multiline composer, 4 s transcript polling |
+| Agent | `Features/Agent/AgentView.swift` | status card + Details disclosure, Status sheet, composer (Send/Continue), chat browser, recent messages + cancel, separate interrupt card/sheet |
 | Progress | `Features/Milestones/MilestonesView.swift` | milestone history, 2×2 galleries, changed-files disclosure, retention note, full-size viewer |
 | Server | `Features/Server/ServerView.swift` | host tiles + details, disks, containers, Pi-hole card + statistics + blocking toggle, Minecraft card + logs + controls |
 | Settings | `Features/Settings/SettingsView.swift` | connection test, identity/scopes, certificate mode, backend capabilities, disconnect |
 
-* **Test**: `swiftc -parse` for all 23 Swift files plus a full typecheck of 20 app files and both
+* **Test**: `swiftc -parse` for all 24 Swift files plus a full typecheck of 21 app files and both
   Xcode test files against mock SwiftUI/UIKit/Combine/XCTest modules (real Swift compiler). The Xcode build/simulator run is
-  prepared in `.github/workflows/ios-build.yml`. The first run executed and exposed two
-  blockers (duplicated resource paths and an ambiguous simulator destination); both are fixed and
-  a rerun is pending.
+  defined in `.github/workflows/ios-build.yml`; run 6 passed and published v1.0.6. The Chat tab is
+  newer than that build and gets its real Xcode compile in the next workflow run.
 * **Limitations**: no iPad layout (iPhone portrait only), no widgets, no watch app.
 
 ## 2.26 iOS snapshot screenshot test
@@ -480,8 +480,8 @@ SQLite database, one daily timer. No new daemons, brokers, agents or monitoring 
 | Backend unit/integration tests | `cd backend && .venv/bin/python -m pytest tests -q` | 164 passed |
 | Live end-to-end checks | `backend/.venv/bin/python scripts/smoke_test.py` | 58 checks passed |
 | Swift model/network tests + compile | `sudo docker run --rm -v "$PWD/ios:/work" -w /work swift:6.0 swift test` | 13 passed |
-| Swift syntax (all 23 files) | `scripts/validate_ios.sh` step 1 | parsed |
-| SwiftUI typecheck (real compiler, mock frameworks) | `scripts/typecheck_ios_views.sh` | 20 app files + 2 test files, 0 errors; found and fixed a 13-child `Section` |
+| Swift syntax (all 24 files) | `scripts/validate_ios.sh` step 1 | parsed |
+| SwiftUI typecheck (real compiler, mock frameworks) | `scripts/typecheck_ios_views.sh` | 21 app files + 2 test files, 0 errors; found and fixed a 13-child `Section` |
 | Xcode project structure | `uv run --with pbxproj python scripts/validate_ios_project.py` | 22 checks passed |
 | Xcode 26.2 unsigned IPA | `.github/workflows/ios-build.yml` (`macos-26`) | **succeeded**; unsigned arm64 IPA + bundled CA verified |
 | Linux sign + install | `scripts/install_ipa_linux.sh` + `docs/LINUX_IPA_INSTALL.md` | succeeded on iPhone 16e / iOS 26.2 |
